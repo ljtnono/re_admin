@@ -4,29 +4,16 @@ const resolve = dir => {
   return path.join(__dirname, dir)
 };
 
-const BASE_URL = process.env.NODE_ENV === 'production'
-  ? '/admin/'
-  : '/';
+// vue-cli 配置项
+const BASE_URL = process.env.NODE_ENV === 'production' ? '/' : '/';
 
 module.exports = {
   publicPath: BASE_URL,
-  lintOnSave: false,
   chainWebpack: config => {
     config.resolve.alias
-      .set('@', resolve('src'))
-      .set('_c', resolve('src/components'))
-  },
-  devServer: {
-    port: 8888,
-    proxy: {
-      '/api': {
-        target: 'http://127.0.0.1:8080/',
-        ws: true,
-        changeOrigin: true,
-        pathRewrite:{
-          '^/api':''
-        }
-      }
-    }
+      .set('@s', resolve('src'))
+      .set('@c', resolve('src/components'))
+      .set('@a', resolve('src/assets'))
+      .set('@v', resolve('src/view'))
   }
 };

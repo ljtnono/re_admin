@@ -1,36 +1,17 @@
-import Vue from 'vue'
-import App from './App'
-import router from './router'
-import store from './store'
-import iView from 'iview'
-import moment from "moment";
-import config from '@/config'
-import mavonEditor from 'mavon-editor'
-import './index.less'
-import '@/assets/icons/iconfont.css'
-import 'mavon-editor/dist/css/index.css'
+import Vue from "vue"
+import App from "./App.vue"
+import ElementUI from "element-ui";
+import axios from "axios";
+import VueAxios from "vue-axios";
+import "element-ui/lib/theme-chalk/index.css";
 
-Vue.use(mavonEditor);
-Vue.use(iView);
+Vue.config.productionTip = false
 
-/**
- * @description 生产环境关掉提示
- */
-Vue.config.productionTip = false;
 
-/**
- * @description 全局注册应用配置
- */
-Vue.prototype.$config = config;
-
-// 配置全局过滤器
-Vue.filter("timeFormat", function (time) {
-  return moment(time).format("YYYY-MM-DD");
-});
+// 使用ElementUI
+Vue.use(ElementUI);
+Vue.use(VueAxios, axios);
 
 new Vue({
-  el: '#app',
-  router,
-  store,
-  render: h => h(App)
-});
+  render: h => h(App),
+}).$mount('#app');
