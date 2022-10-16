@@ -1,0 +1,40 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: rootelement
+  name: re-backend-deployment
+spec:
+  selector:
+    matchLabels:
+      app: re-backend
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: re-backend
+    spec:
+      containers:
+        - name: re-backend
+          image: ljtnono/re-backend:<VERSION>
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: http
+
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: re-backend-service
+  namespace: rootelement
+spec:
+  selector:
+    app: re-backend
+  type: NodePort
+  ports:
+    - port: 99
+      targetPort: 99
+      nodePort: 30099
