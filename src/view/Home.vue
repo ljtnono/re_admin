@@ -1,8 +1,8 @@
 <template>
   <div class="container flex flex-direction-row">
-    <Navigation/>
-    <Header />
-    <Main />
+    <Navigation :collapseStatus="collapseStatus"/>
+    <Header/>
+    <Main/>
   </div>
 </template>
 
@@ -10,11 +10,12 @@
 import Header from '@c/Header.vue';
 import Navigation from '@c/Navigation.vue';
 import Main from '@c/Main.vue'
+
 export default {
   name: 'Home',
   data() {
     return {
-
+      collapseStatus: false
     }
   },
   components: {
@@ -22,9 +23,7 @@ export default {
     Navigation,
     Main
   },
-  methods: {
-
-  } 
+  methods: {}
 }
 </script>
 

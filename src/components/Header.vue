@@ -1,13 +1,13 @@
 <template>
   <div id="header">
     <div class="header-bar flex flex-direction-row">
-      <a type="text" href="javascript:;" class="nav-trigger-a flex  flex-align-items-center">
+      <a type="text" href="javascript:;" class="nav-trigger-a flex  flex-align-items-center" @click="collapseMenu()">
         <i class="el-icon-s-fold" />
       </a>
       <div class="custom-bread-crumb"></div>
       <div class="custom-content-con"></div>
     </div>
-  </div> 
+  </div>
 </template>
 
 <script>
@@ -19,10 +19,13 @@ export default {
     }
   },
   components: {
+
   },
   methods: {
-
-  } 
+    collapseMenu() {
+      this.$emit("")
+    }
+  }
 }
 </script>
 

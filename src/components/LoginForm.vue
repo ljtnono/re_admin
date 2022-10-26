@@ -5,16 +5,26 @@
       <span>欢迎登录</span>
     </div>
     <!--登录表单-->
-    <el-form class="login-form" ref="loginForm" :model="loginForm" :rule="rules">
+    <el-form class="login-form" :model="loginForm" :rules="rules" ref="loginForm">
+      <!-- 用户名 -->
       <el-form-item prop="username">
         <el-input class="input-text fr" v-model="loginForm.username" prefix-icon="el-icon-user-solid"
-          placeholder="请输入用户名" clearable maxlength="50" />
+                  placeholder="请输入用户名" clearable maxlength="50"/>
       </el-form-item>
+      <!-- 密码 -->
       <el-form-item prop="password">
-        <el-input class="input-password fr" prefix-icon="el-icon-lock" v-model="loginForm.password" placeholder="请输入密码"
-          show-password clearable />
+        <el-input class="input-password fr" prefix-icon="el-icon-lock" v-model="loginForm.password"
+                  placeholder="请输入密码" show-password clearable/>
       </el-form-item>
-      <el-button class="btn-submit" type="primary" @click="submitForm">登录</el-button>
+      <!-- 验证码 -->
+      <el-form-item prop="verifyCode">
+        <el-input class="input-password fl" v-model="loginForm.verifyCode" style="width: 200px"/>
+        <img class="fr" style="display: inline-block; width: 20px; height: 20px" src=""/>
+      </el-form-item>
+      <!-- 登录按钮 -->
+      <el-form-item>
+        <el-button class="btn-submit" type="primary" @click="submitForm('loginForm')">登录</el-button>
+      </el-form-item>
     </el-form>
   </el-card>
 </template>
@@ -26,40 +36,45 @@ export default {
   name: 'LoginForm',
   data() {
     return {
+      verifyCodeKey: "",
       loginForm: {
         username: "",
-        password: ""
+        password: "",
+        verifyCode: ""
       },
       rules: {
         username: [
-          { required: true, message: '请输入用户名', trigger: 'blur' }
+          {required: true, message: '请输入用户名', trigger: 'blur'},
+          {min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur'}
         ],
         password: [
-          { required: true, message: '请输入用户名', trigger: 'blur' }
+          {required: true, message: '请输入密码', trigger: 'blur'},
+          {min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur'}
+        ],
+        verifyCode: [
+          {required: true, message: '请输入验证码', trigger: 'blur'}
         ]
       }
     }
   },
-  computed: {
-
-  },
+  computed: {},
   methods: {
-    submitForm() {
-      this.$refs.loginForm.validate((valid, fields) => {
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        // 校验成功，请求登录接口
         if (valid) {
           router.push({
             name: "Home"
-          });
+          })
+          return true;
         } else {
-          console.log('error submit!!');
+          // 校验失败，弹出错误消息
           return false;
         }
       });
     }
   },
-  props: {
-
-  },
+  props: {},
 }
 </script>
 

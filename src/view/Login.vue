@@ -10,16 +10,12 @@ import LoginForm from '@c/LoginForm'
 export default {
   name: 'Login',
   data() {
-    return {
-      
-    }
+    return {}
   },
   components: {
     LoginForm
   },
-  methods: {
-
-  }
+  methods: {}
 }
 
 </script>

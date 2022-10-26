@@ -16,8 +16,11 @@ module.exports = {
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
     "indent": [2, 2],
+    // 关闭组件名必须多个单词的限制
     "vue/multi-word-component-names": "off",
+    // 关闭注册组件未使用会报错的限制
     "vue/no-unused-components": "off",
+    // 关闭未使用变量报错的限制
     "no-unused-vars": "off"
   }
 };
