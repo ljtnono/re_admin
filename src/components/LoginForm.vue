@@ -7,17 +7,17 @@
     <!--登录表单-->
     <el-form class="login-form" :model="loginForm" :rules="rules" ref="loginForm">
       <!-- 用户名 -->
-      <el-form-item prop="username">
+      <el-form-item prop="username" class="mb30">
         <el-input class="input-text fr" v-model="loginForm.username" prefix-icon="el-icon-user-solid"
                   placeholder="请输入用户名" clearable maxlength="50"/>
       </el-form-item>
       <!-- 密码 -->
-      <el-form-item prop="password">
+      <el-form-item prop="password" class="mb30">
         <el-input class="input-password fr" prefix-icon="el-icon-lock" v-model="loginForm.password"
                   placeholder="请输入密码" show-password clearable/>
       </el-form-item>
       <!-- 验证码 -->
-      <el-form-item prop="verifyCode">
+      <el-form-item prop="verifyCode" class="mb30">
         <el-input class="input-password fl mr20" placeholder="请输入验证码" v-model="loginForm.verifyCode" style="width: 200px"/>
         <img class="verify-code-img fl"  :src="verifyCodeImageUrl" @click="refresh()"/>
       </el-form-item>
@@ -30,6 +30,8 @@
 </template>
 
 <script>
+import {PASSWORD_REGEX, USERNAME_REGEX} from "@/constant/regexConstant";
+
 export default {
   name: 'LoginForm',
   data() {
@@ -43,11 +45,11 @@ export default {
       rules: {
         username: [
           {required: true, message: '请输入用户名', trigger: 'blur'},
-          {min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur'}
+          {pattern: USERNAME_REGEX, message: '用户名为4-20英文数字字符串', trigger: 'blur' }
         ],
         password: [
           {required: true, message: '请输入密码', trigger: 'blur'},
-          {min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur'}
+          {pattern: PASSWORD_REGEX, message: '密码为大写字母和小写字母，数字和(，,。.+=[]）中的一种，并且长度在8-20位之间', trigger: 'blur'}
         ],
         verifyCode: [
           {required: true, message: '请输入验证码', trigger: 'blur'}
