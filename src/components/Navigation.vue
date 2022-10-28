@@ -13,18 +13,22 @@
         <img class="nav-logo-max" src="@a/images/logo.png"/>
         <img class="nav-logo-min" src="@a/images/logo-min.png" style="display: none;"/>
       </div>
+      <!-- 工作台 -->
+      <el-menu-item style="text-align: center; cursor: pointer">
+        <a href="/admin/home" >工作台</a>
+      </el-menu-item>
       <!-- 循环渲染菜单 -->
       <div v-for="(m1, i1) in menuList" :key="m1">
         <!-- 包含子菜单 -->
         <div v-if="m1.subMenu !== null && m1.subMenu !== undefined">
-          <el-submenu :index="i1" >
-            <template slot="title" >
-                <i class="el-icon-location "  />
-                <span style="margin-left: 15px" v-show="!collapseStatus">{{ m1.menuName }}</span>
+          <el-submenu :index="i1">
+            <template slot="title">
+              <i class="el-icon-location "/>
+              <span style="margin-left: 15px" v-show="!collapseStatus">{{ m1.menuName }}</span>
             </template>
             <div v-for="(m2, i2) in m1.subMenu" :index="i1-i2" :key="m2">
               <el-menu-item>
-                <a class="ml30" :href="m2.url" > {{ m2.menuName }} </a>
+                <a class="ml30" :href="m2.url"> {{ m2.menuName }} </a>
               </el-menu-item>
             </div>
           </el-submenu>
@@ -47,44 +51,7 @@ export default {
   props: {
     collapseStatus: Boolean,
     menuList: {
-      type: Array,
-      default: () => {
-        return [
-          {
-            menuName: "一级导航一",
-            icon: "",
-            subMenu: [
-              {
-                menuName: "二级导航二",
-                icon: "",
-                url: "http://www.baidu.com"
-              }
-            ]
-          },
-          {
-            menuName: "一级导航一",
-            icon: "",
-            subMenu: [
-              {
-                menuName: "二级导航二",
-                icon: "",
-                url: "http://www.baidu.com"
-              }
-            ]
-          },
-          {
-            menuName: "一级导航一",
-            icon: "",
-            subMenu: [
-              {
-                menuName: "二级导航二",
-                icon: "",
-                url: "http://www.baidu.com"
-              }
-            ]
-          }
-        ]
-      }
+      type: Array
     }
   },
   components: {},

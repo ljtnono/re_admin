@@ -1,7 +1,7 @@
 <template>
   <div id="header">
     <div class="header-bar flex flex-direction-row">
-      <a type="text" href="javascript:;" class="nav-trigger-a flex  flex-align-items-center" @click="collapseMenu()">
+      <a type="text" href="javascript:" class="nav-trigger-a flex  flex-align-items-center" @click="collapseMenu()">
         <i class="el-icon-s-fold" />
       </a>
       <div class="custom-bread-crumb"></div>
@@ -22,6 +22,7 @@ export default {
 
   },
   methods: {
+    // 折叠左边的菜单栏
     collapseMenu() {
       this.$emit("")
     }
@@ -35,7 +36,7 @@ export default {
   width: 100%;
   height: 80px;
   padding: 0 20px;
-  background: #fff;
+  background: #ffffff;
 
   .header-bar {
     position: relative;

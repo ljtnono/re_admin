@@ -18,20 +18,18 @@
       </el-form-item>
       <!-- 验证码 -->
       <el-form-item prop="verifyCode">
-        <el-input class="input-password fl" v-model="loginForm.verifyCode" style="width: 200px"/>
-        <img class="fr" style="display: inline-block; width: 20px; height: 20px" src=""/>
+        <el-input class="input-password fl mr20" placeholder="请输入验证码" v-model="loginForm.verifyCode" style="width: 200px"/>
+        <img class="verify-code-img fl"  :src="verifyCodeImageUrl" @click="refresh()"/>
       </el-form-item>
       <!-- 登录按钮 -->
       <el-form-item>
-        <el-button class="btn-submit" type="primary" @click="submitForm('loginForm')">登录</el-button>
+        <el-button class="btn-submit" type="primary" @click="commit('loginForm')">登录</el-button>
       </el-form-item>
     </el-form>
   </el-card>
 </template>
 
 <script>
-import router from '../router';
-
 export default {
   name: 'LoginForm',
   data() {
@@ -57,24 +55,29 @@ export default {
       }
     }
   },
+  props: {
+    verifyCodeImageUrl: String
+  },
   computed: {},
   methods: {
-    submitForm(formName) {
+    refresh() {
+      this.$emit("refreshVerifyCode");
+    },
+    commit(formName) {
+      // 开启进度栏
       this.$refs[formName].validate((valid) => {
         // 校验成功，请求登录接口
         if (valid) {
-          router.push({
-            name: "Home"
-          })
+          console.log("fdaf")
+          this.$emit("submit", this.loginForm);
           return true;
         } else {
-          // 校验失败，弹出错误消息
           return false;
         }
       });
-    }
-  },
-  props: {},
+    },
+
+  }
 }
 </script>
 
@@ -89,6 +92,14 @@ export default {
   .login-form {
     width: 100%;
     height: 100%;
+
+    .verify-code-img {
+      display: block;
+      width: 100px;
+      height: 40px;
+      line-height: 40px;
+      cursor: pointer;
+    }
 
     .btn-submit {
       width: 100%;

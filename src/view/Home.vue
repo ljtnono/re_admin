@@ -11,6 +11,7 @@ import Header from '@c/Header.vue';
 import Navigation from '@c/Navigation.vue';
 import Main from '@c/Main.vue'
 
+
 export default {
   name: 'Home',
   data() {
@@ -23,7 +24,9 @@ export default {
     Navigation,
     Main
   },
-  methods: {}
+  methods: {
+
+  }
 }
 </script>
 
