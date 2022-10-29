@@ -19,52 +19,45 @@ Mock.mock("/api-backend/login", "post", {
       username: "lingjiatong",
       email: "935188400@qq.com",
       phone: 14444444444,
-      avatar: "http://f.lingjiatong.cn/xxxxx"
+      avatar: "http://f.lingjiatong.cn:30090/rootelement/sys/avatar.jpeg"
     },
     menus: [
       {
         menuName: "博客管理",
-        icon: "",
+        icon: "icon-blog",
         subMenu: [
           {
             menuName: "文章管理",
-            icon: "",
             url: "/article"
           },
           {
-            menuName: "文章分类管理",
-            icon: "",
+            menuName: "分类管理",
             url: "/article/category"
           },
           {
-            menuName: "文章评论管理",
-            icon: "",
+            menuName: "评论管理",
             url: "/article/comment"
           }
         ]
       },
       {
         menuName: "系统管理",
-        icon: "",
+        icon: "icon-setting",
         subMenu: [
           {
             menuName: "用户管理",
-            icon: "",
             url: "/system/user"
           },
           {
             menuName: "角色管理",
-            icon: "",
             url: "/system/role"
           },
           {
             menuName: "网站配置",
-            icon: "",
             url: "/system/config"
           },
           {
             menuName: "系统监控",
-            icon: "",
             url: "/system/monitor"
           }
         ]

@@ -5,6 +5,7 @@
 </template>
 
 <script>
+
 import LoginForm from '@c/LoginForm'
 import axios from "axios";
 import {HTTP_RESULT_SUCCESS_CODE, HTTP_RESULT_SUCCESS_MESSAGE, ROUT_HOME_NAME} from "@/constant/commonConstant";
@@ -57,11 +58,9 @@ export default {
           router.push({
             name: ROUT_HOME_NAME
           });
-          this.$message("hello")
           this.$loading().close();
         } else {
-          // 弹出错误消息
-          this.$message("hello")
+          // TODO 弹出错误消息
           this.$loading().close();
         }
       });

@@ -5,28 +5,33 @@
       background-color="#001529"
       text-color="#ffffff"
       active-text-color="rgba(255, 255, 255, 0.7);"
-      collapse-transition
+      :collapse-transition="collapseTransition"
       :collapse="collapseStatus"
     >
       <!-- 导航栏上面的logo -->
       <div class="nav-logo-container p10">
-        <img class="nav-logo-max" src="@a/images/logo.png"/>
-        <img class="nav-logo-min" src="@a/images/logo-min.png" style="display: none;"/>
+        <img class="nav-logo-max" v-show="!collapseStatus" src="@a/images/logo.png"/>
+        <img class="nav-logo-min" v-show="collapseStatus" src="@a/images/logo-min.png" />
       </div>
       <!-- 工作台 -->
       <el-menu-item style="text-align: center; cursor: pointer">
-        <a href="/admin/home" >工作台</a>
+        <a href="/admin/home" v-show="!collapseStatus">工作台</a>
+        <div v-show="collapseStatus">
+          <a href="/admin/home">
+            <i class="el-icon-location"/>
+          </a>
+        </div>
       </el-menu-item>
       <!-- 循环渲染菜单 -->
-      <div v-for="(m1, i1) in menuList" :key="m1">
+      <div v-for="(m1, i1) in menus" :key="m1">
         <!-- 包含子菜单 -->
         <div v-if="m1.subMenu !== null && m1.subMenu !== undefined">
           <el-submenu :index="i1">
             <template slot="title">
-              <i class="el-icon-location "/>
+              <i :class="'iconfont' + ' ' + m1.icon"/>
               <span style="margin-left: 15px" v-show="!collapseStatus">{{ m1.menuName }}</span>
             </template>
-            <div v-for="(m2, i2) in m1.subMenu" :index="i1-i2" :key="m2">
+            <div v-for="m2 in m1.subMenu" :key="m2">
               <el-menu-item>
                 <a class="ml30" :href="m2.url"> {{ m2.menuName }} </a>
               </el-menu-item>
@@ -46,11 +51,13 @@
 export default {
   name: 'Navigation',
   data() {
-    return {}
+    return {
+      collapseTransition: false
+    }
   },
   props: {
     collapseStatus: Boolean,
-    menuList: {
+    menus: {
       type: Array
     }
   },
@@ -75,14 +82,21 @@ export default {
         float: left;
       }
 
+      .el-submenu__icon-arrow {
+        display: inline-block!important;
+      }
+
       .el-menu-item {
         min-width: 180px;
       }
     }
   }
-
+  // TODO 折叠菜单后隐藏小箭头
   .el-menu--collapse {
     min-width: 0;
+    .el-submenu__icon-arrow {
+      display: none!important;
+    }
   }
 
   .nav-logo-container {
