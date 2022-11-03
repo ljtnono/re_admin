@@ -7,7 +7,7 @@ Vue.use(Router);
 // 创建导航，使用历史模式
 const router = new Router({
   routes,
-  base: "/admin/",
+  base: '/',
   mode: "history"
 });
 

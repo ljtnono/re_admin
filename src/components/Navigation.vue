@@ -1,5 +1,5 @@
 <template>
-  <div class="nav-container flex flex-align-items-start">
+  <div class="nav-container">
     <el-menu
       class="nav-menu"
       background-color="#001529"
@@ -7,18 +7,19 @@
       active-text-color="rgba(255, 255, 255, 0.7);"
       :collapse-transition="collapseTransition"
       :collapse="collapseStatus"
+
     >
       <!-- 导航栏上面的logo -->
       <div class="nav-logo-container p10">
         <img class="nav-logo-max" v-show="!collapseStatus" src="@a/images/logo.png"/>
-        <img class="nav-logo-min" v-show="collapseStatus" src="@a/images/logo-min.png" />
+        <img class="nav-logo-min" v-show="collapseStatus" src="@a/images/logo-min.png"/>
       </div>
       <!-- 工作台 -->
       <el-menu-item style="text-align: center; cursor: pointer">
-        <a href="/admin/home" v-show="!collapseStatus">工作台</a>
+        <a href="/home" v-show="!collapseStatus" style="width: 100%; height: 100%; display: inline-block;">工作台</a>
         <div v-show="collapseStatus">
-          <a href="/admin/home">
-            <i class="el-icon-location"/>
+          <a href="/home" style="width: 100%; height: 100%; display: inline-block;">
+            <i class="el-icon-location" style="display: inline-block !important;"/>
           </a>
         </div>
       </el-menu-item>
@@ -33,7 +34,9 @@
             </template>
             <div v-for="m2 in m1.subMenu" :key="m2">
               <el-menu-item>
-                <a class="ml30" :href="m2.url"> {{ m2.menuName }} </a>
+                <a class="ml30" :href="m2.url" style="width: 100%; height: 100%; display: inline-block;">
+                  {{ m2.menuName }}
+                </a>
               </el-menu-item>
             </div>
           </el-submenu>
@@ -68,7 +71,6 @@ export default {
 
 
 <style lang="scss" scoped>
-
 .nav-container {
   height: 100%;
 
@@ -83,7 +85,7 @@ export default {
       }
 
       .el-submenu__icon-arrow {
-        display: inline-block!important;
+        display: inline-block !important;
       }
 
       .el-menu-item {
@@ -91,11 +93,16 @@ export default {
       }
     }
   }
+
   // TODO 折叠菜单后隐藏小箭头
   .el-menu--collapse {
     min-width: 0;
-    .el-submenu__icon-arrow {
-      display: none!important;
+    .el-menu-item {
+      .el-submenu__title {
+        .el-submenu__icon-arrow {
+          display: inline-block !important;
+        }
+      }
     }
   }
 

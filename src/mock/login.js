@@ -28,15 +28,15 @@ Mock.mock("/api-backend/login", "post", {
         subMenu: [
           {
             menuName: "文章管理",
-            url: "/article"
+            url: "/blog/article"
           },
           {
             menuName: "分类管理",
-            url: "/article/category"
+            url: "/blog/category"
           },
           {
             menuName: "评论管理",
-            url: "/article/comment"
+            url: "/blog/comment"
           }
         ]
       },
@@ -54,7 +54,7 @@ Mock.mock("/api-backend/login", "post", {
           },
           {
             menuName: "网站配置",
-            url: "/system/config"
+            url: "/system/websiteConfig"
           },
           {
             menuName: "系统监控",
@@ -73,5 +73,3 @@ Mock.mock("/api-backend/login", "post", {
     }
   }
 });
-
-

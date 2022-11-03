@@ -21,6 +21,7 @@ module.exports = {
     // 关闭注册组件未使用会报错的限制
     "vue/no-unused-components": "off",
     // 关闭未使用变量报错的限制
-    "no-unused-vars": "off"
+    "no-unused-vars": "off",
+    "vue/no-unused-vars": "off"
   }
 };

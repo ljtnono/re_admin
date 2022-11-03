@@ -1,25 +1,14 @@
 <template>
   <div>
-    
+    评论管理
   </div>
 </template>
 
 <script>
 export default {
-  name: 'Main',
-  data() {
-    return {
-
-    }
-  },
-  components: {
-  },
-  methods: {
-
-  } 
+  name: "CommentManage"
 }
 </script>
-
 
 <style lang="scss" scoped>
 

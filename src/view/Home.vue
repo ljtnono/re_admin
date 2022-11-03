@@ -1,15 +1,16 @@
 <template>
   <div class="container flex flex-direction-row">
-    <Navigation :collapseStatus="collapseStatus" :menus="menus"/>
-    <Header @toggleNav="toggleNav" :avatar="avatar"/>
-    <Main/>
+    <Navigation class="flex" :collapseStatus="collapseStatus" :menus="menus"/>
+    <div class="content-container flex flex-direction-column">
+      <Header @toggleNav="toggleNav" :avatar="avatar"/>
+      <router-view />
+    </div>
   </div>
 </template>
 
 <script>
 import Header from '@c/Header.vue';
 import Navigation from '@c/Navigation.vue';
-import Main from '@c/Main.vue'
 
 export default {
   name: 'Home',
@@ -22,8 +23,7 @@ export default {
   },
   components: {
     Header,
-    Navigation,
-    Main
+    Navigation
   },
   methods: {
     // 获取menus
@@ -55,5 +55,11 @@ export default {
 .container {
   width: 100%;
   height: 100%;
+
+  .content-container {
+    min-width: 1200px;
+    height: 100%;
+    width: 100%;
+  }
 }
 </style>

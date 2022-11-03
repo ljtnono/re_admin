@@ -1,7 +1,7 @@
 // #################### 常用常量池 #################### //
 
 // 页面基础访问url
-export const BASE_URL = "/admin"
+export const BASE_URL = "/"
 // 请求成功code值
 export const HTTP_RESULT_SUCCESS_CODE = 0;
 // 请求成功message值

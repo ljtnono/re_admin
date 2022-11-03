@@ -5,7 +5,7 @@ const resolve = dir => {
 };
 
 // vue-cli 配置项
-const BASE_URL = process.env.NODE_ENV === 'production' ? '/admin' : '/admin';
+const BASE_URL = process.env.NODE_ENV === 'production' ? '/' : '/';
 
 module.exports = {
   publicPath: BASE_URL,
