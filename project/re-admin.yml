@@ -3,20 +3,20 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: rootelement
-  name: re-backend-deployment
+  name: re-admin-deployment
 spec:
   selector:
     matchLabels:
-      app: re-backend
+      app: re-admin
   replicas: 1
   template:
     metadata:
       labels:
-        app: re-backend
+        app: re-admin
     spec:
       containers:
-        - name: re-backend
-          image: ljtnono/re-backend:<VERSION>
+        - name: re-admin
+          image: ljtnono/re-admin:<VERSION>
           imagePullPolicy: Always
           ports:
             - containerPort: 80
@@ -28,13 +28,13 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: re-backend-service
+  name: re-admin-service
   namespace: rootelement
 spec:
   selector:
-    app: re-backend
+    app: re-admin
   type: NodePort
   ports:
-    - port: 99
-      targetPort: 99
-      nodePort: 30099
+    - port: 80
+      targetPort: 80
+      nodePort: 30151

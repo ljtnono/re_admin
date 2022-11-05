@@ -1,4 +1,4 @@
-# 根元素博客前端（re_frontend）
+# 根元素博客前端（re_admin）
 
 # ROOTELEMENT 根元素个人博客后台管理系统
 
