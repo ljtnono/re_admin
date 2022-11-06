@@ -14,7 +14,7 @@ export const ELEMENT_SUCCESS_MESSAGE_CONFIG = {
   type: 'success',
   message: "操作成功",
   duration: 2000,
-  center: true
+  center: false
 };
 
 // 全局操作失败消息配置
@@ -22,5 +22,5 @@ export const ELEMENT_FAILED_MESSAGE_CONFIG = {
   message: '操作失败',
   type: 'error',
   duration: 2000,
-  center: true
+  center: false
 };

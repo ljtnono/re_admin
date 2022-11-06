@@ -53,27 +53,26 @@
 
 <script>
 import "../mock/system"
-import axios from "axios";
-import {HTTP_RESULT_SUCCESS_CODE, HTTP_RESULT_SUCCESS_MESSAGE} from "@/constant/commonConstant";
 
 export default {
   name: "UserManage",
   data() {
     return {
+      // 当前查询条件
       searchCondition: "",
       userList: [],
+      // 当前页数
       page: 1,
-      size: 10
+      // 每页条数
+      size: 10,
     }
   },
   methods: {
     search(page, size, searchCondition) {
-      axios.get("/api-backend/system/user/list").then(res => {
+      this.$http.get("/api-backend/system/user/list").then(res => {
         let outerData = res.data;
-        if (outerData.code === HTTP_RESULT_SUCCESS_CODE && outerData.message === HTTP_RESULT_SUCCESS_MESSAGE) {
-          let innerData = outerData.data;
-          this.userList = innerData;
-        }
+        let innerData = outerData.data;
+        this.userList = innerData;
       });
     }
   },

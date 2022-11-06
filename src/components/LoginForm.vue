@@ -31,6 +31,11 @@
 
 <script>
 import {PASSWORD_REGEX, USERNAME_REGEX} from "@/constant/regexConstant";
+import {
+  LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE, LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE,
+  LOGIN_USERNAME_EMPTY_ERROR_MESSAGE,
+  LOGIN_USERNAME_FORMAT_ERROR_MESSAGE, LOGIN_VERIFY_CODE_EMPTY_ERROR_MESSAGE
+} from "@/constant/errorMessageConstant";
 
 export default {
   name: 'LoginForm',
@@ -44,15 +49,15 @@ export default {
       },
       rules: {
         username: [
-          {required: true, message: '请输入用户名', trigger: 'blur'},
-          {pattern: USERNAME_REGEX, message: '用户名为4-20英文数字字符串', trigger: 'blur' }
+          {required: true, message: LOGIN_USERNAME_EMPTY_ERROR_MESSAGE, trigger: 'blur'},
+          {pattern: USERNAME_REGEX, message: LOGIN_USERNAME_FORMAT_ERROR_MESSAGE, trigger: 'blur' }
         ],
         password: [
-          {required: true, message: '请输入密码', trigger: 'blur'},
-          {pattern: PASSWORD_REGEX, message: '密码为大写字母和小写字母，数字和(，,。.+=[]）中的一种，并且长度在8-20位之间', trigger: 'blur'}
+          {required: true, message: LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE, trigger: 'blur'},
+          {pattern: PASSWORD_REGEX, message: LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE, trigger: 'blur'}
         ],
         verifyCode: [
-          {required: true, message: '请输入验证码', trigger: 'blur'}
+          {required: true, message: LOGIN_VERIFY_CODE_EMPTY_ERROR_MESSAGE, trigger: 'blur'}
         ]
       }
     }
@@ -70,7 +75,6 @@ export default {
       this.$refs[formName].validate((valid) => {
         // 校验成功，请求登录接口
         if (valid) {
-          console.log("fdaf")
           this.$emit("submit", this.loginForm);
           return true;
         } else {
@@ -78,7 +82,6 @@ export default {
         }
       });
     },
-
   }
 }
 </script>

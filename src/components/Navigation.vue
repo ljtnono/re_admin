@@ -7,7 +7,6 @@
       active-text-color="rgba(255, 255, 255, 0.7);"
       :collapse-transition="collapseTransition"
       :collapse="collapseStatus"
-
     >
       <!-- 导航栏上面的logo -->
       <div class="nav-logo-container p10">
@@ -16,9 +15,9 @@
       </div>
       <!-- 工作台 -->
       <el-menu-item style="text-align: center; cursor: pointer">
-        <a href="/home" v-show="!collapseStatus" style="width: 100%; height: 100%; display: inline-block;">工作台</a>
+        <a href="/workspace" v-show="!collapseStatus" style="width: 100%; height: 100%; display: inline-block;">工作台</a>
         <div v-show="collapseStatus">
-          <a href="/home" style="width: 100%; height: 100%; display: inline-block;">
+          <a href="/workspace" style="width: 100%; height: 100%; display: inline-block;">
             <i class="el-icon-location" style="display: inline-block !important;"/>
           </a>
         </div>

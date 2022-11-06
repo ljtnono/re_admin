@@ -1,6 +1,7 @@
 import Vue from "vue";
 import Router from "vue-router";
 import routes from "./routers";
+import {ROUT_HOME_NAME} from "@/constant/commonConstant";
 
 Vue.use(Router);
 
@@ -14,9 +15,12 @@ const router = new Router({
 // 设置路由守卫
 router.beforeEach((to, from, next) => {
   let toPath = to.path;
-  if (toPath === "/") {
-    next({ name: "Login" });
-    return true;
+  let toName = to.name;
+  // TODO 如果token存在，并且路由路径为/,那么直接跳转到工作台页面
+
+
+  if (toPath === "/" + ROUT_HOME_NAME) {
+    next({name: "Workspace"})
   } else {
     next();
   }
