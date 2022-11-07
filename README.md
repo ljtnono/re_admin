@@ -2,7 +2,7 @@
 
 # ROOTELEMENT 根元素个人博客后台管理系统
 
-博客访问地址：[http://re.lingjiatong.cn:30080](http://re.lingjiatong.cn:30080)
+博客访问地址：[http://re.lingjiatong.cn:30152](http://re.lingjiatong.cn:30152)
 
 这是一个使用SpringBoot作为后端，前端使用vue.js的博客系统，使用的是mavon-editor插件作为markdown文本编辑器<br>
 本博客部分内容参考温志怀博客和思欲主题，详情请移步  [温志怀博客](http://www.wenzhihuai.com) | [欲思主题](https://yusi123.com/) | [GitCafe](https://gitcafe.net/) | [崔庆才博客](https://cuiqingcai.com/)<br>
