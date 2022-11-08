@@ -3,7 +3,7 @@
     <Navigation class="flex" :collapseStatus="collapseStatus" :menus="menus"/>
     <div class="content-container flex flex-direction-column">
       <Header @toggleNav="toggleNav" :avatar="avatar"/>
-      <router-view />
+      <router-view/>
     </div>
   </div>
 </template>
@@ -18,12 +18,18 @@ export default {
     return {
       collapseStatus: false,
       menus: null,
-      avatar: ""
+      avatar: "",
+      clientWidth: document.body.clientWidth
     }
   },
   components: {
     Header,
     Navigation
+  },
+  watch: {
+    clientWidth(newVal) {
+      this.collapseStatus = newVal < 2000;
+    }
   },
   methods: {
     // 获取menus
@@ -38,7 +44,7 @@ export default {
     // 切换导航菜单的折叠状态
     toggleNav() {
       this.collapseStatus = !this.collapseStatus;
-    },
+    }
   },
   mounted() {
     this.getMenus();
@@ -46,6 +52,13 @@ export default {
     if (userInfo != null) {
       this.avatar = JSON.parse(userInfo).avatar;
     }
+    let that = this;
+    window.onresize = () => {
+      return (() => {
+        window.clientWidth = document.body.clientWidth;
+        that.clientWidth = window.clientWidth;
+      })();
+    };
   }
 }
 </script>
@@ -55,11 +68,12 @@ export default {
 .container {
   width: 100%;
   height: 100%;
+  min-width: 1600px;
 
   .content-container {
-    min-width: 1200px;
     height: 100%;
     width: 100%;
+    min-width: 1344px;
   }
 }
 </style>

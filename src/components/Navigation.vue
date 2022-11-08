@@ -15,7 +15,8 @@
       </div>
       <!-- 工作台 -->
       <el-menu-item style="text-align: center; cursor: pointer">
-        <a href="/workspace" v-show="!collapseStatus" style="width: 100%; height: 100%; display: inline-block;">工作台</a>
+        <a href="/workspace" v-show="!collapseStatus"
+           style="width: 100%; height: 100%; display: inline-block;">工作台</a>
         <div v-show="collapseStatus">
           <a href="/workspace" style="width: 100%; height: 100%; display: inline-block;">
             <i class="el-icon-location" style="display: inline-block !important;"/>
@@ -64,7 +65,10 @@ export default {
     }
   },
   components: {},
-  methods: {}
+  methods: {
+  },
+  mounted() {
+  }
 }
 </script>
 
@@ -93,15 +97,12 @@ export default {
     }
   }
 
-  // TODO 折叠菜单后隐藏小箭头
+  // 折叠菜单后隐藏小箭头
   .el-menu--collapse {
     min-width: 0;
-    .el-menu-item {
-      .el-submenu__title {
-        .el-submenu__icon-arrow {
-          display: inline-block !important;
-        }
-      }
+
+    ::v-deep .el-submenu__icon-arrow {
+      display: none !important;
     }
   }
 

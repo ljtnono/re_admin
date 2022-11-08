@@ -84,6 +84,7 @@ export default {
   min-height: 60px;
   padding: 0 20px;
   background: #ffffff;
+  min-width: 1344px;
 
   .header-bar {
     position: relative;
