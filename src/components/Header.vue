@@ -81,21 +81,19 @@ export default {
 <style lang="scss" scoped>
 #header {
   width: 100%;
-  min-height: 60px;
+  height: 60px;
   padding: 0 20px;
   background: #ffffff;
   min-width: 1344px;
 
   .header-bar {
     position: relative;
-    line-height: 60px;
-    height: 100%;
+    line-height: 40px;
     padding: 10px 0;
-
+    height: 40px;
 
     .toggle-icon-container {
       height: 100%;
-      width: auto;
 
       // 收起状态
       .nav-trigger-a-collapse {

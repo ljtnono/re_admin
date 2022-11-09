@@ -1,10 +1,10 @@
 @charset "UTF-8";
+
 /**
-  @author ljt
+  @author lingjiatong
   @time 2019/10/9
   @description 前端通用css
-  @website https://www.ljtnono.cn/root_element
-*/
+ */
 /*样式重置*/
 body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, textarea, p, blockquote, th, td {
   margin: 0;
@@ -71,9 +71,6 @@ html, body {
   color: #333333;
   font-size: 14px;
   font-family: 'Microsoft YaHei', 'SF Pro Display', Roboto, Noto, Arial, 'PingFang SC', sans-serif;
-  box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
 }
 
 *, *:before, *:after {

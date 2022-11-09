@@ -17,8 +17,7 @@ export default {
 <style lang="scss" scoped>
 #app {
   width: 100%;
-  height: 100%;
-  min-height: 1100px;
-  min-width: 1600px;
+  height: 100vh;
+  overflow-y: auto;
 }
 </style>

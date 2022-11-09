@@ -68,7 +68,6 @@ export default {
 .container {
   width: 100%;
   height: 100%;
-  min-width: 1600px;
 
   .content-container {
     height: 100%;

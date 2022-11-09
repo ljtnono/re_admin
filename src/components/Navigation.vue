@@ -9,7 +9,7 @@
       :collapse="collapseStatus"
     >
       <!-- 导航栏上面的logo -->
-      <div class="nav-logo-container p10">
+      <div class="nav-logo-container mb10">
         <img class="nav-logo-max" v-show="!collapseStatus" src="@a/images/logo.png"/>
         <img class="nav-logo-min" v-show="collapseStatus" src="@a/images/logo-min.png"/>
       </div>
@@ -65,8 +65,7 @@ export default {
     }
   },
   components: {},
-  methods: {
-  },
+  methods: {},
   mounted() {
   }
 }
@@ -74,13 +73,14 @@ export default {
 
 
 <style lang="scss" scoped>
+
 .nav-container {
-  height: 100%;
+  height: 100vh;
 
   .nav-menu {
-    height: 100%;
-    overflow: hidden;
+    overflow-x: hidden;
     min-width: 256px;
+    height: 100%;
 
     .el-submenu {
       .el-submenu__title {
@@ -101,20 +101,41 @@ export default {
   .el-menu--collapse {
     min-width: 0;
 
+    ::v-deep .el-submenu__title {
+      text-align: center;
+    }
     ::v-deep .el-submenu__icon-arrow {
       display: none !important;
+    }
+
+    .nav-logo-container {
+      width: 64px;
+      height: 64px;
+      padding: 0;
+      position: relative;
+      img {
+        display: block;
+        width: 44px;
+        height: 44px;
+        position: absolute;
+        left: calc(50% - 22px);
+        top: 10px;
+      }
     }
   }
 
   .nav-logo-container {
-    width: 100%;
     height: 64px;
-
+    padding: 0;
+    position: relative;
     img {
       height: 44px;
       width: auto;
       display: block;
       margin: 0 auto;
+      position: absolute;
+      left: calc(50% - 80px);
+      top: 10px;
     }
   }
 }

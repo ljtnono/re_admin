@@ -23,96 +23,178 @@
       </div>
       <!-- 系统博客相关概览信息 -->
       <div class="overview-container">
+        <!-- 总文章数 -->
         <el-card class="overview-card mr20" shadow="hover">
-          <!-- 总文章数 -->
           <div class="overview-card-body-item fl">
             <div class="item-icon-container">
-              <!-- TODO 换成其他ICON -->
-              <i class="iconfont icon-comment"></i>
+              <i class="iconfont icon-article"></i>
             </div>
           </div>
           <div class="overview-card-body-item fr">
             <div class="item-text-container">
-              <p class="mt15 mb10">11111</p>
+              <p class="mt15 mb10">78</p>
               <p>总文章数</p>
             </div>
           </div>
         </el-card>
+        <!-- 总标签数 -->
         <el-card class="overview-card mr20" shadow="hover">
           <!-- 总文章数 -->
           <div class="overview-card-body-item fl">
-            <div class="item-icon-container">
-              <!-- TODO 换成其他ICON -->
-              <i class="iconfont icon-comment"></i>
+            <div class="item-icon-container" style="background: #FF9900">
+              <i class="iconfont icon-biaoqian"></i>
             </div>
           </div>
           <div class="overview-card-body-item fr">
             <div class="item-text-container">
-              <p class="mt15 mb10">11111</p>
-              <p>总文章数</p>
+              <p class="mt15 mb10">25</p>
+              <p>总标签数</p>
             </div>
           </div>
         </el-card>
+        <!-- 总浏览量 -->
         <el-card class="overview-card mr20" shadow="hover">
-          <!-- 总文章数 -->
+          <!-- 总浏览量 -->
           <div class="overview-card-body-item fl">
-            <div class="item-icon-container">
-              <!-- TODO 换成其他ICON -->
-              <i class="iconfont icon-comment"></i>
+            <div class="item-icon-container" style="background: #E46CBB">
+              <i class="iconfont icon-icon-"></i>
             </div>
           </div>
           <div class="overview-card-body-item fr">
             <div class="item-text-container">
-              <p class="mt15 mb10">11111</p>
-              <p>总文章数</p>
+              <p class="mt15 mb10">1000</p>
+              <p>总浏览量</p>
             </div>
           </div>
         </el-card>
+        <!-- 总点赞数 -->
         <el-card class="overview-card" shadow="hover">
-          <!-- 总文章数 -->
+          <!-- 总点赞数 -->
           <div class="overview-card-body-item fl">
-            <div class="item-icon-container">
-              <!-- TODO 换成其他ICON -->
-              <i class="iconfont icon-comment"></i>
+            <div class="item-icon-container" style="background: #349AD9">
+              <i class="iconfont icon-dianzan"></i>
             </div>
           </div>
           <div class="overview-card-body-item fr">
             <div class="item-text-container">
-              <p class="mt15 mb10">11111</p>
-              <p>总文章数</p>
+              <p class="mt15 mb10">200</p>
+              <p>总点赞数</p>
             </div>
           </div>
         </el-card>
       </div>
     </div>
     <!-- 服务器监控曲线图 -->
-    <div class="workspace-content mt50">
-      <el-card>
+    <div class="workspace-content mt20">
+      <el-card shadow="hover">
         <template slot="header">
           服务器监控
         </template>
+        <div id="memoryLine"></div>
+        <div id="cpuLine"></div>
       </el-card>
     </div>
     <!-- 底部访问量曲线图 -->
-    <div class="workspace-footer mt50">
-
+    <div class="workspace-footer mt20">
+      <el-card shadow="hover">
+        <template slot="header">
+          流量监控
+        </template>
+        <div></div>
+      </el-card>
+      <!-- 二维码 -->
+      <div class="qrcode-container">
+        <img src="" alt="">
+        <img src="" alt="">
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+
 export default {
   name: "Workspace",
   data() {
     return {}
   },
-  methods: {}
+  methods: {
+    // 内存曲线图
+    drawMemoryLine() {
+      // 基于准备好的dom，初始化echarts实例
+      let myChart = this.$echarts.init(document.getElementById("memoryLine"));
+      // 指定图表的配置项和数据
+      let option = {
+        title: {
+          text: "系统内存消耗柱状图",
+          left: "40%",
+          top: "5%",
+          textStyle: {
+            fontSize: 14
+          }
+        },
+        xAxis: {
+          type: 'category',
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            type: 'line',
+            smooth: true
+          }
+        ]
+      };
+      // 使用刚指定的配置项和数据显示图表。
+      myChart.setOption(option);
+    },
+    // cpu曲线图
+    drawCpuLine() {
+      // 基于准备好的dom，初始化echarts实例
+      let myChart = this.$echarts.init(document.getElementById("cpuLine"));
+      // 指定图表的配置项和数据
+      let option = {
+        title: {
+          text: "系统cpu消耗柱状图",
+          textAlign: "left",
+          left: "40%",
+          top: "5%",
+          textStyle: {
+            fontSize: 14
+          }
+        },
+        xAxis: {
+          type: 'category',
+          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+          type: 'value'
+        },
+        series: [
+          {
+            data: [820, 932, 901, 934, 1290, 1330, 1320],
+            type: 'line',
+            smooth: true
+          }
+        ]
+      };
+      // 使用刚指定的配置项和数据显示图表。
+      myChart.setOption(option);
+    }
+  },
+  mounted() {
+    this.drawMemoryLine();
+    this.drawCpuLine();
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 .workspace-container {
-  height: 100%;
+  height: calc(100% - 60px);
   min-width: 1344px;
   padding: 20px 10px;
   margin: 0 auto;
@@ -167,7 +249,6 @@ export default {
       .el-card {
         padding: 16px 24px;
         border-radius: 4px;
-        min-width: 220px;
         display: inline-block;
       }
 
@@ -190,12 +271,14 @@ export default {
             text-align: center;
             vertical-align: center;
 
+
             i {
               line-height: 110px;
               font-size: 30px;
               color: #ffffff;
             }
           }
+
 
           &:nth-child(2) {
             .item-text-container {
@@ -217,15 +300,52 @@ export default {
   .workspace-content {
     min-width: 1344px;
     width: 100%;
-    height: 300px;
-    background: #ffffff;
+    height: 400px;
+
+    .el-card {
+      cursor: pointer;
+      height: 400px;
+
+      ::v-deep .el-card__body {
+        position: relative;
+        padding: 10px;
+        height: 343px;
+      }
+
+      #memoryLine {
+        height: 323px;
+        width: 650px;
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+
+      #cpuLine {
+        height: 323px;
+        width: 650px;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+    }
   }
 
   .workspace-footer {
     min-width: 1344px;
     width: 100%;
     height: 300px;
-    background: #ffffff;
+
+    .el-card {
+      cursor: pointer;
+      height: 340px;
+      width: 960px;
+
+      ::v-deep .el-card__body {
+        position: relative;
+        padding: 10px;
+        height: calc(340px - 57px);
+      }
+    }
   }
 }
 </style>

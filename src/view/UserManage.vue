@@ -85,7 +85,7 @@ export default {
 <style lang="scss" scoped>
 .user-manage-container {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 60px);
   padding: 50px 50px 50px;
 
   .table-container {
