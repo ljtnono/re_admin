@@ -1,6 +1,6 @@
 <template>
   <div class="container flex flex-direction-row">
-    <Navigation class="flex" :collapseStatus="collapseStatus" :menus="menus"/>
+    <Navigation class="flex navigation" :collapseStatus="collapseStatus" :menus="menus"/>
     <div class="content-container flex flex-direction-column">
       <Header @toggleNav="toggleNav" :avatar="avatar"/>
       <router-view/>
@@ -77,10 +77,20 @@ export default {
 .container {
   width: 100%;
   height: 100%;
+  // 设置最小高度和最小宽度
+  min-height: 1100px;
+  min-width: 1400px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+
+  .navigation {
+    height: 100%;
+  }
 
   .content-container {
     height: 100%;
-    width: 100%;
+    flex: 1;
   }
 }
 </style>

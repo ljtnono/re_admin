@@ -1,5 +1,5 @@
 <template>
-  <div class="nav-container">
+  <div>
     <el-menu
       class="nav-menu"
       background-color="#001529"
@@ -73,70 +73,69 @@ export default {
 
 
 <style lang="scss" scoped>
+.nav-menu {
+  overflow-x: hidden;
+  min-width: 256px;
+  height: 100%;
+  position: relative;
 
-.nav-container {
-  height: 100vh;
+  .el-submenu {
+    .el-submenu__title {
+      float: left;
+    }
 
-  .nav-menu {
-    overflow-x: hidden;
-    min-width: 256px;
-    height: 100%;
+    .el-submenu__icon-arrow {
+      display: inline-block !important;
+    }
 
-    .el-submenu {
-      .el-submenu__title {
-        float: left;
-      }
-
-      .el-submenu__icon-arrow {
-        display: inline-block !important;
-      }
-
-      .el-menu-item {
-        min-width: 180px;
-      }
+    .el-menu-item {
+      min-width: 180px;
     }
   }
+}
 
-  // 折叠菜单后隐藏小箭头
-  .el-menu--collapse {
-    min-width: 0;
+// 折叠菜单后隐藏小箭头
+.el-menu--collapse {
+  min-width: 0;
 
-    ::v-deep .el-submenu__title {
-      text-align: center;
-    }
-    ::v-deep .el-submenu__icon-arrow {
-      display: none !important;
-    }
+  ::v-deep .el-submenu__title {
+    text-align: center;
+  }
 
-    .nav-logo-container {
-      width: 64px;
-      height: 64px;
-      padding: 0;
-      position: relative;
-      img {
-        display: block;
-        width: 44px;
-        height: 44px;
-        position: absolute;
-        left: calc(50% - 22px);
-        top: 10px;
-      }
-    }
+  ::v-deep .el-submenu__icon-arrow {
+    display: none !important;
   }
 
   .nav-logo-container {
+    width: 64px;
     height: 64px;
     padding: 0;
     position: relative;
+
     img {
-      height: 44px;
-      width: auto;
       display: block;
-      margin: 0 auto;
+      width: 44px;
+      height: 44px;
       position: absolute;
-      left: calc(50% - 80px);
+      left: calc(50% - 22px);
       top: 10px;
     }
+  }
+}
+
+.nav-logo-container {
+  height: 64px;
+  padding: 0;
+  position: relative;
+
+  img {
+    height: 44px;
+    width: auto;
+    display: block;
+    margin: 0 auto;
+    position: absolute;
+    left: calc(50% - 80px);
+    top: 10px;
   }
 }
 </style>
