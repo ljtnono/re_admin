@@ -19,7 +19,8 @@ export default {
       collapseStatus: false,
       menus: null,
       avatar: "",
-      clientWidth: document.body.clientWidth
+      clientWidth: document.body.clientWidth,
+      clientHeight: document.body.clientHeight
     }
   },
   components: {
@@ -44,21 +45,29 @@ export default {
     // 切换导航菜单的折叠状态
     toggleNav() {
       this.collapseStatus = !this.collapseStatus;
+    },
+    // 监听窗口大小改变
+    windowOnResize() {
+      let that = this;
+      window.onresize = () => {
+        window.clientWidth = document.body.clientWidth;
+        window.clientHeight = document.body.clientHeight;
+        that.clientWidth = window.clientWidth;
+        that.clientHeight = window.clientHeight;
+      };
+    },
+    // 设置用户信息
+    setUserInfo() {
+      let userInfo = sessionStorage.getItem("userInfo");
+      if (userInfo != null) {
+        this.avatar = JSON.parse(userInfo).avatar;
+      }
     }
   },
   mounted() {
     this.getMenus();
-    let userInfo = sessionStorage.getItem("userInfo");
-    if (userInfo != null) {
-      this.avatar = JSON.parse(userInfo).avatar;
-    }
-    let that = this;
-    window.onresize = () => {
-      return (() => {
-        window.clientWidth = document.body.clientWidth;
-        that.clientWidth = window.clientWidth;
-      })();
-    };
+    this.setUserInfo();
+    this.windowOnResize();
   }
 }
 </script>
@@ -72,7 +81,6 @@ export default {
   .content-container {
     height: 100%;
     width: 100%;
-    min-width: 1344px;
   }
 }
 </style>
