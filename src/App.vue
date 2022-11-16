@@ -5,10 +5,9 @@
 </template>
 
 <script>
-
 export default {
-  name: 'App'
-}
+  name: "App",
+};
 </script>
 
 <style lang="scss" scoped>
@@ -20,7 +19,8 @@ export default {
   padding: 0;
 }
 
-body, html {
+body,
+html {
   margin: 0;
   padding: 0;
   height: 100%;

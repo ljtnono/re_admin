@@ -6,7 +6,29 @@
   @description 前端通用css
  */
 /*样式重置*/
-body, div, dl, dt, dd, ul, ol, li, h1, h2, h3, h4, h5, h6, pre, form, fieldset, input, textarea, p, blockquote, th, td {
+body,
+div,
+dl,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+form,
+fieldset,
+input,
+textarea,
+p,
+blockquote,
+th,
+td {
   margin: 0;
   padding: 0;
 }
@@ -16,33 +38,51 @@ table {
   border-spacing: 1px;
 }
 
-fieldest, img {
+fieldest,
+img {
   border: 0;
 }
 
-address, caption, cite, code, dfn, em, strong, th, var {
+address,
+caption,
+cite,
+code,
+dfn,
+em,
+strong,
+th,
+var {
   font-style: normal;
   font-weight: normal;
 }
 
-ol, ul {
+ol,
+ul {
   list-style: none;
 }
 
-caption, th {
+caption,
+th {
   text-align: left;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-size: 100%;
   font-weight: normal;
 }
 
-p:before, q:after {
-  content: '';
+p:before,
+q:after {
+  content: "";
 }
 
-abbr, acronym {
+abbr,
+acronym {
   border: 0;
 }
 
@@ -62,7 +102,8 @@ a {
 }
 
 /*基础样式*/
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   height: 100%;
@@ -70,10 +111,13 @@ html, body {
   background: #f1f1f1;
   color: #333333;
   font-size: 14px;
-  font-family: 'Microsoft YaHei', 'SF Pro Display', Roboto, Noto, Arial, 'PingFang SC', sans-serif;
+  font-family: "Microsoft YaHei", "SF Pro Display", Roboto, Noto, Arial,
+    "PingFang SC", sans-serif;
 }
 
-*, *:before, *:after {
+*,
+*:before,
+*:after {
   box-sizing: inherit;
 }
 
@@ -91,7 +135,7 @@ html, body {
 }
 
 .clearfix:after {
-  content: '.';
+  content: ".";
   display: block;
   height: 0;
   clear: both;
@@ -221,7 +265,6 @@ html, body {
   -webkit-align-items: stretch;
   align-items: stretch;
 }
-
 
 .f10 {
   font-size: 10px;
@@ -635,14 +678,12 @@ html, body {
   height: 10px;
 }
 
-
 .line {
   width: 100%;
   display: block;
-  background-color: #5F9EA0;
+  background-color: #5f9ea0;
 }
 
 .cursor-pointer {
   cursor: pointer;
 }
-

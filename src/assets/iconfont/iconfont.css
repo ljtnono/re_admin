@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3736894 */
-  src: url('iconfont.woff2?t=1668002051834') format('woff2'),
-       url('iconfont.woff?t=1668002051834') format('woff'),
-       url('iconfont.ttf?t=1668002051834') format('truetype');
+  src: url("iconfont.woff2?t=1668002051834") format("woff2"),
+    url("iconfont.woff?t=1668002051834") format("woff"),
+    url("iconfont.ttf?t=1668002051834") format("truetype");
 }
 
 .iconfont {
@@ -60,4 +60,3 @@
 .icon-comment:before {
   content: "\e68f";
 }
-

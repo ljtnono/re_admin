@@ -1,7 +1,7 @@
 <template>
   <div class="error-page">
     <div class="content-con">
-      <img :src="src" :alt="code">
+      <img :src="src" :alt="code" />
       <div class="text-con">
         <h4>{{ code }}</h4>
         <h5>{{ desc }}</h5>
@@ -12,19 +12,19 @@
 </template>
 
 <script>
-import backBtnGroup from './back-btn-group.vue'
+import backBtnGroup from "./back-btn-group.vue";
 
 export default {
-  name: 'error_content',
+  name: "error_content",
   components: {
-    backBtnGroup
+    backBtnGroup,
   },
   props: {
     code: String,
     desc: String,
-    src: String
-  }
-}
+    src: String,
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -59,7 +59,7 @@ export default {
         top: 0px;
         font-size: 80px;
         font-weight: 700;
-        color: #348EED;
+        color: #348eed;
       }
 
       h5 {
@@ -69,7 +69,7 @@ export default {
         top: 100px;
         font-size: 20px;
         font-weight: 700;
-        color: #67647D;
+        color: #67647d;
       }
     }
 
@@ -80,5 +80,4 @@ export default {
     }
   }
 }
-
 </style>

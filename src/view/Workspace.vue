@@ -13,11 +13,15 @@
           </div>
           <div class="system-info-card-body-item mb10">
             <span>前端地址</span>
-            <a href="http://re.lingjiatong.cn:30150" target="_blank">http://re.lingjiatong.cn:30150</a>
+            <a href="http://re.lingjiatong.cn:30150" target="_blank"
+              >http://re.lingjiatong.cn:30150</a
+            >
           </div>
           <div class="system-info-card-body-item">
             <span>github地址</span>
-            <a href="https://github.com/ljtnono/re_admin" target="_blank">https://github.com/ljtnono/re_admin</a>
+            <a href="https://github.com/ljtnono/re_admin" target="_blank"
+              >https://github.com/ljtnono/re_admin</a
+            >
           </div>
         </el-card>
       </div>
@@ -41,7 +45,7 @@
         <el-card class="overview-card mr20" shadow="hover">
           <!-- 总文章数 -->
           <div class="overview-card-body-item fl">
-            <div class="item-icon-container" style="background: #FF9900">
+            <div class="item-icon-container" style="background: #ff9900">
               <i class="iconfont icon-biaoqian"></i>
             </div>
           </div>
@@ -56,13 +60,13 @@
         <el-card class="overview-card mr20" shadow="hover">
           <!-- 总浏览量 -->
           <div class="overview-card-body-item fl">
-            <div class="item-icon-container" style="background: #E46CBB">
+            <div class="item-icon-container" style="background: #e46cbb">
               <i class="iconfont icon-icon-"></i>
             </div>
           </div>
           <div class="overview-card-body-item fr">
             <div class="item-text-container">
-              <p> 100000</p>
+              <p>100000</p>
               <p>总浏览量</p>
             </div>
           </div>
@@ -71,7 +75,7 @@
         <el-card class="overview-card" shadow="hover">
           <!-- 总点赞数 -->
           <div class="overview-card-body-item fl">
-            <div class="item-icon-container" style="background: #349AD9">
+            <div class="item-icon-container" style="background: #349ad9">
               <i class="iconfont icon-dianzan"></i>
             </div>
           </div>
@@ -87,9 +91,7 @@
     <!-- 服务器监控曲线图 -->
     <div class="workspace-content mt20">
       <el-card shadow="hover">
-        <template slot="header">
-          服务器监控
-        </template>
+        <template slot="header"> 服务器监控 </template>
         <div id="memory-line"></div>
         <div id="cpu-line"></div>
       </el-card>
@@ -97,26 +99,26 @@
     <!-- 底部访问量曲线图 -->
     <div class="workspace-footer mt20">
       <el-card class="fl" shadow="hover">
-        <template slot="header">
-          流量监控
-        </template>
+        <template slot="header"> 流量监控 </template>
         <div id="flow-line"></div>
       </el-card>
       <!-- 二维码 -->
       <div class="qrcode-container fr">
         <p>扫描二维码关注</p>
-        <img src="http://www.lingjiatong.cn:30090/rootelement/sys/author_wx_qrcode.jpeg" alt="作者微信二维码">
+        <img
+          src="http://www.lingjiatong.cn:30090/rootelement/sys/author_wx_qrcode.jpeg"
+          alt="作者微信二维码"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-
 export default {
   name: "Workspace",
   data() {
-    return {}
+    return {};
   },
   methods: {
     // 内存曲线图
@@ -130,23 +132,23 @@ export default {
           left: "40%",
           top: "5%",
           textStyle: {
-            fontSize: 14
-          }
+            fontSize: 14,
+          },
         },
         xAxis: {
-          type: 'category',
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          type: "category",
+          data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         },
         yAxis: {
-          type: 'value'
+          type: "value",
         },
         series: [
           {
             data: [820, 932, 901, 934, 1290, 1330, 1320],
-            type: 'line',
-            smooth: true
-          }
-        ]
+            type: "line",
+            smooth: true,
+          },
+        ],
       };
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
@@ -163,23 +165,23 @@ export default {
           left: "40%",
           top: "5%",
           textStyle: {
-            fontSize: 14
-          }
+            fontSize: 14,
+          },
         },
         xAxis: {
-          type: 'category',
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          type: "category",
+          data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         },
         yAxis: {
-          type: 'value'
+          type: "value",
         },
         series: [
           {
             data: [820, 932, 901, 934, 1290, 1330, 1320],
-            type: 'line',
-            smooth: true
-          }
-        ]
+            type: "line",
+            smooth: true,
+          },
+        ],
       };
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
@@ -195,34 +197,34 @@ export default {
           left: "40%",
           top: "5%",
           textStyle: {
-            fontSize: 14
-          }
+            fontSize: 14,
+          },
         },
         xAxis: {
-          type: 'category',
-          data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+          type: "category",
+          data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         },
         yAxis: {
-          type: 'value'
+          type: "value",
         },
         series: [
           {
             data: [820, 932, 901, 934, 1290, 1330, 1320],
-            type: 'line',
-            smooth: true
-          }
-        ]
+            type: "line",
+            smooth: true,
+          },
+        ],
       };
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
-    }
+    },
   },
   mounted() {
     this.drawMemoryLine();
     this.drawCpuLine();
     this.drawFlowLine();
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -254,7 +256,7 @@ export default {
           }
 
           a {
-            color: #515A6E;
+            color: #515a6e;
 
             &:hover {
               text-decoration: underline;
@@ -300,7 +302,7 @@ export default {
 
           .item-icon-container {
             height: 110px;
-            background: #19BE6B;
+            background: #19be6b;
             border-top-left-radius: 8px;
             border-bottom-left-radius: 8px;
             text-align: center;
@@ -418,7 +420,7 @@ export default {
       background: #ffffff;
       border-radius: 4px;
       cursor: pointer;
-      transition: .3s;
+      transition: 0.3s;
       text-align: center;
       position: relative;
       &:hover {

@@ -1,15 +1,11 @@
 <template>
-  <div>
-    网站配置
-  </div>
+  <div>网站配置</div>
 </template>
 
 <script>
 export default {
-  name: "WebsiteConfig"
-}
+  name: "WebsiteConfig",
+};
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

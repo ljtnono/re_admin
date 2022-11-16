@@ -1,15 +1,11 @@
 <template>
-  <div>
-    角色管理
-  </div>
+  <div>角色管理</div>
 </template>
 
 <script>
 export default {
-  name: "RoleManage"
-}
+  name: "RoleManage",
+};
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

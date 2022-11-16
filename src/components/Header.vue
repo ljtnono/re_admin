@@ -2,9 +2,16 @@
   <div id="header">
     <div class="header-bar">
       <!-- 折叠菜单图标 -->
-      <div class="toggle-icon-container fl mr30 flex flex-direction-column flex-justify-content-center">
-        <a type="text" href="javascript:" :class="navTriggerClass" @click="toggleNav">
-          <i class="iconfont icon-zhedie"/>
+      <div
+        class="toggle-icon-container fl mr30 flex flex-direction-column flex-justify-content-center"
+      >
+        <a
+          type="text"
+          href="javascript:"
+          :class="navTriggerClass"
+          @click="toggleNav"
+        >
+          <i class="iconfont icon-zhedie" />
         </a>
       </div>
       <!-- 面包屑导航 -->
@@ -18,13 +25,15 @@
       <div class="user-info-content fr">
         <el-dropdown class="fr mr50" trigger="click" @command="handleCommand">
           <div class="flex flex-direction-row">
-            <img class="mr5 flex" :src="avatar" alt="用户头像"/>
+            <img class="mr5 flex" :src="avatar" alt="用户头像" />
             <span>杂技程序员老凌</span>
-            <i class="el-icon-arrow-down el-icon--right flex"/>
+            <i class="el-icon-arrow-down el-icon--right flex" />
           </div>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="personal">个人中心</el-dropdown-item>
-            <el-dropdown-item command="updatePassword">修改密码</el-dropdown-item>
+            <el-dropdown-item command="updatePassword"
+              >修改密码
+            </el-dropdown-item>
             <el-dropdown-item command="logout">注销</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -34,22 +43,21 @@
 </template>
 
 <script>
-
 import router from "@/router";
 
 export default {
-  name: 'Header',
+  name: "Header",
   data() {
-    return {}
+    return {};
   },
   computed: {
     navTriggerClass() {
       // TODO 计算当前切换导航栏icon的class属性值
       return "nav-trigger-a";
-    }
+    },
   },
   props: {
-    avatar: String
+    avatar: String,
   },
   components: {},
   methods: {
@@ -66,25 +74,24 @@ export default {
         sessionStorage.removeItem("userInfo");
         sessionStorage.removeItem("menus");
         router.push({
-          name: "Login"
+          name: "Login",
         });
       } else if (command === "updatePassword") {
         router.push({
-          name: "UpdatePassword"
+          name: "UpdatePassword",
         });
       } else if (command === "personal") {
         router.push({
-          name: "Personal"
+          name: "Personal",
         });
       }
-    }
+    },
   },
   mounted() {
     //
-  }
-}
+  },
+};
 </script>
-
 
 <style lang="scss" scoped>
 #header {
@@ -119,7 +126,6 @@ export default {
       }
     }
 
-
     .bread-crumb-container {
       height: 100%;
 
@@ -142,7 +148,6 @@ export default {
         line-height: 40px;
       }
 
-
       img {
         border-radius: 50%;
         width: 40px;
@@ -150,6 +155,5 @@ export default {
       }
     }
   }
-
 }
 </style>

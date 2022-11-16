@@ -1,29 +1,30 @@
 <template>
   <div>
     <Button size="large" type="text" @click="backHome">返回首页</Button>
-    <Button size="large" type="text" @click="backPrev">返回上一页({{ second }}s)</Button>
+    <Button size="large" type="text" @click="backPrev"
+      >返回上一页({{ second }}s)</Button
+    >
   </div>
 </template>
 
 <script>
-
 export default {
-  name: 'backBtnGroup',
+  name: "backBtnGroup",
   data() {
     return {
       second: 5,
-      timer: null
-    }
+      timer: null,
+    };
   },
   methods: {
     backHome() {
       this.$router.replace({
-        name: "index"
-      })
+        name: "index",
+      });
     },
     backPrev() {
       this.$router.go(-1);
-    }
+    },
   },
   mounted() {
     this.timer = setInterval(() => {
@@ -33,8 +34,8 @@ export default {
   },
   beforeDestroy() {
     clearInterval(this.timer);
-  }
-}
+  },
+};
 </script>
 
 <style lang="scss" scoped>
@@ -69,7 +70,7 @@ export default {
         top: 0px;
         font-size: 80px;
         font-weight: 700;
-        color: #348EED;
+        color: #348eed;
       }
 
       h5 {
@@ -79,7 +80,7 @@ export default {
         top: 100px;
         font-size: 20px;
         font-weight: 700;
-        color: #67647D;
+        color: #67647d;
       }
     }
 
@@ -90,5 +91,4 @@ export default {
     }
   }
 }
-
 </style>

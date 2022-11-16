@@ -1,15 +1,11 @@
 <template>
-  <div>
-    评论管理
-  </div>
+  <div>评论管理</div>
 </template>
 
 <script>
 export default {
-  name: "CommentManage"
-}
+  name: "CommentManage",
+};
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

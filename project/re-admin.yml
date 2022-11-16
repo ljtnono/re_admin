@@ -22,7 +22,6 @@ spec:
             - containerPort: 80
               name: http
 
-
 ---
 # Service
 apiVersion: v1

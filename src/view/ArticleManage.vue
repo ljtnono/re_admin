@@ -1,15 +1,11 @@
 <template>
-  <div>
-    文章管理
-  </div>
+  <div>文章管理</div>
 </template>
 
 <script>
 export default {
-  name: "Article"
-}
+  name: "Article",
+};
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

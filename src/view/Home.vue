@@ -1,36 +1,40 @@
 <template>
   <div class="container flex flex-direction-row">
-    <Navigation class="flex navigation" :collapseStatus="collapseStatus" :menus="menus"/>
+    <Navigation
+      class="flex navigation"
+      :collapseStatus="collapseStatus"
+      :menus="menus"
+    />
     <div class="content-container flex flex-direction-column">
-      <Header @toggleNav="toggleNav" :avatar="avatar"/>
-      <router-view/>
+      <Header @toggleNav="toggleNav" :avatar="avatar" />
+      <router-view />
     </div>
   </div>
 </template>
 
 <script>
-import Header from '@c/Header.vue';
-import Navigation from '@c/Navigation.vue';
+import Header from "@c/Header.vue";
+import Navigation from "@c/Navigation.vue";
 
 export default {
-  name: 'Home',
+  name: "Home",
   data() {
     return {
       collapseStatus: false,
       menus: null,
       avatar: "",
       clientWidth: document.body.clientWidth,
-      clientHeight: document.body.clientHeight
-    }
+      clientHeight: document.body.clientHeight,
+    };
   },
   components: {
     Header,
-    Navigation
+    Navigation,
   },
   watch: {
     clientWidth(newVal) {
       this.collapseStatus = newVal < 2000;
-    }
+    },
   },
   methods: {
     // 获取menus
@@ -62,16 +66,15 @@ export default {
       if (userInfo != null) {
         this.avatar = JSON.parse(userInfo).avatar;
       }
-    }
+    },
   },
   mounted() {
     this.getMenus();
     this.setUserInfo();
     this.windowOnResize();
-  }
-}
+  },
+};
 </script>
-
 
 <style lang="scss" scoped>
 .container {
