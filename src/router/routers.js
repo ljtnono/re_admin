@@ -24,6 +24,24 @@ export default [
     },
     children: [
       {
+        path: "/updatePassword",
+        name: "UpdatePassword",
+        meta: {
+          title: '修改密码',
+          hideInMenu: true
+        },
+        component: () => import("@v/UpdatePassword.vue")
+      },
+      {
+        path: "/personal",
+        name: "Personal",
+        meta: {
+          title: '个人中心',
+          hideInMenu: true
+        },
+        component: () => import("@v/Personal.vue")
+      },
+      {
         path: "/workspace",
         name: "Workspace",
         meta: {

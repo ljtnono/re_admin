@@ -4,13 +4,14 @@
   </div>
 </template>
 
+
 <script>
 
-import LoginForm from '@c/LoginForm'
+import LoginForm from '@c/LoginForm';
 import {ROUT_WORKSPACE_NAME} from "@/constant/commonConstant";
 import router from "@/router";
 import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
-import '../mock/login'
+import '../mock/login';
 
 export default {
   name: 'Login',

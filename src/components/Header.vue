@@ -23,7 +23,7 @@
             <i class="el-icon-arrow-down el-icon--right flex"/>
           </div>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="personCenter">个人中心</el-dropdown-item>
+            <el-dropdown-item command="personal">个人中心</el-dropdown-item>
             <el-dropdown-item command="updatePassword">修改密码</el-dropdown-item>
             <el-dropdown-item command="logout">注销</el-dropdown-item>
           </el-dropdown-menu>
@@ -67,6 +67,14 @@ export default {
         sessionStorage.removeItem("menus");
         router.push({
           name: "Login"
+        });
+      } else if (command === "updatePassword") {
+        router.push({
+          name: "UpdatePassword"
+        });
+      } else if (command === "personal") {
+        router.push({
+          name: "Personal"
         });
       }
     }

@@ -12,9 +12,6 @@
         <div class="flex table-content-container">
           <el-table :data="userList" stripe border max-height="600">
             <el-table-column type="selection" width="40"/>
-            <el-table-column fixed="left" prop="username" label="用户名" min-width="160"/>
-            <el-table-column prop="phone" label="手机号码" min-width="120"/>
-            <el-table-column prop="email" label="邮箱" min-width="200"/>
             <el-table-column prop="avatarUrl" label="头像" min-width="80">
               <template slot-scope="scope">
                 <div class="img-avatar-container">
@@ -22,6 +19,9 @@
                 </div>
               </template>
             </el-table-column>
+            <el-table-column prop="username" label="用户名" min-width="160"/>
+            <el-table-column prop="phone" label="手机号码" min-width="120"/>
+            <el-table-column prop="email" label="邮箱" min-width="200"/>
             <el-table-column prop="createTime" sortable label="创建时间" min-width="160"/>
             <el-table-column prop="modifyTime" sortable label="最后修改时间" min-width="160"/>
             <el-table-column prop="roleIdList" label="角色" min-width="160">
@@ -84,9 +84,9 @@ export default {
 
 <style lang="scss" scoped>
 .user-manage-container {
-  width: 100%;
   height: calc(100% - 60px);
-  padding: 50px 50px 50px;
+  margin: 20px auto;
+  width: 1100px;
 
   .table-container {
     width: 100%;
