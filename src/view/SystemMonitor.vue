@@ -1,11 +1,124 @@
 <template>
-  <div>系统监控</div>
+  <div class="system-monitor-container">
+    <!-- cpu、内存概览信息 -->
+    <div class="cpu-memory-overview-container">
+      <el-card class="mr10" shadow="hover">
+        <template slot="header">
+          <span>CPU</span>
+        </template>
+        <div class="card-body-container flex flex-direction-row flex-justify-content-space-between">
+          <div class="text-item flex flex-direction-column">
+            <span>16</span>
+            <span>核心数</span>
+          </div>
+          <div class="text-item flex flex-direction-column">
+            <span>0.1%</span>
+            <span>用户使用率</span>
+          </div>
+          <div class="text-item flex flex-direction-column">
+            <span>0.05%</span>
+            <span>系统使用率</span>
+          </div>
+          <div class="text-item flex flex-direction-column">
+            <span>0.86%</span>
+            <span>当前空闲率</span>
+          </div>
+        </div>
+      </el-card>
+      <el-card shadow="hover">
+        <template slot="header">
+          <span>内存</span>
+        </template>
+        <div class="card-body-container flex flex-direction-row flex-justify-content-space-between">
+          <div class="text-item flex flex-direction-column">
+            <span>64GB</span>
+            <span>总内存</span>
+          </div>
+          <div class="text-item flex flex-direction-column">
+            <span>36.58%</span>
+            <span>已用内存</span>
+          </div>
+          <div class="text-item flex flex-direction-column">
+            <span>27.42%</span>
+            <span>剩余内存</span>
+          </div>
+          <div class="text-item flex flex-direction-column">
+            <span>23.12%</span>
+            <span>使用率</span>
+          </div>
+        </div>
+      </el-card>
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
   name: "SystemMonitor",
+  data() {
+    return {
+
+    }
+  },
+  methods: {
+
+  },
+  mounted() {
+
+  }
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+  .system-monitor-container {
+    height: calc(100% - 60px);
+    margin: 20px auto;
+    width: 1320px;
+    padding-left: 20px;
+    padding-right: 20px;
+
+    .cpu-memory-overview-container {
+      width: 100%;
+      height: 200px;
+
+      .el-card {
+        width: calc(50% - 10px);
+        height: 100%;
+        display: inline-block;
+
+        ::v-deep .el-card__header {
+          height: 60px;
+          padding: 20px;
+          font-size: 14px;
+        }
+
+        ::v-deep .el-card__header {
+          border-bottom: none;
+        }
+
+        .card-body-container {
+          width: 100%;
+
+          .text-item {
+            height: 100px;
+            vertical-align: center;
+            text-align: center;
+            span {
+              display: block;
+              margin-top: 10px;
+
+              &:nth-child(1) {
+                font-size: 24px;
+              }
+
+              &:nth-child(2) {
+                font-size: 14px;
+
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+</style>
