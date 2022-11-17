@@ -1,43 +1,39 @@
 <template>
-  <div id="header">
-    <div class="header-bar">
-      <!-- 折叠菜单图标 -->
-      <div
-        class="toggle-icon-container fl mr30 flex flex-direction-column flex-justify-content-center"
+  <div class="header-bar flex flex-direction-row">
+    <!-- 折叠菜单图标 -->
+    <div class="toggle-icon-container mr30 flex flex-direction-column flex-justify-content-center">
+      <a
+        type="text"
+        href="javascript:"
+        :class="navTriggerClass"
+        @click="toggleNav"
       >
-        <a
-          type="text"
-          href="javascript:"
-          :class="navTriggerClass"
-          @click="toggleNav"
-        >
-          <i class="iconfont icon-zhedie" />
-        </a>
-      </div>
-      <!-- 面包屑导航 -->
-      <div class="bread-crumb-container fl">
-        <el-breadcrumb separator-class="el-icon-arrow-right">
-          <el-breadcrumb-item>系统管理</el-breadcrumb-item>
-          <el-breadcrumb-item>用户管理</el-breadcrumb-item>
-        </el-breadcrumb>
-      </div>
-      <!-- 用户头像和信息 -->
-      <div class="user-info-content fr">
-        <el-dropdown class="fr mr50" trigger="click" @command="handleCommand">
-          <div class="flex flex-direction-row">
-            <img class="mr5 flex" :src="avatar" alt="用户头像" />
-            <span>杂技程序员老凌</span>
-            <i class="el-icon-arrow-down el-icon--right flex" />
+        <i class="iconfont icon-zhedie"/>
+      </a>
+    </div>
+    <!-- 面包屑导航 -->
+    <div class="bread-crumb-container flex">
+      <el-breadcrumb separator-class="el-icon-arrow-right">
+        <el-breadcrumb-item>系统管理</el-breadcrumb-item>
+        <el-breadcrumb-item>用户管理</el-breadcrumb-item>
+      </el-breadcrumb>
+    </div>
+    <!-- 用户头像和信息 -->
+    <div class="user-info-content flex flex1 flex-justify-content-end">
+      <el-dropdown trigger="click" @command="handleCommand">
+        <div class="flex flex-direction-row flex-justify-content-center">
+          <div class="mr5 avatar-container flex flex-direction-column flex-justify-content-center">
+            <img class="flex" :src="avatar" alt="用户头像"/>
           </div>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="personal">个人中心</el-dropdown-item>
-            <el-dropdown-item command="updatePassword"
-              >修改密码
-            </el-dropdown-item>
-            <el-dropdown-item command="logout">注销</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-      </div>
+          <span class="flex">杂技程序员老凌</span>
+          <i class="el-icon-arrow-down el-icon--right flex"/>
+        </div>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="personal">个人中心</el-dropdown-item>
+          <el-dropdown-item command="updatePassword">修改密码</el-dropdown-item>
+          <el-dropdown-item command="logout">注销</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </div>
   </div>
 </template>
@@ -94,64 +90,60 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-#header {
-  width: 100%;
+.header-bar {
+  position: relative;
   height: 60px;
   padding: 0 20px;
   background: #ffffff;
   box-shadow: 0 0 4px 0 rgb(0 0 0 / 10%);
 
-  .header-bar {
-    position: relative;
-    line-height: 40px;
-    padding: 10px 0;
-    height: 40px;
+  .toggle-icon-container {
+    height: 100%;
 
-    .toggle-icon-container {
-      height: 100%;
-
-      // 收起状态
-      .nav-trigger-a-collapse {
-        transform: rotateY(-90deg);
-      }
-
-      .nav-trigger-a {
-        line-height: 40px;
-        font-size: 30px;
-        color: #5c6b77;
-
-        i {
-          font-size: 26px;
-        }
-      }
+    // 收起状态
+    .nav-trigger-a-collapse {
+      transform: rotateY(-90deg);
     }
 
-    .bread-crumb-container {
-      height: 100%;
+    .nav-trigger-a {
+      line-height: 40px;
+      font-size: 30px;
+      color: #5c6b77;
 
-      .el-breadcrumb {
-        line-height: 40px;
+      i {
+        font-size: 26px;
       }
     }
+  }
+
+  .bread-crumb-container {
+    height: 100%;
+
+    .el-breadcrumb {
+      line-height: 60px;
+    }
+  }
+
+  .user-info-content {
+    overflow: hidden;
+    cursor: pointer;
+    height: 100%;
 
     .el-dropdown {
-      line-height: 40px;
       height: 100%;
-    }
-
-    .user-info-content {
-      overflow: hidden;
-      cursor: pointer;
-      line-height: 40px;
+      line-height: 60px;
 
       .el-icon-arrow-down:before {
-        line-height: 40px;
+        line-height: 60px;
       }
 
-      img {
-        border-radius: 50%;
-        width: 40px;
-        height: 40px;
+      .avatar-container {
+        img {
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          display: block;
+        }
       }
     }
   }

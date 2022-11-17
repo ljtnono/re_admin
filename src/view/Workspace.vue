@@ -1,34 +1,34 @@
 <template>
-  <div class="workspace-container">
+  <div class="workspace-container p20 flex flex1 flex-direction-column">
     <!-- 头部信息概览 -->
-    <div class="workspace-header">
-      <div class="system-info-container mr20">
+    <div class="workspace-header flex flex-direction-row">
+      <div class="system-info-container flex mr20">
         <el-card class="system-info-card" shadow="hover">
           <template slot="header">
             <span class="system-info-card-header">系统信息</span>
           </template>
-          <div class="system-info-card-body-item mb10">
+          <div class="system-info-card-body-item mb20">
             <span>当前版本</span>
             <span>v2.2.2</span>
           </div>
-          <div class="system-info-card-body-item mb10">
+          <div class="system-info-card-body-item mb20">
             <span>前端地址</span>
-            <a href="http://re.lingjiatong.cn:30150" target="_blank"
-              >http://re.lingjiatong.cn:30150</a
-            >
+            <a href="http://re.lingjiatong.cn:30150" target="_blank">
+              http://re.lingjiatong.cn:30150
+            </a>
           </div>
           <div class="system-info-card-body-item">
             <span>github地址</span>
-            <a href="https://github.com/ljtnono/re_admin" target="_blank"
-              >https://github.com/ljtnono/re_admin</a
-            >
+            <a href="https://github.com/ljtnono/re_admin" target="_blank">
+              https://github.com/ljtnono/re_admin
+            </a>
           </div>
         </el-card>
       </div>
       <!-- 系统博客相关概览信息 -->
-      <div class="overview-container">
+      <div class="overview-container flex">
         <!-- 总文章数 -->
-        <el-card class="overview-card mr20" shadow="hover">
+        <el-card class="overview-card mr30" shadow="hover">
           <div class="overview-card-body-item fl">
             <div class="item-icon-container">
               <i class="iconfont icon-article"></i>
@@ -42,7 +42,7 @@
           </div>
         </el-card>
         <!-- 总标签数 -->
-        <el-card class="overview-card mr20" shadow="hover">
+        <el-card class="overview-card mr30" shadow="hover">
           <!-- 总文章数 -->
           <div class="overview-card-body-item fl">
             <div class="item-icon-container" style="background: #ff9900">
@@ -57,7 +57,7 @@
           </div>
         </el-card>
         <!-- 总浏览量 -->
-        <el-card class="overview-card mr20" shadow="hover">
+        <el-card class="overview-card mr30" shadow="hover">
           <!-- 总浏览量 -->
           <div class="overview-card-body-item fl">
             <div class="item-icon-container" style="background: #e46cbb">
@@ -91,7 +91,7 @@
     <!-- 服务器监控曲线图 -->
     <div class="workspace-content mt20">
       <el-card shadow="hover">
-        <template slot="header"> 服务器监控 </template>
+        <template slot="header"> 服务器监控</template>
         <div id="memory-line"></div>
         <div id="cpu-line"></div>
       </el-card>
@@ -99,7 +99,7 @@
     <!-- 底部访问量曲线图 -->
     <div class="workspace-footer mt20">
       <el-card class="fl" shadow="hover">
-        <template slot="header"> 流量监控 </template>
+        <template slot="header"> 流量监控</template>
         <div id="flow-line"></div>
       </el-card>
       <!-- 二维码 -->
@@ -229,24 +229,19 @@ export default {
 
 <style lang="scss" scoped>
 .workspace-container {
-  height: calc(100% - 60px);
-  margin: 20px auto;
-  width: 1100px;
+  overflow: scroll;
 
   .workspace-header {
-    height: 145px;
     position: relative;
+    height: 200px;
 
     .system-info-container {
-      width: 320px;
-      display: inline-block;
-      position: absolute;
-      left: 0;
-      top: 0;
+      height: 100%;
 
       .system-info-card {
         cursor: pointer;
         font-size: 14px;
+        width: 400px;
 
         .system-info-card-body-item {
           span {
@@ -263,93 +258,79 @@ export default {
             }
           }
         }
-
-        ::v-deep .el-card__header {
-          padding: 10px;
-        }
-
-        ::v-deep .el-card__body {
-          padding: 10px;
-        }
       }
     }
 
     .overview-container {
-      display: inline-block;
-      height: 145px;
-      position: absolute;
-      right: 0;
-      top: 0;
+      height: 100%;
 
-      .el-card {
+      .overview-card {
         padding: 16px 20px;
         border-radius: 4px;
         display: inline-block;
-        width: 120px;
-        height: 110px;
-      }
 
-      ::v-deep .el-card__body {
-        cursor: pointer;
-        font-size: 14px;
-        height: 100%;
-        padding: 0;
-
-        .overview-card-body-item.fl {
-          display: inline-block;
+        ::v-deep .el-card__body {
+          cursor: pointer;
+          font-size: 14px;
           height: 100%;
-          width: 50px;
+          padding: 0;
+          width: 200px;
 
-          .item-icon-container {
-            height: 110px;
-            background: #19be6b;
-            border-top-left-radius: 8px;
-            border-bottom-left-radius: 8px;
-            text-align: center;
-            vertical-align: center;
+          .overview-card-body-item.fl {
+            display: inline-block;
+            height: 100%;
+            width: 100px;
 
-            i {
-              line-height: 110px;
-              font-size: 30px;
-              color: #ffffff;
+            .item-icon-container {
+              height: 100%;
+              background: #19be6b;
+              border-top-left-radius: 8px;
+              border-bottom-left-radius: 8px;
+              text-align: center;
+              line-height: 166px;
+
+              i {
+                font-size: 40px;
+                color: #ffffff;
+              }
             }
           }
-        }
 
-        .overview-card-body-item.fr {
-          display: inline-block;
-          height: 100%;
-          width: 70px;
-
-          .item-text-container {
-            text-align: center;
-            color: #000000;
-            background: #ffffff;
-            position: relative;
+          .overview-card-body-item.fr {
+            display: inline-block;
             height: 100%;
+            width: 100px;
 
-            p:nth-child(1) {
-              font-size: 16px;
-              display: block;
-              width: 100%;
-              height: 32px;
-              position: absolute;
-              left: 0;
-              top: calc(30% - 16px);
-              line-height: 32px;
+            .item-text-container {
               text-align: center;
-            }
+              color: #000000;
+              background: #ffffff;
+              position: relative;
+              height: 100%;
 
-            p:nth-child(2) {
-              text-align: center;
-              font-size: 12px;
-              display: block;
-              height: 18px;
-              width: 100%;
-              position: absolute;
-              left: 0;
-              line-height: 18px;
-              top: calc(70% - 9px);
+              p:nth-child(1) {
+                font-size: 20px;
+                display: block;
+                width: 100%;
+                height: 32px;
+                position: absolute;
+                left: 0;
+                top: calc(30% - 16px);
+                line-height: 32px;
+                text-align: center;
+              }
+
+              p:nth-child(2) {
+                text-align: center;
+                font-size: 14px;
+                display: block;
+                height: 18px;
+                width: 100%;
+                position: absolute;
+                left: 0;
+                line-height: 18px;
+                top: calc(70% - 9px);
+              }
             }
           }
         }
@@ -423,6 +404,7 @@ export default {
       transition: 0.3s;
       text-align: center;
       position: relative;
+
       &:hover {
         box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
       }

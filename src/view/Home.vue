@@ -5,8 +5,8 @@
       :collapseStatus="collapseStatus"
       :menus="menus"
     />
-    <div class="content-container flex flex-direction-column">
-      <Header @toggleNav="toggleNav" :avatar="avatar" />
+    <div class="content-container flex flex1 flex-direction-column">
+      <Header class="flex" @toggleNav="toggleNav" :avatar="avatar" />
       <router-view />
     </div>
   </div>
@@ -79,10 +79,7 @@ export default {
 <style lang="scss" scoped>
 .container {
   width: 100%;
-  height: 100%;
-  // 设置最小高度和最小宽度
-  min-height: 1100px;
-  min-width: 1400px;
+  height: 100vh;
   margin: 0;
   padding: 0;
   overflow: hidden;
@@ -93,7 +90,6 @@ export default {
 
   .content-container {
     height: 100%;
-    flex: 1;
   }
 }
 </style>

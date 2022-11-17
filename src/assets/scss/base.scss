@@ -176,6 +176,11 @@ body {
   display: flex; /* 新版本语法: Opera 12.1, Firefox 22+ */
 }
 
+.flex1 {
+  flex: 1 1 0%;
+  -webkit-flex: 1 1 0%;
+}
+
 .flex-direction-row {
   -webkit-box-direction: normal;
   -webkit-box-orient: horizontal;
