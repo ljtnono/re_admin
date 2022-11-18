@@ -26,9 +26,9 @@
         </el-card>
       </div>
       <!-- 系统博客相关概览信息 -->
-      <div class="overview-container flex">
+      <div class="overview-container flex flex1 flex-direction-row flex-justify-content-space-between">
         <!-- 总文章数 -->
-        <el-card class="overview-card mr30" shadow="hover">
+        <el-card class="overview-card flex" shadow="hover">
           <div class="overview-card-body-item fl">
             <div class="item-icon-container">
               <i class="iconfont icon-article"></i>
@@ -41,8 +41,23 @@
             </div>
           </div>
         </el-card>
+        <!-- 总分类数 -->
+        <el-card class="overview-card flex" shadow="hover">
+          <!-- 总点赞数 -->
+          <div class="overview-card-body-item fl">
+            <div class="item-icon-container" style="background: #f56c6c">
+              <i class="iconfont icon-dianzan"></i>
+            </div>
+          </div>
+          <div class="overview-card-body-item fr">
+            <div class="item-text-container">
+              <p>17</p>
+              <p>总分类数</p>
+            </div>
+          </div>
+        </el-card>
         <!-- 总标签数 -->
-        <el-card class="overview-card mr30" shadow="hover">
+        <el-card class="overview-card flex" shadow="hover">
           <!-- 总文章数 -->
           <div class="overview-card-body-item fl">
             <div class="item-icon-container" style="background: #ff9900">
@@ -57,7 +72,7 @@
           </div>
         </el-card>
         <!-- 总浏览量 -->
-        <el-card class="overview-card mr30" shadow="hover">
+        <el-card class="overview-card flex" shadow="hover">
           <!-- 总浏览量 -->
           <div class="overview-card-body-item fl">
             <div class="item-icon-container" style="background: #e46cbb">
@@ -72,7 +87,7 @@
           </div>
         </el-card>
         <!-- 总点赞数 -->
-        <el-card class="overview-card" shadow="hover">
+        <el-card class="overview-card flex" shadow="hover">
           <!-- 总点赞数 -->
           <div class="overview-card-body-item fl">
             <div class="item-icon-container" style="background: #349ad9">
@@ -91,25 +106,23 @@
     <!-- 服务器监控曲线图 -->
     <div class="workspace-content mt20">
       <el-card shadow="hover">
-        <template slot="header"> 服务器监控</template>
-        <div id="memory-line"></div>
-        <div id="cpu-line"></div>
+        <template slot="header">
+          <span>服务器监控</span>
+        </template>
+        <div class="flex flex-direction-row flex-justify-content-space-between">
+          <div class="memory-line flex flex1"></div>
+          <div class="cpu-line flex flex1"></div>
+        </div>
       </el-card>
     </div>
     <!-- 底部访问量曲线图 -->
     <div class="workspace-footer mt20">
-      <el-card class="fl" shadow="hover">
-        <template slot="header"> 流量监控</template>
-        <div id="flow-line"></div>
-      </el-card>
-      <!-- 二维码 -->
-      <div class="qrcode-container fr">
-        <p>扫描二维码关注</p>
-        <img
-          src="http://www.lingjiatong.cn:30090/rootelement/sys/author_wx_qrcode.jpeg"
-          alt="作者微信二维码"
-        />
-      </div>
+        <el-card shadow="hover">
+          <template slot="header">
+            <span>流量监控</span>
+          </template>
+          <div class="flow-line"></div>
+        </el-card>
     </div>
   </div>
 </template>
@@ -118,13 +131,17 @@
 export default {
   name: "Workspace",
   data() {
-    return {};
+    return {
+      memoryLine: null,
+      cpuLine: null,
+      flowLine: null
+    };
   },
   methods: {
     // 内存曲线图
     drawMemoryLine() {
       // 基于准备好的dom，初始化echarts实例
-      let myChart = this.$echarts.init(document.getElementById("memory-line"));
+      let myChart = this.$echarts.init(document.querySelector(".memory-line"));
       // 指定图表的配置项和数据
       let option = {
         title: {
@@ -152,11 +169,16 @@ export default {
       };
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
+      this.memoryLine = myChart;
+      window.addEventListener("resize", () => {
+        // 第六步，执行echarts自带的resize方法，即可做到让echarts图表自适应
+        myChart.resize();
+      });
     },
     // cpu曲线图
     drawCpuLine() {
       // 基于准备好的dom，初始化echarts实例
-      let myChart = this.$echarts.init(document.getElementById("cpu-line"));
+      let myChart = this.$echarts.init(document.querySelector(".cpu-line"));
       // 指定图表的配置项和数据
       let option = {
         title: {
@@ -185,11 +207,16 @@ export default {
       };
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
+      this.cpuLine = myChart;
+      window.addEventListener("resize", () => {
+        // 第六步，执行echarts自带的resize方法，即可做到让echarts图表自适应
+        myChart.resize();
+      });
     },
     // 流量曲线图
     drawFlowLine() {
       // 基于准备好的dom，初始化echarts实例
-      let myChart = this.$echarts.init(document.getElementById("flow-line"));
+      let myChart = this.$echarts.init(document.querySelector(".flow-line"));
       // 指定图表的配置项和数据
       let option = {
         title: {
@@ -217,6 +244,11 @@ export default {
       };
       // 使用刚指定的配置项和数据显示图表。
       myChart.setOption(option);
+      this.flowLine = myChart;
+      window.addEventListener("resize", () => {
+        // 第六步，执行echarts自带的resize方法，即可做到让echarts图表自适应
+        myChart.resize();
+      });
     },
   },
   mounted() {
@@ -224,12 +256,20 @@ export default {
     this.drawCpuLine();
     this.drawFlowLine();
   },
+  beforeDestroy() {
+    /* 页面组件销毁的时候，别忘了移除绑定的监听resize事件，否则的话，多渲染几次
+    容易导致内存泄漏和额外CPU或GPU占用哦*/
+    window.removeEventListener("resize", () => {
+      this.cpuLine.resize();
+      this.memoryLine.resize();
+      this.flowLine.resize();
+    });
+  },
 };
 </script>
 
 <style lang="scss" scoped>
 .workspace-container {
-  overflow: scroll;
 
   .workspace-header {
     position: relative;
@@ -350,83 +390,33 @@ export default {
         position: relative;
         padding: 10px;
         height: 343px;
-      }
 
-      #memory-line {
-        height: 323px;
-        width: 550px;
-        position: absolute;
-        left: 0;
-        top: 0;
-      }
+        .memory-line {
+          height: 323px;
+        }
 
-      #cpu-line {
-        height: 323px;
-        width: 550px;
-        position: absolute;
-        right: 0;
-        top: 0;
+        .cpu-line {
+          height: 323px;
+        }
       }
     }
   }
 
   .workspace-footer {
     width: 100%;
-    height: 300px;
-
+    height: 400px;
     .el-card {
       cursor: pointer;
-      height: 300px;
-      width: 700px;
+      height: 400px;
 
       ::v-deep .el-card__body {
         position: relative;
-        height: calc(300px - 57px);
-        width: 100%;
-        padding: 0;
-      }
+        padding: 10px;
 
-      #flow-line {
-        height: calc(300px - 57px);
-        width: 100%;
-        position: absolute;
-        right: 0;
-        top: 0;
-      }
-    }
-
-    .qrcode-container {
-      width: 300px;
-      height: 300px;
-      background: #ffffff;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: 0.3s;
-      text-align: center;
-      position: relative;
-
-      &:hover {
-        box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
-      }
-
-      p {
-        font-size: 18px;
-        position: absolute;
-        width: 140px;
-        height: 40px;
-        top: 10px;
-        left: 80px;
-        line-height: 40px;
-      }
-
-      img {
-        display: block;
-        width: 200px;
-        height: 200px;
-        margin: 0 auto;
-        position: absolute;
-        left: 50px;
-        top: 60px;
+        .flow-line {
+          height: calc(400px - 77px);
+          width: 100%;
+        }
       }
     }
   }

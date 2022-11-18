@@ -90,6 +90,8 @@ export default {
 
   .content-container {
     height: 100%;
+    overflow-y: scroll;
+    -ms-overflow-y: scroll;
   }
 }
 </style>
