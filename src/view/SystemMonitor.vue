@@ -1,8 +1,8 @@
 <template>
-  <div class="system-monitor-container">
+  <div class="system-monitor-container p20 flex flex1 flex-direction-column">
     <!-- cpu、内存概览信息 -->
-    <div class="cpu-memory-overview-container">
-      <el-card class="mr10" shadow="hover">
+    <div class="cpu-memory-overview-container flex flex-direction-row flex-justify-content-space-between">
+      <el-card class="flex" shadow="hover">
         <template slot="header">
           <span>CPU</span>
         </template>
@@ -25,7 +25,7 @@
           </div>
         </div>
       </el-card>
-      <el-card shadow="hover">
+      <el-card class="flex" shadow="hover">
         <template slot="header">
           <span>内存</span>
         </template>
@@ -47,6 +47,15 @@
             <span>使用率</span>
           </div>
         </div>
+      </el-card>
+    </div>
+    <!-- k8s集群信息 -->
+    <div class="k8s-overview-container mt20">
+      <el-card shadow="hover">
+        <template slot="header">
+          <span>k8s集群信息</span>
+        </template>
+
       </el-card>
     </div>
   </div>
@@ -71,15 +80,8 @@ export default {
 
 <style lang="scss" scoped>
   .system-monitor-container {
-    height: calc(100% - 60px);
-    margin: 20px auto;
-    width: 1320px;
-    padding-left: 20px;
-    padding-right: 20px;
 
     .cpu-memory-overview-container {
-      width: 100%;
-      height: 200px;
 
       .el-card {
         width: calc(50% - 10px);
@@ -113,12 +115,15 @@ export default {
 
               &:nth-child(2) {
                 font-size: 14px;
-
               }
             }
           }
         }
       }
+    }
+
+    .k8s-overview-container {
+
     }
   }
 </style>

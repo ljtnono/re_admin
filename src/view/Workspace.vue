@@ -117,12 +117,12 @@
     </div>
     <!-- 底部访问量曲线图 -->
     <div class="workspace-footer mt20">
-        <el-card shadow="hover">
-          <template slot="header">
-            <span>流量监控</span>
-          </template>
-          <div class="flow-line"></div>
-        </el-card>
+      <el-card shadow="hover">
+        <template slot="header">
+          <span>流量监控</span>
+        </template>
+        <div class="flow-line"></div>
+      </el-card>
     </div>
   </div>
 </template>
@@ -405,6 +405,7 @@ export default {
   .workspace-footer {
     width: 100%;
     height: 400px;
+
     .el-card {
       cursor: pointer;
       height: 400px;
