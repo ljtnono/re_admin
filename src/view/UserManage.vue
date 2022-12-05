@@ -3,18 +3,13 @@
     <div class="table-container">
       <el-card class="card">
         <!-- 用户名、手机号、邮箱搜索栏 -->
-        <div
-          class="table-search-container flex flex-direction-row flex-justify-content-start mb20"
-        >
+        <div class="table-search-container flex flex-direction-row flex-justify-content-start mb20">
           <el-input
             class="mr20"
             v-model="searchCondition"
             placeholder="输入用户名、邮箱、手机号搜索"
-            clearable
-          />
-          <el-button class="btn-submit" type="primary" @click="search"
-            >搜索</el-button
-          >
+            clearable/>
+          <el-button class="btn-submit" type="primary" @click="search">搜索</el-button>
           <el-button class="btn-submit" type="primary">更多</el-button>
         </div>
         <!-- 表格显示栏 -->

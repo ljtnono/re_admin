@@ -55,7 +55,87 @@
         <template slot="header">
           <span>k8s集群信息</span>
         </template>
-
+        <div class="k8s-overview-body-container">
+          <el-table
+            :data="k8sFormData"
+            max-height="600"
+            stripe
+            style="width: 100%">
+            <el-table-column
+              prop="date"
+              label="NAME">
+            </el-table-column>
+            <el-table-column
+              prop="date"
+              label="READY">
+            </el-table-column>
+            <el-table-column
+              prop="date"
+              label="STATUS">
+            </el-table-column>
+            <el-table-column
+              prop="date"
+              label="RESTARTS">
+            </el-table-column>
+            <el-table-column
+              prop="date"
+              label="AGE">
+            </el-table-column>
+            <el-table-column
+              prop="date"
+              label="IP">
+            </el-table-column>
+            <el-table-column
+              prop="date"
+              label="NODE">
+            </el-table-column>
+            <el-table-column
+              prop="date"
+              label="NOMINATED NODE">
+            </el-table-column>
+            <el-table-column
+              prop="date"
+              label="READINESS GATES">
+            </el-table-column>
+          </el-table>
+        </div>
+      </el-card>
+    </div>
+    <!-- 硬盘状态 -->
+    <div class="hard-overview-container mt20">
+      <el-card shadow="hover">
+        <template slot="header">
+          <span>硬盘状态</span>
+        </template>
+        <el-table
+          stripe
+          :data="hardFormData"
+          style="width: 100%">
+          <el-table-column
+            prop="date"
+            label="盘符路径">
+          </el-table-column>
+          <el-table-column
+            prop="date"
+            label="文件系统">
+          </el-table-column>
+          <el-table-column
+            prop="date"
+            label="总大小">
+          </el-table-column>
+          <el-table-column
+            prop="date"
+            label="可用大小">
+          </el-table-column>
+          <el-table-column
+            prop="date"
+            label="已用大小">
+          </el-table-column>
+          <el-table-column
+            prop="date"
+            label="已用百分比">
+          </el-table-column>
+        </el-table>
       </el-card>
     </div>
   </div>
@@ -66,7 +146,8 @@ export default {
   name: "SystemMonitor",
   data() {
     return {
-
+      k8sFormData: null,
+      hardFormData: null
     }
   },
   methods: {
@@ -123,7 +204,22 @@ export default {
     }
 
     .k8s-overview-container {
+      .el-card {
+        margin: 0 auto;
 
+        ::v-deep .el-card__header {
+          border-bottom: none;
+        }
+      }
+
+    }
+
+    .hard-overview-container {
+      .el-card {
+        ::v-deep .el-card__header {
+          border-bottom: none;
+        }
+      }
     }
   }
 </style>
