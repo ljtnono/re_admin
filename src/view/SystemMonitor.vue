@@ -141,7 +141,7 @@
           <div class="flex flex-direction-row flex-justify-content-space-between">
             <span>硬盘状态</span>
             <span>{{ hardStatusMonitorNode }}</span>
-            <el-dropdown trigger="click" @command="changeK8sPodMonitorNamespace">
+            <el-dropdown trigger="click" @command="changeHardStatusMonitorIP">
               <span>选择机器地址</span>
               <el-dropdown-menu slot="dropdown">
                 <el-dropdown-item v-for="node in k8sNodeList" :command="node" :key="node.hostname">
@@ -270,6 +270,11 @@ export default {
       this.$http.get("/api-backend/system/monitor/hardStatus").then(res => {
         let data = res.data.data;
         this.hardStatusList = data;
+        if (node === null || node === undefined) {
+          this.hardStatusMonitorNode = this.k8sNodeList[0].hostname + "\t" + this.k8sNodeList[0].ipAddress;
+        } else {
+          this.hardStatusMonitorNode = node.hostname + "\t" + node.ipAddress;
+        }
       });
     },
     changeCPUMonitorIP(node) {
@@ -281,6 +286,9 @@ export default {
     changeK8sPodMonitorNamespace(namespace) {
       this.getK8sNamespaceList(namespace);
     },
+    changeHardStatusMonitorIP(node) {
+      this.getHardStatus(node);
+    }
   },
   mounted() {
     this.getK8sNodeList();
