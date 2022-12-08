@@ -1,11 +1,13 @@
 <template>
-  <div>文章管理</div>
+  <div>
+    写文章
+  </div>
 </template>
 
 <script>
 export default {
-  name: "Article",
-};
+  name: "WriteArticle"
+}
 </script>
 
 <style lang="scss" scoped>

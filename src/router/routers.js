@@ -32,6 +32,15 @@ export default [
         component: () => import("@v/UpdatePassword.vue"),
       },
       {
+        path: "/writeArticle",
+        name: "WriteArticle",
+        meta: {
+          title: "写文章",
+          hideInMenu: true,
+        },
+        component: () => import("@v/WriteArticle.vue"),
+      },
+      {
         path: "/personal",
         name: "Personal",
         meta: {

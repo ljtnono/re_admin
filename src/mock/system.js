@@ -69,9 +69,9 @@ Mock.mock("/api-backend/system/monitor/memoryInfo", "get", {
   message: HTTP_RESULT_SUCCESS_MESSAGE,
   data: {
     total: 64,
-    used: 25.44,
-    freePercent: 0.03,
-    usedPercent: 0.27
+    used: 25,
+    free: 39,
+    usedPercent: 0.3921
   }
 });
 
@@ -256,18 +256,18 @@ Mock.mock("/api-backend/system/monitor/hardStatus", "get", {
     {
       path: "/dev/sda",
       fileSystem: "overlay",
-      totalSize: 123,
-      freeSize: 12.7,
-      usedSize: 12.5,
-      usedPercent: 12.6
+      totalSize: "123GB",
+      freeSize: "22GB",
+      usedSize: "121GB",
+      usedPercent: "80.12%"
     },
     {
       path: "/dev/sdb",
       fileSystem: "ext4",
-      totalSize: 123,
-      freeSize: 12.7,
-      usedSize: 12.5,
-      usedPercent: 12.6
+      totalSize: "123GB",
+      freeSize: "22GB",
+      usedSize: "121GB",
+      usedPercent: "80.12%"
     }
   ]
 });
