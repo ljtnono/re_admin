@@ -216,8 +216,8 @@ export default {
   },
   methods: {
     // 获取k8s节点列表
-    getK8sNodeList() {
-      this.$http.get("/api-backend/system/monitor/k8sNodeList").then(res => {
+    async getK8sNodeList() {
+      await this.$http.get("/api-backend/system/monitor/k8sNodeList").then(res => {
         let data = res.data.data;
         let defaultSelect = data[0].hostname + "\t" + data[0].ipAddress;
         this.k8sNodeList = data;
@@ -228,33 +228,36 @@ export default {
     },
     // 获取cpu监控信息
     getCPUInfo(node) {
+      let that = this;
       this.$http.get("/api-backend/system/monitor/CPUInfo").then(res => {
         let data = res.data.data;
-        this.cpuMonitorInfo = data;
+        that.cpuMonitorInfo = data;
         if (node !== null && node !== undefined) {
-          this.cpuMonitorNode = node.hostname + "\t" + node.ipAddress;
+          that.cpuMonitorNode = node.hostname + "\t" + node.ipAddress;
         }
       });
     },
     // 获取内存监控信息
     getMemoryInfo(node) {
+      let that = this;
       this.$http.get("/api-backend/system/monitor/memoryInfo").then(res => {
         let data = res.data.data;
-        this.memoryMonitorInfo = data;
+        that.memoryMonitorInfo = data;
         if (node !== null && node !== undefined) {
-          this.memoryMonitorNode = node.hostname + "\t" + node.ipAddress;
+          that.memoryMonitorNode = node.hostname + "\t" + node.ipAddress;
         }
       });
     },
     // 获取k8s名称空间列表
-    getK8sNamespaceList(namespace) {
-      this.$http.get("/api-backend/system/monitor/k8sNamespaceList").then(res => {
+    async getK8sNamespaceList(namespace) {
+      let that = this;
+      await this.$http.get("/api-backend/system/monitor/k8sNamespaceList").then(res => {
         let data = res.data.data;
-        this.k8sNamespaceList = data;
+        that.k8sNamespaceList = data;
         if (namespace === null || namespace === undefined) {
-          this.k8sMonitorNamespace = data[1];
+          that.k8sMonitorNamespace = data[1];
         } else {
-          this.k8sMonitorNamespace = namespace;
+          that.k8sMonitorNamespace = namespace;
         }
       });
     },
@@ -267,13 +270,14 @@ export default {
     },
     // 获取指定机器的硬盘状态
     getHardStatus(node) {
+      let that = this;
       this.$http.get("/api-backend/system/monitor/hardStatus").then(res => {
         let data = res.data.data;
-        this.hardStatusList = data;
+        that.hardStatusList = data;
         if (node === null || node === undefined) {
-          this.hardStatusMonitorNode = this.k8sNodeList[0].hostname + "\t" + this.k8sNodeList[0].ipAddress;
+          that.hardStatusMonitorNode = that.k8sNodeList[0]["hostname"] + "\t" + that.k8sNodeList[0]["ipAddress"];
         } else {
-          this.hardStatusMonitorNode = node.hostname + "\t" + node.ipAddress;
+          that.hardStatusMonitorNode = node.hostname + "\t" + node.ipAddress;
         }
       });
     },
@@ -288,15 +292,20 @@ export default {
     },
     changeHardStatusMonitorIP(node) {
       this.getHardStatus(node);
+    },
+    // 初始化
+    async init() {
+      let that = this;
+      await this.getK8sNodeList();
+      await this.getK8sNamespaceList(null);
+      this.getCPUInfo();
+      this.getMemoryInfo();
+      this.getK8sPodInfoList(that.k8sMonitorNamespace);
+      this.getHardStatus(null);
     }
   },
   mounted() {
-    this.getK8sNodeList();
-    this.getCPUInfo();
-    this.getMemoryInfo();
-    this.getK8sNamespaceList(null);
-    this.getK8sPodInfoList(this.k8sMonitorNamespace);
-    this.getHardStatus(null);
+    this.init();
   }
 };
 </script>

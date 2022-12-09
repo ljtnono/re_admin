@@ -60,7 +60,7 @@ export default [
       },
       {
         path: "/blog/article",
-        name: "Blog-Article",
+        name: "BlogArticle",
         meta: {
           title: "文章管理",
           hideInMenu: true,
@@ -69,7 +69,7 @@ export default [
       },
       {
         path: "/blog/category",
-        name: "Blog-Category",
+        name: "BlogCategory",
         meta: {
           title: "分类管理",
           hideInMenu: true,
@@ -78,7 +78,7 @@ export default [
       },
       {
         path: "/blog/comment",
-        name: "Blog-Comment",
+        name: "BlogComment",
         meta: {
           title: "评论管理",
           hideInMenu: true,
@@ -87,7 +87,7 @@ export default [
       },
       {
         path: "/system/user",
-        name: "System-User",
+        name: "SystemUser",
         meta: {
           title: "用户管理",
           hideInMenu: true,
@@ -96,7 +96,7 @@ export default [
       },
       {
         path: "/system/role",
-        name: "System-Role",
+        name: "SystemRole",
         meta: {
           title: "角色管理",
           hideInMenu: true,
@@ -105,7 +105,7 @@ export default [
       },
       {
         path: "/system/websiteConfig",
-        name: "System-WebsiteConfig",
+        name: "SystemWebsiteConfig",
         meta: {
           title: "网站配置",
           hideInMenu: true,
@@ -114,7 +114,7 @@ export default [
       },
       {
         path: "/system/monitor",
-        name: "System-Monitor",
+        name: "SystemMonitor",
         meta: {
           title: "系统监控",
           hideInMenu: true,

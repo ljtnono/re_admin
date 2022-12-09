@@ -1,5 +1,6 @@
 import Vue from "vue";
 import App from "./App.vue";
+import Router from "vue-router";
 import router from "./router";
 import VueAxios from "vue-axios";
 import ElementUI from "element-ui";
@@ -9,18 +10,20 @@ import "element-ui/lib/theme-chalk/index.css";
 import axios from "@/config/axiosConfig";
 import mavonEditor from "mavon-editor";
 import "mavon-editor/dist/css/index.css";
-
-// 引入echarts
+import store from "./store"
 import * as echarts from "echarts";
+
 Vue.prototype.$echarts = echarts;
 Vue.config.productionTip = false;
+
 // 使用ElementUI
 Vue.use(ElementUI);
 Vue.use(VueAxios, axios);
-// use
-Vue.use(mavonEditor)
+Vue.use(mavonEditor);
+Vue.use(Router);
 
 new Vue({
   render: (h) => h(App),
   router,
+  store
 }).$mount("#app");

@@ -22,10 +22,12 @@
     <div class="user-info-content flex flex1 flex-justify-content-end">
       <el-dropdown trigger="click" @command="handleCommand">
         <div class="flex flex-direction-row flex-justify-content-center">
+          <div class="write-article mr40"  @click.stop="$router.push({name: 'WriteArticle'})">
+            写文章
+          </div>
           <div class="mr5 avatar-container flex flex-direction-column flex-justify-content-center">
             <img class="flex" :src="avatar" alt="用户头像"/>
           </div>
-          <a class="mr20" href="javascript:;" >写文章</a>
           <span class="flex">杂技程序员老凌</span>
           <i class="el-icon-arrow-down el-icon--right flex"/>
         </div>
@@ -133,6 +135,11 @@ export default {
     .el-dropdown {
       height: 100%;
       line-height: 60px;
+
+      .write-article {
+        cursor: pointer;
+        height: 80%;
+      }
 
       .el-icon-arrow-down:before {
         line-height: 60px;

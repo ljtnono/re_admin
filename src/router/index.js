@@ -1,20 +1,23 @@
-import Vue from "vue";
 import Router from "vue-router";
-import routes from "./routers";
+import routers from "./routers";
 import { ROUT_HOME_NAME } from "@/constant/commonConstant";
 import message from "element-ui/packages/message";
 
-Vue.use(Router);
-
 // 创建导航，使用历史模式
 const router = new Router({
-  routes,
+  routes: routers,
   base: "/",
   mode: "history",
 });
 
 // 特殊页面数组
 const SPECIAL_PAGES = ["/login", "/404", "/500", "/401"];
+
+// 解决重复点击路由报错的BUG
+const originalPush = Router.prototype.push;
+Router.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch((err) => err);
+}
 
 // 设置路由守卫
 router.beforeEach((to, from, next) => {

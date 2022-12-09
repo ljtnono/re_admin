@@ -32,14 +32,17 @@ Mock.mock("/api-backend/login", "post", {
           {
             menuName: "文章管理",
             url: "/blog/article",
+            routeName: "BlogArticle"
           },
           {
             menuName: "分类管理",
             url: "/blog/category",
+            routeName: "BlogCategory"
           },
           {
             menuName: "评论管理",
             url: "/blog/comment",
+            routeName: "BlogComment"
           },
         ],
       },
@@ -50,18 +53,22 @@ Mock.mock("/api-backend/login", "post", {
           {
             menuName: "用户管理",
             url: "/system/user",
+            routeName: "SystemUser"
           },
           {
             menuName: "角色管理",
             url: "/system/role",
+            routeName: "SystemRole"
           },
           {
             menuName: "网站配置",
             url: "/system/websiteConfig",
+            routeName: "SystemWebsiteConfig"
           },
           {
             menuName: "系统监控",
             url: "/system/monitor",
+            routeName: "SystemMonitor"
           },
         ],
       },

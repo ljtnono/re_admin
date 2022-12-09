@@ -6,59 +6,37 @@
       text-color="#ffffff"
       active-text-color="rgba(255, 255, 255, 0.7);"
       :collapse-transition="collapseTransition"
-      :collapse="collapseStatus"
-    >
+      :collapse="collapseStatus">
       <!-- 导航栏上面的logo -->
       <div class="nav-logo-container mb10">
-        <img
-          class="nav-logo-max"
-          v-show="!collapseStatus"
-          src="@a/images/logo.png"
-        />
-        <img
-          class="nav-logo-min"
-          v-show="collapseStatus"
-          src="@a/images/logo-min.png"
-        />
+        <img class="nav-logo-max" v-show="!collapseStatus" src="@a/images/logo.png" />
+        <img class="nav-logo-min" v-show="collapseStatus" src="@a/images/logo-min.png" />
       </div>
       <!-- 工作台 -->
-      <el-menu-item style="text-align: center; cursor: pointer">
-        <a
-          href="/workspace"
-          v-show="!collapseStatus"
-          style="width: 100%; height: 100%; display: inline-block"
-          >工作台</a
-        >
+      <el-menu-item style="text-align: center; cursor: pointer" @click="$router.push({ name: 'Workspace' })">
+        <a href="javascript:;" v-show="!collapseStatus" style="width: 100%; height: 100%; display: inline-block">
+          工作台
+        </a>
         <div v-show="collapseStatus">
-          <a
-            href="/workspace"
-            style="width: 100%; height: 100%; display: inline-block"
-          >
-            <i
-              class="el-icon-location"
-              style="display: inline-block !important"
-            />
+          <a href="javascript:;" style="width: 100%; height: 100%; display: inline-block">
+            <i class="el-icon-location" style="display: inline-block !important" />
           </a>
         </div>
       </el-menu-item>
       <!-- 循环渲染菜单 -->
-      <div v-for="(m1, i1) in menus" :key="m1">
+      <div v-for="(m1, i1) in menus" :key="m1.name">
         <!-- 包含子菜单 -->
         <div v-if="m1.subMenu !== null && m1.subMenu !== undefined">
-          <el-submenu :index="i1">
-            <template slot="title">
+          <el-submenu :index="i1 + ''">
+            <div slot="title">
               <i :class="'iconfont' + ' ' + m1.icon" />
-              <span style="margin-left: 15px" v-show="!collapseStatus">{{
-                m1.menuName
-              }}</span>
-            </template>
-            <div v-for="m2 in m1.subMenu" :key="m2">
-              <el-menu-item>
-                <a
-                  class="ml30"
-                  :href="m2.url"
-                  style="width: 100%; height: 100%; display: inline-block"
-                >
+              <span style="margin-left: 15px" v-show="!collapseStatus">
+                {{ m1.menuName }}
+              </span>
+            </div>
+            <div v-for="m2 in m1.subMenu" :key="m2.name">
+              <el-menu-item @click="$router.push({ name: m2.routeName })">
+                <a class="ml30" href="javascript:;" style="width: 100%; height: 100%; display: inline-block">
                   {{ m2.menuName }}
                 </a>
               </el-menu-item>
@@ -66,11 +44,8 @@
           </el-submenu>
         </div>
         <!-- 不包含子菜单 -->
-        <el-menu-item
-          v-if="m1.subMenu === null || m1.subMenu === undefined"
-          :index="i1"
-        >
-          <a :href="m1.url"> {{ m1.menuName }} </a>
+        <el-menu-item v-if="m1.subMenu === null || m1.subMenu === undefined" :index="i1" @click="$router.push({ name: m1.routeName })">
+          <a href="javascript:;"> {{ m1.menuName }} </a>
         </el-menu-item>
       </div>
     </el-menu>
@@ -92,8 +67,12 @@ export default {
     },
   },
   components: {},
-  methods: {},
-  mounted() {},
+  methods: {
+
+  },
+  mounted() {
+
+  },
 };
 </script>
 
