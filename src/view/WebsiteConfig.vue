@@ -1,5 +1,7 @@
 <template>
-  <div>网站配置</div>
+  <div class="website-config-container p20 flex flex1 flex-direction-column">
+
+  </div>
 </template>
 
 <script>
@@ -17,5 +19,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.website-config-container {
 
+}
 </style>

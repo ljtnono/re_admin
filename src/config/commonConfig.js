@@ -24,3 +24,8 @@ export const ELEMENT_FAILED_MESSAGE_CONFIG = {
   duration: 2000,
   center: false,
 };
+
+// markdown编辑器配置
+export const EDITOR_CONFIG = {
+
+};

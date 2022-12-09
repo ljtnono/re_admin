@@ -1,6 +1,6 @@
 {
   "name": "re_admin",
-  "version": "v0.0.2",
+  "version": "v0.0.3",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -12,6 +12,7 @@
     "core-js": "^3.8.3",
     "echarts": "^5.4.0",
     "element-ui": "^2.15.10",
+    "mavon-editor": "^2.10.4",
     "moment": "^2.24.0",
     "sass": "^1.48.0",
     "sass-loader": "^10",

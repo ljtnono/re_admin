@@ -25,6 +25,7 @@
           <div class="mr5 avatar-container flex flex-direction-column flex-justify-content-center">
             <img class="flex" :src="avatar" alt="用户头像"/>
           </div>
+          <a class="mr20" href="javascript:;" >写文章</a>
           <span class="flex">杂技程序员老凌</span>
           <i class="el-icon-arrow-down el-icon--right flex"/>
         </div>
