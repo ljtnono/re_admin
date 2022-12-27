@@ -12,6 +12,7 @@ import mavonEditor from "mavon-editor";
 import "mavon-editor/dist/css/index.css";
 import store from "./store"
 import * as echarts from "echarts";
+import DateUtil from "@/util/dateUtil";
 
 Vue.prototype.$echarts = echarts;
 Vue.config.productionTip = false;
@@ -21,6 +22,11 @@ Vue.use(ElementUI);
 Vue.use(VueAxios, axios);
 Vue.use(mavonEditor);
 Vue.use(Router);
+
+// 全局过滤器
+Vue.filter("dateFormat", function(value, style) {
+  return DateUtil.format(value, style);
+});
 
 new Vue({
   render: (h) => h(App),

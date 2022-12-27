@@ -5,6 +5,23 @@ import {
 import ElementUI from "element-ui";
 
 const instance = axios.create();
+// 开发环境使用的token
+const devToken = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJwaG9uZSI6IjE2MzMzMzMzMzMzIiwidXNlcl9uYW1lIjoibGluZ2ppYXRvbmciLCJzY29wZSI6WyJhbGwiXSwiZXhwIjoxNjcyMTc1MTc4LCJ1c2VySWQiOjEsImF1dGhvcml0aWVzIjpbImJsb2ciXSwianRpIjoiZGFhYjE0NjMtZDc4ZS00OTkxLTk4OWMtY2JiMjA4NzJlY2RiIiwiZW1haWwiOiI5MzUxODg0MDBAcXEuY29tIiwiY2xpZW50X2lkIjoiY2xpZW50IiwidXNlcm5hbWUiOiJsaW5namlhdG9uZyJ9.mBgBZ77vnTSP_j-rBecKlFJj9dcSUJsWmoj3vmmm7pCVbZOZAw6jAWRUWSs6Iw3VPxjhKQPKQfY9WPImEb0KqEkrRMJ9fXCgXn1JdTilys0orWHF9M-8A47SdAbOMDZXsdQ08ld-8OMAx2EnzCuc55tKUl0NRwKFIOUOJu4unuNGBzL6XYFEtoGwIW6vDaHuNQZT0pC_snXx94050_75qD6UmZc9kL_D3UnK5l-lyizEygqdKyAZwmmJ6pDAgqUuWOKe-VXzcktw1ApuT2I81Tv2L7Dtu8ZLDeKNAm83qOfvsQ0LxPf2ErhvJL-IfsMKGfoEQiCtS-PTCYnMQ0sjjA";
+// 添加请求拦截器
+instance.interceptors.request.use(config => {
+  if (process.env.NODE_ENV === "production") {
+    let token = sessionStorage.getItem("tokenInfo");
+    if(token) {
+      //这里面获取的请求头的键(tokenHeader)根据每个后端的习惯封装的名称各不相同
+      config.headers.common["Authorization"] = "Bearer " + JSON.parse(token).access_token;
+    }
+  } else {
+    config.headers.common["Authorization"] = "Bearer " + devToken;
+  }
+  return config;
+}, error => {
+  return Promise.reject(error);
+});
 
 // 添加响应拦截器
 instance.interceptors.response.use((response) => {
@@ -13,11 +30,9 @@ instance.interceptors.response.use((response) => {
   let code = response.data.code;
   let message = response.data.message;
   if (HTTP_RESULT_SUCCESS_CODE === code && HTTP_RESULT_SUCCESS_MESSAGE === message) {
-    // 根据错误消息做一些特殊处理
-    // TODO 捕获401、403、404、500等异常
     return response;
   } else {
-    // TODO 弹出错误消息
+    // 弹出错误消息
     ElementUI.Message.error({
       message: message, type: "error", duration: 2000, center: false,
     });

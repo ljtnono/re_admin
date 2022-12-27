@@ -1,7 +1,8 @@
 // #################### 常用常量池 #################### //
 
 // 页面基础访问url
-export const BASE_URL = "/";
+export const BASE_URL = "http://127.0.0.1:8152/api-backend";
+// export const BASE_URL = "http://re.lingjiatong.cn:30152/api-backend";
 // 请求成功code值
 export const HTTP_RESULT_SUCCESS_CODE = 0;
 // 请求成功message值
