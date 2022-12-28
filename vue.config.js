@@ -16,4 +16,7 @@ module.exports = {
       .set("@a", resolve("src/assets"))
       .set("@v", resolve("src/view"));
   },
+  devServer: {
+    disableHostCheck: true
+  }
 };

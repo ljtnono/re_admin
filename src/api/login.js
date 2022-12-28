@@ -1,5 +1,5 @@
-import axios from "axios";
-import qs from "qs";
+import axios from "@/config/axiosConfig";
+import { BASE_URL } from "@/constant/commonConstant";
 
-// 登录
+// 获取token
 export const login = (username, password) => {};
