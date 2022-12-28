@@ -78,7 +78,7 @@
 import { EDITOR_CONFIG } from "../config/commonConfig";
 import DateUtil from "@/util/dateUtil";
 import PublishArticleForm from "@c/PublishArticleForm.vue";
-import {deleteDraft, getDraftList, saveOrUpdateDraft} from "../api/article";
+import {deleteDraft, getDraftDetail, getDraftList, saveOrUpdateDraft} from "../api/article";
 import articleUtil from "@/util/articleUtil";
 import commonUtil from "@/util/commonUtil";
 
@@ -96,13 +96,10 @@ export default {
       draftList: [],
       currentDraftIndex: 0,
       saveStatus: 2,
-      showPublishForm: false
+      showPublishForm: true
     }
   },
   computed: {
-    commonUtil() {
-      return commonUtil
-    },
     saveStatusStr() {
       let saveStatus = this.saveStatus;
       if (saveStatus === 0) {
@@ -124,28 +121,34 @@ export default {
         if (!showIndex) {
           showIndex = 0;
         }
-        let draft = that.draftList[showIndex];
-        that.currentDraftIndex = showIndex;
-        that.markdownContent = draft.markdownContent;
-        that.title = draft.title;
-        that.saveStatus = 2;
+        let draftId = that.draftList[showIndex].draftId;
+        // 获取当前数据
+        getDraftDetail(draftId).then(r => {
+          let draft = r.data.data;
+          that.currentDraftIndex = showIndex;
+          that.markdownContent = draft.markdownContent;
+          that.title = draft.title;
+          that.saveStatus = 2;
+        });
       });
     },
     // 编辑某个草稿
-    editDraft(index) {
+    editDraft: commonUtil.throttle(function (index) {
       let that = this;
-      if (index !== that.currentDraftIndex) {
+      let draftId = that.draftList[index].draftId;
+      getDraftDetail(draftId).then(r => {
+        let draft = r.data.data;
         that.currentDraftIndex = index;
-        that.markdownContent = that.draftList[index].markdownContent;
-        that.title = that.draftList[index].title;
-      }
-    },
+        that.markdownContent = draft.markdownContent;
+        that.title = draft.title;
+      });
+    }, 200),
     // 监听markdown内容改变事件
     editorChange: commonUtil.throttle(function (value) {
       let that = this;
       that.markdownContent = value;
       that.title = articleUtil.getTitleFromMarkdownContent(value) || DateUtil.getNowDate("yyyy-MM-D");
-    }, 1000),
+    }, 200),
     // 保存草稿
     editorSave: commonUtil.throttle(async function (value) {
       let that = this;
@@ -155,7 +158,7 @@ export default {
       // 重新获取草稿列表
       await that.refreshDraftList();
       this.saveStatus = 2;
-    }, 1000),
+    }, 200),
     // 新建文章
     newArticle: commonUtil.throttle(async function() {
       let that = this;
@@ -167,7 +170,7 @@ export default {
       this.saveStatus = 2;
       // 再请求一次列表
       await that.refreshDraftList();
-    }, 1000),
+    }, 200),
     // 处理草稿下拉列表
     async handleDraftDropdownCommand(command) {
       let that = this;

@@ -24,7 +24,7 @@ class ArticleUtil {
           return "\n";
         })
         // 匹配所有以 # 开始的内容
-        .replace(/#+(.*)/g, (match, g1) => {
+        .replace(/#+\s+(.*)/g, (match, g1) => {
           let title = g1;
           nav.push(title);
         });

@@ -14,6 +14,15 @@ export const getDraftList = () => {
 };
 
 /**
+ * 获取单个草稿内容
+ *
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const getDraftDetail = (draftId) => {
+  return axios.get(BASE_URL + requestMapping + "/draft/" + draftId);
+};
+
+/**
  * 保存或更新
  *
  * @returns {Promise<AxiosResponse<any>>}
