@@ -32,6 +32,9 @@
     <!-- 编辑区 -->
     <div class="editor-container flex flex1">
       <mavon-editor
+        ref="md"
+        @imgAdd="imgAdd"
+        @imgDel="imgDel"
         :language="editorConfig.language"
         :font-size="editorConfig.fontSize"
         :scroll-style="editorConfig.scrollStyle"
@@ -81,6 +84,7 @@ import PublishArticleForm from "@c/PublishArticleForm.vue";
 import {deleteDraft, getDraftDetail, getDraftList, saveOrUpdateDraft} from "../api/article";
 import articleUtil from "@/util/articleUtil";
 import commonUtil from "@/util/commonUtil";
+import {uploadFile} from "@/api/common";
 
 export default {
   name: "WriteArticle",
@@ -136,19 +140,21 @@ export default {
     editDraft: commonUtil.throttle(function (index) {
       let that = this;
       let draftId = that.draftList[index].draftId;
-      getDraftDetail(draftId).then(r => {
-        let draft = r.data.data;
-        that.currentDraftIndex = index;
-        that.markdownContent = draft.markdownContent;
-        that.title = draft.title;
-      });
+      if (that.currentDraftIndex !== index) {
+        getDraftDetail(draftId).then(r => {
+          let draft = r.data.data;
+          that.currentDraftIndex = index;
+          that.markdownContent = draft.markdownContent;
+          that.title = draft.title;
+        });
+      }
     }, 200),
     // 监听markdown内容改变事件
-    editorChange: commonUtil.throttle(function (value) {
+    editorChange(value) {
       let that = this;
       that.markdownContent = value;
       that.title = articleUtil.getTitleFromMarkdownContent(value) || DateUtil.getNowDate("yyyy-MM-D");
-    }, 200),
+    },
     // 保存草稿
     editorSave: commonUtil.throttle(async function (value) {
       let that = this;
@@ -184,6 +190,22 @@ export default {
         // 重新请求草稿列表
         await that.refreshDraftList();
       }
+    },
+    // 处理图片上传
+    imgAdd(pos, file) {
+      let vm = this.$refs.md;
+      const data = new FormData();
+      data.append("file", file);
+      // 第一步.将图片上传到服务器.
+      uploadFile(data).then(res => {
+        // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)
+        let url = res.data.data;
+        vm.$img2Url(pos, url);
+      });
+    },
+    // 处理图片删除
+    imgDel() {
+
     }
   },
   async mounted() {
