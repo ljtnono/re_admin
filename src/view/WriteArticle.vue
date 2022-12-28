@@ -75,7 +75,7 @@
 
 <script>
 
-import { EDITOR_CONFIG } from "../config/commonConfig";
+import {EDITOR_CONFIG} from "../config/commonConfig";
 import DateUtil from "@/util/dateUtil";
 import PublishArticleForm from "@c/PublishArticleForm.vue";
 import {deleteDraft, getDraftDetail, getDraftList, saveOrUpdateDraft} from "../api/article";
@@ -85,7 +85,7 @@ import {uploadFile} from "@/api/common";
 
 export default {
   name: "WriteArticle",
-  components: { PublishArticleForm },
+  components: {PublishArticleForm},
   data() {
     return {
       // 当前草稿id
@@ -121,20 +121,23 @@ export default {
     // 刷新草稿列表并显示第index草稿的内容
     async refreshDraftList(showIndex) {
       let that = this;
-      getDraftList().then(res => {
+      getDraftList().then(async res => {
         that.draftList = res.data.data;
         if (!showIndex) {
           showIndex = 0;
         }
         let showDraftId = that.draftList[showIndex].draftId;
         // 获取当前数据
-        getDraftDetail(showDraftId).then(r => {
+        await getDraftDetail(showDraftId).then(r => {
           let draft = r.data.data;
           that.currentDraftId = draft.draftId;
           that.currentDraftIndex = showIndex;
           that.currentDraftMarkdownContent = draft.markdownContent;
           that.currentDraftTitle = draft.title;
+          that.saveStatus = 2;
         });
+        // 这里是为了修复从别的页面跳转时保存状态被editorChange覆盖为0，请勿删除
+        that.saveStatus = 2;
       });
     },
     // 编辑某个草稿
@@ -153,6 +156,7 @@ export default {
           that.currentDraftMarkdownContent = draft.markdownContent;
           that.currentDraftTitle = draft.title;
           that.currentDraftId = draft.draftId;
+          that.saveStatus = 2;
         });
         that.saveStatus = 2;
       }
@@ -168,23 +172,23 @@ export default {
     // 保存草稿
     editorSave: commonUtil.throttle(async function (value) {
       let that = this;
-      this.saveStatus = 1;
+      that.saveStatus = 1;
       // 保存或更新草稿
       let draftTitle = articleUtil.getTitleFromMarkdownContent(value) || DateUtil.getNowDate("yyyy-MM-D");
       await saveOrUpdateDraft(that.currentDraftId, draftTitle, value);
       // 重新获取草稿列表
       await that.refreshDraftList();
-      this.saveStatus = 2;
+      that.saveStatus = 2;
     }, 200),
     // 新建文章
-    newArticle: commonUtil.throttle(async function() {
+    newArticle: commonUtil.throttle(async function () {
       let that = this;
       let now = DateUtil.getNowDate("yyyy-MM-D");
       let markdownContent = "# " + now;
       let title = articleUtil.getTitleFromMarkdownContent(markdownContent) || now;
-      this.saveStatus = 1;
+      that.saveStatus = 1;
       await saveOrUpdateDraft(null, title, markdownContent);
-      this.saveStatus = 2;
+      that.saveStatus = 2;
       // 再请求一次列表
       await that.refreshDraftList();
     }, 200),
@@ -220,10 +224,20 @@ export default {
     // 获取草稿列表
     that.refreshDraftList();
   },
-  beforeDestroy() {
+  async beforeDestroy() {
+    let that = this;
+    // 页面销毁之前保存草稿
+    that.saveStatus = 1;
+    await saveOrUpdateDraft(that.currentDraftId, that.currentDraftTitle, that.currentDraftMarkdownContent);
+    that.saveStatus = 2;
+  },
+  async beforeRouteLeave(to, from, next) {
     let that = this;
     // 跳转之前保存当前草稿
-    saveOrUpdateDraft(that.currentDraftId, that.currentDraftTitle, that.currentDraftMarkdownContent);
+    that.saveStatus = 1;
+    await saveOrUpdateDraft(that.currentDraftId, that.currentDraftTitle, that.currentDraftMarkdownContent);
+    that.saveStatus = 2;
+    next();
   }
 }
 </script>
