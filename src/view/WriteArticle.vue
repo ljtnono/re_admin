@@ -3,17 +3,15 @@
     <!-- 草稿箱列表 -->
     <div class="draft-container flex flex-direction-column mr5">
       <!-- 新建文章按钮 -->
-      <div @click="newArticle" class="new-btn-container flex flex-direction-row flex-justify-content-space-between">
-        <a href="javascript:;">
-          <i class="iconfont icon-add"/>
-          新建文章
-        </a>
+      <div @click="newArticle" class="new-btn-container flex flex-direction-row">
+        <i class="iconfont icon-add mr10" style="margin-top: 1px;"/>
+        <span>新建文章</span>
       </div>
       <!-- 草稿葙列表 -->
       <div class="draft-list-container flex flex1 flex-direction-column">
-        <div v-if="draftList.length === 0">
+        <span class="empty-text" v-if="draftList.length === 0">
           草稿箱为空
-        </div>
+        </span>
         <!-- 第一个草稿为当前正在编辑的草稿 -->
         <div @click="editDraft(index)" v-for="(item, index) in draftList" :key="item.draftId"
              :class="index === currentDraftIndex ? 'draft-item-container flex flex-direction-row flex-justify-content-space-between ' + 'draft-item-container-current' : 'draft-item-container flex flex-direction-row flex-justify-content-space-between'">
@@ -34,7 +32,6 @@
       <mavon-editor
         ref="md"
         @imgAdd="imgAdd"
-        @imgDel="imgDel"
         :language="editorConfig.language"
         :font-size="editorConfig.fontSize"
         :scroll-style="editorConfig.scrollStyle"
@@ -56,10 +53,10 @@
         :html="editorConfig.html"
         :xss-options="editorConfig.xssOptions"
         :toolbars="editorConfig.toolbars"
-        :value="markdownContent"
+        :value="currentDraftMarkdownContent"
         @change="editorChange"
         @save="editorSave"
-        style="width: 100%; height: 850px">
+        style="width: 100%;">
         <!-- 右工具栏前加入自定义按钮  -->
         <template slot="right-toolbar-before">
           <span>{{ saveStatusStr }}</span>
@@ -91,16 +88,20 @@ export default {
   components: { PublishArticleForm },
   data() {
     return {
-      // 文章标题
-      title: null,
-      // 文章内容
-      markdownContent: null,
-      // showDrawer: false,
-      editorConfig: EDITOR_CONFIG,
+      // 当前草稿id
+      currentDraftId: null,
+      // 当前草稿标题
+      currentDraftTitle: null,
+      // 当前草稿内容
+      currentDraftMarkdownContent: null,
+      // 草稿列表
       draftList: [],
+      // 当前显示的草稿列表下表
       currentDraftIndex: 0,
+      // 当前保存状态
       saveStatus: 2,
-      showPublishForm: true
+      showPublishForm: true,
+      editorConfig: EDITOR_CONFIG,
     }
   },
   computed: {
@@ -125,42 +126,52 @@ export default {
         if (!showIndex) {
           showIndex = 0;
         }
-        let draftId = that.draftList[showIndex].draftId;
+        let showDraftId = that.draftList[showIndex].draftId;
         // 获取当前数据
-        getDraftDetail(draftId).then(r => {
+        getDraftDetail(showDraftId).then(r => {
           let draft = r.data.data;
+          that.currentDraftId = draft.draftId;
           that.currentDraftIndex = showIndex;
-          that.markdownContent = draft.markdownContent;
-          that.title = draft.title;
-          that.saveStatus = 2;
+          that.currentDraftMarkdownContent = draft.markdownContent;
+          that.currentDraftTitle = draft.title;
         });
       });
     },
     // 编辑某个草稿
-    editDraft: commonUtil.throttle(function (index) {
+    editDraft: commonUtil.throttle(async function (index) {
       let that = this;
-      let draftId = that.draftList[index].draftId;
+      let showDraftId = that.draftList[index].draftId;
       if (that.currentDraftIndex !== index) {
-        getDraftDetail(draftId).then(r => {
+        // 先保存当前的内容
+        let currentDraftMarkdownContent = that.currentDraftMarkdownContent;
+        let currentDraftTitle = articleUtil.getTitleFromMarkdownContent(currentDraftMarkdownContent) || DateUtil.getNowDate("yyyy-MM-D");
+        let currentDraftId = that.currentDraftId;
+        await saveOrUpdateDraft(currentDraftId, currentDraftTitle, currentDraftMarkdownContent);
+        await getDraftDetail(showDraftId).then(r => {
           let draft = r.data.data;
           that.currentDraftIndex = index;
-          that.markdownContent = draft.markdownContent;
-          that.title = draft.title;
+          that.currentDraftMarkdownContent = draft.markdownContent;
+          that.currentDraftTitle = draft.title;
+          that.currentDraftId = draft.draftId;
         });
+        that.saveStatus = 2;
       }
     }, 200),
     // 监听markdown内容改变事件
     editorChange(value) {
       let that = this;
-      that.markdownContent = value;
-      that.title = articleUtil.getTitleFromMarkdownContent(value) || DateUtil.getNowDate("yyyy-MM-D");
+      // 只监听当前草稿的改动
+      that.currentDraftMarkdownContent = value;
+      that.currentDraftTitle = articleUtil.getTitleFromMarkdownContent(value) || DateUtil.getNowDate("yyyy-MM-D");
+      that.saveStatus = 0;
     },
     // 保存草稿
     editorSave: commonUtil.throttle(async function (value) {
       let that = this;
       this.saveStatus = 1;
       // 保存或更新草稿
-      await saveOrUpdateDraft(that.draftList[that.currentDraftIndex].draftId, that.title, value);
+      let draftTitle = articleUtil.getTitleFromMarkdownContent(value) || DateUtil.getNowDate("yyyy-MM-D");
+      await saveOrUpdateDraft(that.currentDraftId, draftTitle, value);
       // 重新获取草稿列表
       await that.refreshDraftList();
       this.saveStatus = 2;
@@ -181,7 +192,7 @@ export default {
     async handleDraftDropdownCommand(command) {
       let that = this;
       if (command === "delete") {
-        let draftId = that.draftList[that.currentDraftIndex].draftId;
+        let draftId = that.currentDraftId;
         // 删除该行
         await deleteDraft(draftId).then(() => {
           // 弹出删除成功的弹窗
@@ -202,16 +213,17 @@ export default {
         let url = res.data.data;
         vm.$img2Url(pos, url);
       });
-    },
-    // 处理图片删除
-    imgDel() {
-
     }
   },
-  async mounted() {
+  mounted() {
     let that = this;
     // 获取草稿列表
-    await that.refreshDraftList();
+    that.refreshDraftList();
+  },
+  beforeDestroy() {
+    let that = this;
+    // 跳转之前保存当前草稿
+    saveOrUpdateDraft(that.currentDraftId, that.currentDraftTitle, that.currentDraftMarkdownContent);
   }
 }
 </script>
@@ -243,6 +255,13 @@ export default {
     .draft-list-container {
       overflow-y: scroll;
       overflow-x: hidden;
+
+      .empty-text {
+        font-size: 16px;
+        text-align: center;
+        margin-top: 40px;
+        color: #4a4a4a;
+      }
 
       .draft-item-container {
         padding: 10px;
