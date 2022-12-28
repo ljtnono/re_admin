@@ -80,6 +80,7 @@ import DateUtil from "@/util/dateUtil";
 import PublishArticleForm from "@c/PublishArticleForm.vue";
 import {deleteDraft, getDraftList, saveOrUpdateDraft} from "../api/article";
 import articleUtil from "@/util/articleUtil";
+import commonUtil from "@/util/commonUtil";
 
 export default {
   name: "WriteArticle",
@@ -95,12 +96,13 @@ export default {
       draftList: [],
       currentDraftIndex: 0,
       saveStatus: 2,
-      showPublishForm: false,
-      autoSaveDraftTimer: null,
-      markdownContentChange: false
+      showPublishForm: false
     }
   },
   computed: {
+    commonUtil() {
+      return commonUtil
+    },
     saveStatusStr() {
       let saveStatus = this.saveStatus;
       if (saveStatus === 0) {
@@ -138,15 +140,14 @@ export default {
         that.title = that.draftList[index].title;
       }
     },
-    editorChange(value) {
-      // TODO 此函数需要节流
+    // 监听markdown内容改变事件
+    editorChange: commonUtil.throttle(function (value) {
       let that = this;
       that.markdownContent = value;
       that.title = articleUtil.getTitleFromMarkdownContent(value) || DateUtil.getNowDate("yyyy-MM-D");
-      that.markdownContentChange = true;
-    },
+    }, 1000),
     // 保存草稿
-    async editorSave(value) {
+    editorSave: commonUtil.throttle(async function (value) {
       let that = this;
       this.saveStatus = 1;
       // 保存或更新草稿
@@ -154,9 +155,9 @@ export default {
       // 重新获取草稿列表
       await that.refreshDraftList();
       this.saveStatus = 2;
-    },
+    }, 1000),
     // 新建文章
-    async newArticle() {
+    newArticle: commonUtil.throttle(async function() {
       let that = this;
       let now = DateUtil.getNowDate("yyyy-MM-D");
       let markdownContent = "# " + now;
@@ -166,7 +167,7 @@ export default {
       this.saveStatus = 2;
       // 再请求一次列表
       await that.refreshDraftList();
-    },
+    }, 1000),
     // 处理草稿下拉列表
     async handleDraftDropdownCommand(command) {
       let that = this;
@@ -186,17 +187,6 @@ export default {
     let that = this;
     // 获取草稿列表
     await that.refreshDraftList();
-    // 开启自动保存
-    if (that.autoSaveDraftTimer == null && that.markdownContentChange) {
-      that.autoSaveDraftTimer = setInterval(async () => {
-        let draft = that.draftList[that.currentDraftIndex];
-        that.saveStatus = 1;
-        await saveOrUpdateDraft(draft.draftId, that.title, that.markdownContent);
-        that.saveStatus = 2;
-        // 再请求一次列表
-        await that.refreshDraftList();
-      }, 5000);
-    }
   }
 }
 </script>
