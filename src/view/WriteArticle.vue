@@ -76,7 +76,6 @@
 <script>
 
 import { EDITOR_CONFIG } from "../config/commonConfig";
-import "../mock/article";
 import DateUtil from "@/util/dateUtil";
 import PublishArticleForm from "@c/PublishArticleForm.vue";
 import {deleteDraft, getDraftList, saveOrUpdateDraft} from "../api/article";
