@@ -96,7 +96,9 @@ export default {
       draftList: [],
       currentDraftIndex: 0,
       saveStatus: 2,
-      showPublishForm: false
+      showPublishForm: false,
+      autoSaveDraftTimer: null,
+      markdownContentChange: false
     }
   },
   computed: {
@@ -138,9 +140,11 @@ export default {
       }
     },
     editorChange(value) {
+      // TODO 此函数需要节流
       let that = this;
       that.markdownContent = value;
       that.title = articleUtil.getTitleFromMarkdownContent(value) || DateUtil.getNowDate("yyyy-MM-D");
+      that.markdownContentChange = true;
     },
     // 保存草稿
     async editorSave(value) {
@@ -155,17 +159,12 @@ export default {
     // 新建文章
     async newArticle() {
       let that = this;
-      if (that.draftList.length !== 0) {
-        let draft = that.draftList[that.currentDraftIndex];
-        // 新建文章之前，先保存当前草稿
-        this.saveStatus = 1;
-        await saveOrUpdateDraft(draft.draftId, that.title, that.markdownContent);
-        this.saveStatus = 2;
-      }
       let now = DateUtil.getNowDate("yyyy-MM-D");
       let markdownContent = "# " + now;
       let title = articleUtil.getTitleFromMarkdownContent(markdownContent) || now;
+      this.saveStatus = 1;
       await saveOrUpdateDraft(null, title, markdownContent);
+      this.saveStatus = 2;
       // 再请求一次列表
       await that.refreshDraftList();
     },
@@ -188,6 +187,17 @@ export default {
     let that = this;
     // 获取草稿列表
     await that.refreshDraftList();
+    // 开启自动保存
+    if (that.autoSaveDraftTimer == null && that.markdownContentChange) {
+      that.autoSaveDraftTimer = setInterval(async () => {
+        let draft = that.draftList[that.currentDraftIndex];
+        that.saveStatus = 1;
+        await saveOrUpdateDraft(draft.draftId, that.title, that.markdownContent);
+        that.saveStatus = 2;
+        // 再请求一次列表
+        await that.refreshDraftList();
+      }, 5000);
+    }
   }
 }
 </script>
