@@ -22,53 +22,55 @@ Mock.mock("/api-backend/login", "post", {
       username: "lingjiatong",
       email: "935188400@qq.com",
       phone: 14444444444,
-      avatar: "http://f.lingjiatong.cn:30090/rootelement/sys/avatar.jpeg",
+      avatarUrl: "http://f.lingjiatong.cn:30090/rootelement/sys/avatar.jpeg",
     },
     menus: [
       {
-        menuName: "博客管理",
+        title: "博客管理",
         icon: "icon-blog",
-        subMenu: [
+        name: "Blog",
+        children: [
           {
-            menuName: "文章管理",
-            url: "/blog/article",
-            routeName: "BlogArticle"
+            title: "文章管理",
+            path: "/blog/article",
+            name: "BlogArticle"
           },
           {
-            menuName: "分类管理",
-            url: "/blog/category",
-            routeName: "BlogCategory"
+            title: "分类管理",
+            path: "/blog/category",
+            name: "BlogCategory"
           },
           {
-            menuName: "评论管理",
-            url: "/blog/comment",
-            routeName: "BlogComment"
+            title: "评论管理",
+            path: "/blog/comment",
+            name: "BlogComment"
           },
         ],
       },
       {
-        menuName: "系统管理",
+        title: "系统管理",
         icon: "icon-setting",
-        subMenu: [
+        name: "System",
+        children: [
           {
-            menuName: "用户管理",
-            url: "/system/user",
-            routeName: "SystemUser"
+            title: "用户管理",
+            path: "/system/user",
+            name: "SystemUser"
           },
           {
-            menuName: "角色管理",
-            url: "/system/role",
-            routeName: "SystemRole"
+            title: "角色管理",
+            path: "/system/role",
+            name: "SystemRole"
           },
           {
-            menuName: "网站配置",
-            url: "/system/websiteConfig",
-            routeName: "SystemWebsiteConfig"
+            title: "网站配置",
+            path: "/system/websiteConfig",
+            name: "SystemWebsiteConfig"
           },
           {
-            menuName: "系统监控",
-            url: "/system/monitor",
-            routeName: "SystemMonitor"
+            title: "系统监控",
+            path: "/system/monitor",
+            name: "SystemMonitor"
           },
         ],
       },

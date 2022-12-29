@@ -64,7 +64,7 @@ export default {
     setUserInfo() {
       let userInfo = sessionStorage.getItem("userInfo");
       if (userInfo != null) {
-        this.avatar = JSON.parse(userInfo).avatar;
+        this.avatar = JSON.parse(userInfo).avatarUrl;
       }
     },
   },

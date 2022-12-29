@@ -26,26 +26,26 @@
       <!-- 循环渲染菜单 -->
       <div v-for="(m1, i1) in menus" :key="m1.name">
         <!-- 包含子菜单 -->
-        <div v-if="m1.subMenu !== null && m1.subMenu !== undefined">
+        <div v-if="m1.children !== null && m1.children !== undefined">
           <el-submenu :index="i1 + ''">
             <div slot="title">
               <i :class="'iconfont' + ' ' + m1.icon" />
               <span style="margin-left: 15px" v-show="!collapseStatus">
-                {{ m1.menuName }}
+                {{ m1.title }}
               </span>
             </div>
-            <div v-for="m2 in m1.subMenu" :key="m2.name">
-              <el-menu-item @click="$router.push({ name: m2.routeName })">
+            <div v-for="m2 in m1.children" :key="m2.name">
+              <el-menu-item @click="$router.push({ name: m2.name })">
                 <a class="ml30" href="javascript:;" style="width: 100%; height: 100%; display: inline-block">
-                  {{ m2.menuName }}
+                  {{ m2.title }}
                 </a>
               </el-menu-item>
             </div>
           </el-submenu>
         </div>
         <!-- 不包含子菜单 -->
-        <el-menu-item v-if="m1.subMenu === null || m1.subMenu === undefined" :index="i1" @click="$router.push({ name: m1.routeName })">
-          <a href="javascript:;"> {{ m1.menuName }} </a>
+        <el-menu-item v-if="m1.children === null || m1.children === undefined" :index="i1" @click="$router.push({ name: m1.name })">
+          <a href="javascript:;"> {{ m1.name }} </a>
         </el-menu-item>
       </div>
     </el-menu>
