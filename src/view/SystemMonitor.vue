@@ -187,6 +187,7 @@
 
 <script>
 import "../mock/system"
+import axios from "axios";
 
 export default {
   name: "SystemMonitor",
@@ -217,7 +218,7 @@ export default {
   methods: {
     // 获取k8s节点列表
     async getK8sNodeList() {
-      await this.$http.get("/api-backend/system/monitor/k8sNodeList").then(res => {
+      await axios.get("/api-backend/system/monitor/k8sNodeList").then(res => {
         let data = res.data.data;
         let defaultSelect = data[0].hostname + "\t" + data[0].ipAddress;
         this.k8sNodeList = data;
@@ -229,7 +230,7 @@ export default {
     // 获取cpu监控信息
     getCPUInfo(node) {
       let that = this;
-      this.$http.get("/api-backend/system/monitor/CPUInfo").then(res => {
+      axios.get("/api-backend/system/monitor/CPUInfo").then(res => {
         let data = res.data.data;
         that.cpuMonitorInfo = data;
         if (node !== null && node !== undefined) {
@@ -240,7 +241,7 @@ export default {
     // 获取内存监控信息
     getMemoryInfo(node) {
       let that = this;
-      this.$http.get("/api-backend/system/monitor/memoryInfo").then(res => {
+      axios.get("/api-backend/system/monitor/memoryInfo").then(res => {
         let data = res.data.data;
         that.memoryMonitorInfo = data;
         if (node !== null && node !== undefined) {
@@ -251,7 +252,7 @@ export default {
     // 获取k8s名称空间列表
     async getK8sNamespaceList(namespace) {
       let that = this;
-      await this.$http.get("/api-backend/system/monitor/k8sNamespaceList").then(res => {
+      await axios.get("/api-backend/system/monitor/k8sNamespaceList").then(res => {
         let data = res.data.data;
         that.k8sNamespaceList = data;
         if (namespace === null || namespace === undefined) {
@@ -263,7 +264,7 @@ export default {
     },
     // 获取指定名称空间的pod状态信息
     getK8sPodInfoList(namespace) {
-      this.$http.get("/api-backend/system/monitor/k8sPodInfoList").then(res => {
+      axios.get("/api-backend/system/monitor/k8sPodInfoList").then(res => {
         let data = res.data.data;
         this.k8sPodInfoList = data;
       });
@@ -271,7 +272,7 @@ export default {
     // 获取指定机器的硬盘状态
     getHardStatus(node) {
       let that = this;
-      this.$http.get("/api-backend/system/monitor/hardStatus").then(res => {
+      axios.get("/api-backend/system/monitor/hardStatus").then(res => {
         let data = res.data.data;
         that.hardStatusList = data;
         if (node === null || node === undefined) {

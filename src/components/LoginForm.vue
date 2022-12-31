@@ -74,7 +74,6 @@ export default {
   name: "LoginForm",
   data() {
     return {
-      verifyCodeKey: "",
       loginForm: {
         username: "",
         password: "",
@@ -124,11 +123,11 @@ export default {
       this.$emit("refreshVerifyCode");
     },
     commit(formName) {
-      // 开启进度栏
+      let that = this;
       this.$refs[formName].validate((valid) => {
         // 校验成功，请求登录接口
         if (valid) {
-          this.$emit("submit", this.loginForm);
+          this.$emit("submit", that.loginForm.username, that.loginForm.password, that.loginForm.verifyCode);
           return true;
         } else {
           return false;

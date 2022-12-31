@@ -151,6 +151,7 @@ import {
   RE_PASSWORD_NOT_EQUALS_PASSWORD_ERROR_MESSAGE,
 } from "@/constant/errorMessageConstant";
 import {PASSWORD_REGEX} from "@/constant/regexConstant";
+import axios from "axios";
 
 export default {
   name: "UpdatePassword",
@@ -219,7 +220,7 @@ export default {
   methods: {
     // 刷新验证码图片
     refresh() {
-      this.$http.get("/api-backend/refreshVerifyCode").then((res) => {
+      axios.get("/api-backend/refreshVerifyCode").then((res) => {
         let outerData = res.data;
         let innerData = outerData.data;
         this.verifyCodeImageUrl = innerData;

@@ -7,7 +7,7 @@ export default [
     }
   },
   {
-    path: "/login",
+    path: "/auth",
     name: "Login",
     meta: {
       title: "Login - 登录",

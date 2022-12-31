@@ -1,8 +1,10 @@
 import axios from "@/config/axiosConfig";
 import { BASE_URL } from "@/constant/commonConstant";
 
+// #################### 草稿相关接口 #################### //
+
 // url通用前缀
-const requestMapping = "/article";
+const requestMapping = "/api-backend/article";
 
 /**
  * 获取草稿列表

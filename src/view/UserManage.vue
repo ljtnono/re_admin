@@ -67,6 +67,7 @@
 
 <script>
 import "../mock/system";
+import axios from "axios";
 
 export default {
   name: "UserManage",
@@ -83,7 +84,7 @@ export default {
   },
   methods: {
     search(page, size, searchCondition) {
-      this.$http.get("/api-backend/system/user/list").then((res) => {
+      axios.get("/api-backend/system/user/list").then((res) => {
         let outerData = res.data;
         let innerData = outerData.data;
         this.userList = innerData;
