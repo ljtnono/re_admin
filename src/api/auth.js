@@ -45,3 +45,10 @@ export const login = (username, password, verifyCodeKey, verifyCode) => {
     }
   });
 };
+
+/**
+ * 注销
+ */
+export const logout = () => {
+  return axios.post(BASE_URL + requestMapping + "/user/logout");
+};

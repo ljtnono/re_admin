@@ -43,6 +43,9 @@
 
 <script>
 import router from "@/router";
+import {logout} from "@/api/auth";
+import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
+
 
 export default {
   name: "Header",
@@ -67,13 +70,33 @@ export default {
     },
     // 注销
     handleCommand(command) {
+      let that = this;
       if (command === "logout") {
-        // 删除当前token信息,并返回到登录界面
-        sessionStorage.removeItem("tokenInfo");
-        sessionStorage.removeItem("userInfo");
-        sessionStorage.removeItem("menus");
-        router.push({
-          name: "Login",
+        that.$loading(ELEMENT_PAGE_LOADING_CONFIG);
+        logout().then(res => {
+          // 删除当前token信息,并返回到登录界面
+          sessionStorage.removeItem("tokenInfo");
+          sessionStorage.removeItem("userInfo");
+          sessionStorage.removeItem("menus");
+          that.$loading().close();
+          this.$message({
+            type: "success",
+            message: "注销成功",
+            duration: 2000,
+            center: false,
+          });
+          router.push({
+            name: "Login",
+          });
+        }).catch(e => {
+          debugger
+          that.$loading().close();
+          this.$message({
+            type: "error",
+            message: "注销失败",
+            duration: 2000,
+            center: false,
+          });
         });
       } else if (command === "updatePassword") {
         router.push({

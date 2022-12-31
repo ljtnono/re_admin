@@ -11,7 +11,7 @@ const router = new Router({
 });
 
 // 特殊页面数组
-const SPECIAL_PAGES = ["/auth", "/404", "/500", "/401"];
+const SPECIAL_PAGES = ["/login", "/404", "/500", "/401"];
 
 // 解决重复点击路由报错的BUG
 const originalPush = Router.prototype.push;

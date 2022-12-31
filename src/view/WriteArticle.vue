@@ -227,16 +227,20 @@ export default {
   async beforeDestroy() {
     let that = this;
     // 页面销毁之前保存草稿
-    that.saveStatus = 1;
-    await saveOrUpdateDraft(that.currentDraftId, that.currentDraftTitle, that.currentDraftMarkdownContent);
-    that.saveStatus = 2;
+    if (that.saveStatus === 0) {
+      that.saveStatus = 1;
+      await saveOrUpdateDraft(that.currentDraftId, that.currentDraftTitle, that.currentDraftMarkdownContent);
+      that.saveStatus = 2;
+    }
   },
   async beforeRouteLeave(to, from, next) {
     let that = this;
     // 跳转之前保存当前草稿
-    that.saveStatus = 1;
-    await saveOrUpdateDraft(that.currentDraftId, that.currentDraftTitle, that.currentDraftMarkdownContent);
-    that.saveStatus = 2;
+    if (that.saveStatus === 0) {
+      that.saveStatus = 1;
+      await saveOrUpdateDraft(that.currentDraftId, that.currentDraftTitle, that.currentDraftMarkdownContent);
+      that.saveStatus = 2;
+    }
     next();
   }
 }
