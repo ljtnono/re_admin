@@ -19,6 +19,7 @@ module.exports = {
     // 关闭未使用变量报错的限制
     "no-unused-vars": "off",
     "vue/no-unused-vars": "off",
+    "vue/no-mutating-props": "off",
     quotes: [2, "double"],
     indent: [2, 2],
   },

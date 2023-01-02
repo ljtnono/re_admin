@@ -18,7 +18,7 @@
           <i class="flex iconfont icon-icon-article"/>
           <span class="flex draft-title">{{ item.title }}</span>
           <span class="flex draft-date">{{ item.saveTime | dateFormat('yyyy-MM-D') }}</span>
-          <el-dropdown class="flex" v-if="currentDraftIndex === index" @command="handleDraftDropdownCommand">
+          <el-dropdown class="flex" v-if="currentDraftIndex === index" @command="handleDraftDropdownCommand" trigger="click">
             <i class="iconfont icon-setting" style="font-size: 16px;line-height: 40px;color: #4a4a4a"/>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="delete">删除</el-dropdown-item>
@@ -62,21 +62,96 @@
           <span>{{ saveStatusStr }}</span>
         </template>
         <template slot="left-toolbar-after">
-          <span @click="showPublishForm = !showPublishForm">发布文章</span>
+          <span style="cursor: pointer" @click="publishFormVisible = true">发布文章</span>
         </template>
       </mavon-editor>
     </div>
-    <!-- publishForm -->
+    <!-- 文章发布表单 -->
     <div class="publish-form-container">
       <el-dialog
         title="发布文章"
-        :visible.sync="showPublishForm"
-        width="30%">
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="showPublishForm=false">取 消</el-button>
-            <el-button type="primary" @click="showPublishForm=false">确 定</el-button>
+        @open="publishFormOpen"
+        :visible.sync="publishFormVisible">
+        <template slot="footer">
+          <span class="dialog-footer">
+            <el-button @click="publishFormVisible = false">取 消</el-button>
+            <el-button type="primary" @click="commitPublishForm">确 定</el-button>
           </span>
-        <publish-article-form :value="publishForm" />
+        </template>
+        <el-form ref="publishForm" :model="publishForm" label-width="120px">
+          <el-form-item label="文章标题：" prop="title">
+            <el-input v-model="publishForm.title" clearable placeholder="请输入文章标题"/>
+          </el-form-item>
+          <el-form-item label="文章简介：" prop="summary">
+            <el-input type="textarea" v-model="publishForm.summary" :autosize="{ minRows: 4, maxRows: 4}" maxlength="200" show-word-limit placeholder="请输入文章简介，如果不填会根据文章内容自动生成" />
+          </el-form-item>
+          <el-form-item label="文章引用：" prop="quoteInfo">
+            <el-input type="textarea" v-model="publishForm.quoteInfo" :autosize="{ minRows: 4, maxRows: 4}" maxlength="200" show-word-limit placeholder="请输入文章引文信息" />
+          </el-form-item>
+          <el-form-item label="文章类型：" prop="categoryId">
+            <el-select style="width: 100%" v-model="publishForm.categoryId" clearable filterable placeholder="请选择文章类型">
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value">
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="文章标签：" prop="tagList">
+            <el-select style="width: 100%"
+                       v-model="publishForm.tagList"
+                       multiple
+                       filterable
+                       clearable
+                       allow-create
+                       default-first-option
+                       placeholder="请输入文章标签">
+            </el-select>
+          </el-form-item>
+          <el-form-item label="文章设定：">
+            <el-radio-group v-model="publishForm.recommend" class="mr30">
+              <el-radio :label="1">推荐</el-radio>
+              <el-radio :label="0">不推荐</el-radio>
+            </el-radio-group>
+            <el-radio-group v-model="publishForm.top" class="mr30">
+              <el-radio :label="1">置顶</el-radio>
+              <el-radio :label="0">不置顶</el-radio>
+            </el-radio-group>
+            <el-radio-group v-model="publishForm.creationType">
+              <el-radio :label="1">原创</el-radio>
+              <el-radio :label="2">转载</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="文章封面：">
+            <el-upload
+              action="#"
+              list-type="picture-card"
+              :auto-upload="false">
+              <i slot="default" class="el-icon-plus" />
+              <div slot="file" slot-scope="{file}">
+                <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
+                <span class="el-upload-list__item-actions">
+                  <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
+                    <i class="el-icon-zoom-in"></i>
+                  </span>
+                  <span v-if="!disabled" class="el-upload-list__item-delete" @click="handleDownload(file)">
+                    <i class="el-icon-download"></i>
+                  </span>
+                  <span v-if="!disabled" class="el-upload-list__item-delete" @click="handleRemove(file)">
+                    <i class="el-icon-delete"></i>
+                  </span>
+                </span>
+              </div>
+              <div slot="tip" class="el-upload__tip">
+                只能上传jpg/png文件，且不超过500kb
+              </div>
+            </el-upload>
+            <el-dialog :visible.sync="dialogVisible">
+              <img width="100%" :src="dialogImageUrl" :alt="dialogImageUrl">
+            </el-dialog>
+          </el-form-item>
+        </el-form>
       </el-dialog>
     </div>
   </div>
@@ -86,7 +161,6 @@
 
 import {EDITOR_CONFIG} from "../config/commonConfig";
 import DateUtil from "@/util/dateUtil";
-import PublishArticleForm from "@c/PublishArticleForm.vue";
 import {deleteDraft, getDraftDetail, getDraftList, saveOrUpdateDraft} from "../api/article";
 import articleUtil from "@/util/articleUtil";
 import commonUtil from "@/util/commonUtil";
@@ -94,7 +168,6 @@ import {uploadFile} from "@/api/common";
 
 export default {
   name: "WriteArticle",
-  components: {PublishArticleForm},
   data() {
     return {
       // 当前草稿id
@@ -107,12 +180,55 @@ export default {
       draftList: [],
       // 当前显示的草稿列表下表
       currentDraftIndex: 0,
-      // 当前保存状态
+      // 当前保存状态, 0 未保存 1 保存中 2 已保存
       saveStatus: 2,
-      showPublishForm: false,
+      // 文章发布表单状态
+      publishFormVisible: false,
+      // markdown编辑器配置
       editorConfig: EDITOR_CONFIG,
+      dialogImageUrl: "",
+      dialogVisible: false,
+      disabled: false,
+      fileList: [
+        {
+          name: "food.jpeg",
+          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100"
+        },
+        {
+          name: "food2.jpeg",
+          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100"
+        }
+      ],
+      options: [{
+        value: "选项1",
+        label: "黄金糕"
+      }, {
+        value: "选项2",
+        label: "双皮奶"
+      }, {
+        value: "选项3",
+        label: "蚵仔煎"
+      }, {
+        value: "选项4",
+        label: "龙须面"
+      }, {
+        value: "选项5",
+        label: "北京烤鸭"
+      }],
+      // 文章发布表单
       publishForm: {
-        title: this.currentDraftTitle
+        title: null,
+        draftId: null,
+        markdownContent: null,
+        summary: null,
+        categoryId: null,
+        tagList: ["a", "b"],
+        recommend: 0,
+        top: 0,
+        creationType: 1,
+        coverUrl: null,
+        transportInfo: null,
+        quoteInfo: null
       }
     }
   },
@@ -128,8 +244,45 @@ export default {
       }
     }
   },
-  props: {},
   methods: {
+    // TODO 当发布文章表单打开时进行处理
+    publishFormOpen() {
+      let that = this;
+      that.publishForm = {
+        title: that.currentDraftTitle,
+        draftId: that.currentDraftId,
+        markdownContent: that.currentDraftMarkdownContent,
+        summary: that.title,
+        categoryId: null,
+        tagList: ["a", "b"],
+        recommend: 0,
+        top: 0,
+        creationType: 1,
+        coverUrl: "",
+        transportInfo: null,
+        quoteInfo: null
+      }
+    },
+    // TODO 提交发布文章表单
+    commitPublishForm() {
+      let that = this;
+      that.publishFormVisible = false;
+    },
+    // TODO 获取文章标签列表
+    getArticleTagList() {
+      let that = this;
+      that.publishForm.tagList = ["fdasfs"]
+    },
+    handleRemove(file) {
+      console.log(file);
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    handleDownload(file) {
+      console.log(file);
+    },
     // 刷新草稿列表并显示第index草稿的内容
     async refreshDraftList(showIndex) {
       let that = this;
@@ -158,10 +311,12 @@ export default {
       let showDraftId = that.draftList[index].draftId;
       if (that.currentDraftIndex !== index) {
         // 先保存当前的内容
-        let currentDraftMarkdownContent = that.currentDraftMarkdownContent;
-        let currentDraftTitle = articleUtil.getTitleFromMarkdownContent(currentDraftMarkdownContent) || DateUtil.getNowDate("yyyy-MM-D");
-        let currentDraftId = that.currentDraftId;
-        await saveOrUpdateDraft(currentDraftId, currentDraftTitle, currentDraftMarkdownContent);
+        if (that.saveStatus === 0) {
+          let currentDraftMarkdownContent = that.currentDraftMarkdownContent;
+          let currentDraftTitle = articleUtil.getTitleFromMarkdownContent(currentDraftMarkdownContent) || DateUtil.getNowDate("yyyy-MM-D");
+          let currentDraftId = that.currentDraftId;
+          await saveOrUpdateDraft(currentDraftId, currentDraftTitle, currentDraftMarkdownContent);
+        }
         await getDraftDetail(showDraftId).then(r => {
           let draft = r.data.data;
           that.currentDraftIndex = index;
@@ -235,6 +390,8 @@ export default {
     let that = this;
     // 获取草稿列表
     that.refreshDraftList();
+    // 获取标签列表
+    that.getArticleTagList();
   },
   async beforeDestroy() {
     let that = this;
@@ -259,6 +416,31 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409EFF;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+
 .write-article-container {
 
   .draft-container {
@@ -341,8 +523,5 @@ export default {
     height: 850px;
   }
 
-  .publish-form-container {
-    position: absolute;
-  }
 }
 </style>
