@@ -67,8 +67,17 @@
       </mavon-editor>
     </div>
     <!-- publishForm -->
-    <div v-if="showPublishForm" class="publish-form-container">
-      <publish-article-form/>
+    <div class="publish-form-container">
+      <el-dialog
+        title="发布文章"
+        :visible.sync="showPublishForm"
+        width="30%">
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="showPublishForm=false">取 消</el-button>
+            <el-button type="primary" @click="showPublishForm=false">确 定</el-button>
+          </span>
+        <publish-article-form :value="publishForm" />
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -100,8 +109,11 @@ export default {
       currentDraftIndex: 0,
       // 当前保存状态
       saveStatus: 2,
-      showPublishForm: true,
+      showPublishForm: false,
       editorConfig: EDITOR_CONFIG,
+      publishForm: {
+        title: this.currentDraftTitle
+      }
     }
   },
   computed: {
@@ -327,6 +339,10 @@ export default {
   .editor-container {
     width: 80%;
     height: 850px;
+  }
+
+  .publish-form-container {
+    position: absolute;
   }
 }
 </style>

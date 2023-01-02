@@ -35,7 +35,7 @@
               </span>
             </div>
             <div v-for="m2 in m1.children" :key="m2.name">
-              <el-menu-item @click="$router.push({ name: m2.name })">
+              <el-menu-item @click="$router.push({ path: m2.path })">
                 <a class="ml30" href="javascript:;" style="width: 100%; height: 100%; display: inline-block">
                   {{ m2.title }}
                 </a>
@@ -44,7 +44,7 @@
           </el-submenu>
         </div>
         <!-- 不包含子菜单 -->
-        <el-menu-item v-if="m1.children === null || m1.children === undefined" :index="i1" @click="$router.push({ name: m1.name })">
+        <el-menu-item v-if="m1.children === null || m1.children === undefined" :index="i1" @click="$router.push({ path: m1.path })">
           <a href="javascript:;"> {{ m1.name }} </a>
         </el-menu-item>
       </div>

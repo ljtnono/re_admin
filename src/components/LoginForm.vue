@@ -1,5 +1,5 @@
 <template>
-  <el-card id="login-card" class="box-card m20">
+  <el-card id="login-card" class="box-card m20" @keyup.enter.native="commit('loginForm')">
     <!-- 登录提示头 -->
     <div slot="header" class="clearfix">
       <span>欢迎登录</span>

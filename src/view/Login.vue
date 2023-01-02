@@ -25,16 +25,18 @@ export default {
     };
   },
   components: {
-    LoginForm,
+    LoginForm
   },
   methods: {
     // 刷新用户验证码
     refreshVerifyCode() {
       let that = this;
       let verifyCodeKey = randomUtil.getUUID();
-      that.verifyCodeKey = verifyCodeKey
+      that.verifyCodeKey = verifyCodeKey;
       refreshVerifyCode(verifyCodeKey).then(res => {
-        that.verifyCodeImageUrl = URL.createObjectURL(res.data);
+        let b = new window.Blob([res.data], {type: "image/jpeg"});
+        let url = window.URL.createObjectURL(b);
+        that.verifyCodeImageUrl = url;
       });
     },
     // 用户登录
@@ -60,7 +62,7 @@ export default {
           center: false,
         });
         router.push({
-          name: ROUT_WORKSPACE_NAME,
+          name: ROUT_WORKSPACE_NAME
         });
         that.$loading().close();
       }).catch(e => {
