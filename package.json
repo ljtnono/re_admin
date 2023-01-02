@@ -1,6 +1,6 @@
 {
   "name": "re_admin",
-  "version": "v0.0.5",
+  "version": "v0.0.6",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
