@@ -9,8 +9,7 @@
       class="login-form"
       :model="loginForm"
       :rules="rules"
-      ref="loginForm"
-    >
+      ref="loginForm">
       <!-- 用户名 -->
       <el-form-item prop="username">
         <el-input
@@ -19,8 +18,7 @@
           prefix-icon="el-icon-user-solid"
           placeholder="请输入用户名"
           clearable
-          maxlength="50"
-        />
+          maxlength="50"/>
       </el-form-item>
       <!-- 密码 -->
       <el-form-item prop="password">
@@ -30,8 +28,7 @@
           v-model="loginForm.password"
           placeholder="请输入密码"
           show-password
-          clearable
-        />
+          clearable/>
       </el-form-item>
       <!-- 验证码 -->
       <el-form-item prop="verifyCode">
@@ -39,29 +36,27 @@
           class="fl mr20"
           placeholder="请输入验证码"
           v-model="loginForm.verifyCode"
-          style="width: 200px"
-        />
+          style="width: 200px"/>
         <img
           class="verify-code-img fl"
           :src="verifyCodeImageUrl"
-          @click="refresh()"
-        />
+          @click="refresh()"/>
       </el-form-item>
       <!-- 登录按钮 -->
       <el-form-item>
         <el-button
           class="btn-submit"
           type="primary"
-          @click="commit('loginForm')"
-          >登录</el-button
-        >
+          @click="commit('loginForm')">
+          登录
+        </el-button>
       </el-form-item>
     </el-form>
   </el-card>
 </template>
 
 <script>
-import { PASSWORD_REGEX, USERNAME_REGEX } from "@/constant/regexConstant";
+import {LOGIN_PASSWORD_REGEX, LOGIN_USERNAME_REGEX} from "@/constant/regexConstant";
 import {
   LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE,
   LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE,
@@ -87,7 +82,7 @@ export default {
             trigger: "blur",
           },
           {
-            pattern: USERNAME_REGEX,
+            pattern: LOGIN_USERNAME_REGEX,
             message: LOGIN_USERNAME_FORMAT_ERROR_MESSAGE,
             trigger: "blur",
           },
@@ -99,7 +94,7 @@ export default {
             trigger: "blur",
           },
           {
-            pattern: PASSWORD_REGEX,
+            pattern: LOGIN_PASSWORD_REGEX,
             message: LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE,
             trigger: "blur",
           },

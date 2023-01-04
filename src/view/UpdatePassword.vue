@@ -21,8 +21,7 @@
             :rules="validateFormRules"
             :model="validateForm"
             ref="validateForm"
-            label-width="140px"
-          >
+            label-width="140px">
             <!-- 密码 -->
             <el-form-item prop="password" label="请输入当前密码：">
               <el-input
@@ -30,21 +29,18 @@
                 v-model="validateForm.password"
                 style="width: 400px"
                 show-password
-                clearable
-              />
+                clearable/>
             </el-form-item>
             <!-- 验证码 -->
             <el-form-item prop="verifyCode" label="请输入验证码：">
               <el-input
                 class="fl mr20"
                 v-model="validateForm.verifyCode"
-                style="width: 200px"
-              />
+                style="width: 200px"/>
               <img
                 class="verify-code-img fl"
                 :src="verifyCodeImageUrl"
-                @click="refresh()"
-              />
+                @click="refresh()"/>
               <a href="javascript:;" class="ml20" @click="refresh()">
                 看不清？换一张
               </a>
@@ -53,13 +49,11 @@
             <el-form-item>
               <el-button
                 type="primary"
-                @click="commitValidateForm('validateForm')"
-              >
+                @click="commitValidateForm('validateForm')">
                 提交
               </el-button>
               <el-button
-                type="primary"
-              >
+                type="primary">
                 返回上一步
               </el-button>
               <a class="ml20" href="javascript:;">忘记密码?</a>
@@ -73,16 +67,14 @@
             :model="updatePasswordForm"
             ref="updatePasswordForm"
             :rules="updatePasswordFormRules"
-            label-width="140px"
-          >
+            label-width="140px">
             <el-form-item prop="password" class="mb30" label="请输入新密码">
               <el-input
                 class="input-password fl"
                 v-model="updatePasswordForm.password"
                 style="width: 400px"
                 show-password
-                clearable
-              />
+                clearable/>
             </el-form-item>
             <el-form-item prop="rePassword" class="mb30" label="重新输入密码">
               <el-input
@@ -90,21 +82,18 @@
                 v-model="updatePasswordForm.rePassword"
                 style="width: 400px"
                 show-password
-                clearable
-              />
+                clearable/>
             </el-form-item>
             <!-- 验证身份 -->
             <el-form-item>
               <el-button
                 class="btn-submit"
                 type="primary"
-                @click="commitUpdatePasswordForm('updatePasswordForm')"
-              >
+                @click="commitUpdatePasswordForm('updatePasswordForm')">
                 确认修改
               </el-button>
               <el-button
-                type="primary"
-              >
+                type="primary">
                 返回上一步
               </el-button>
             </el-form-item>
@@ -120,18 +109,17 @@
             xmlns="http://www.w3.org/2000/svg"
             p-id="7238"
             width="200"
-            height="200"
-          >
+            height="200">
             <path
               d="M512 512m-448 0a448 448 0 1 0 896 0 448 448 0 1 0-896 0Z"
               fill="#07C160"
-              p-id="7239"
-            ></path>
+              p-id="7239">
+            </path>
             <path
               d="M466.7 679.8c-8.5 0-16.6-3.4-22.6-9.4l-181-181.1c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l158.4 158.5 249-249c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3L489.3 670.4c-6 6-14.1 9.4-22.6 9.4z"
               fill="#FFFFFF"
-              p-id="7240"
-            ></path>
+              p-id="7240">
+            </path>
           </svg>
           <p class="mt20">修改成功</p>
         </div>
@@ -150,7 +138,7 @@ import {
   LOGIN_VERIFY_CODE_EMPTY_ERROR_MESSAGE,
   RE_PASSWORD_NOT_EQUALS_PASSWORD_ERROR_MESSAGE,
 } from "@/constant/errorMessageConstant";
-import {PASSWORD_REGEX} from "@/constant/regexConstant";
+import {LOGIN_PASSWORD_REGEX} from "@/constant/regexConstant";
 import axios from "axios";
 
 export default {
@@ -172,7 +160,7 @@ export default {
             trigger: "blur",
           },
           {
-            pattern: PASSWORD_REGEX,
+            pattern: LOGIN_PASSWORD_REGEX,
             message: LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE,
             trigger: "blur",
           },
@@ -197,7 +185,7 @@ export default {
             trigger: "blur",
           },
           {
-            pattern: PASSWORD_REGEX,
+            pattern: LOGIN_PASSWORD_REGEX,
             message: LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE,
             trigger: "blur",
           },

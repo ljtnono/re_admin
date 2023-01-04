@@ -3,8 +3,7 @@
     <LoginForm
       :verify-code-image-url="verifyCodeImageUrl"
       @submit="submit"
-      @refreshVerifyCode="refreshVerifyCode"
-    />
+      @refreshVerifyCode="refreshVerifyCode"/>
   </div>
 </template>
 

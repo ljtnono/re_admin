@@ -18,7 +18,8 @@
           <i class="flex iconfont icon-icon-article"/>
           <span class="flex draft-title">{{ item.title }}</span>
           <span class="flex draft-date">{{ item.saveTime | dateFormat('yyyy-MM-DD') }}</span>
-          <el-dropdown class="flex" v-if="currentDraftIndex === index" @command="handleDraftDropdownCommand" trigger="click">
+          <el-dropdown class="flex" v-if="currentDraftIndex === index" @command="handleDraftDropdownCommand"
+                       trigger="click">
             <i class="iconfont icon-setting" style="font-size: 16px;line-height: 40px;color: #4a4a4a"/>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="delete">删除</el-dropdown-item>
@@ -77,20 +78,15 @@
         <template slot="footer">
           <span class="dialog-footer">
             <el-button @click="publishFormVisible = false">取 消</el-button>
-            <el-button type="primary" @click="commitPublishForm">确 定</el-button>
+            <el-button type="primary" @click="commitPublishForm('publishForm')">发 布</el-button>
           </span>
         </template>
-        <el-form ref="publishForm" :model="publishForm" label-width="100px">
-          <el-form-item label="文章标题：" prop="title">
+        <!-- 文章发布表单 -->
+        <el-form ref="publishForm" :model="publishForm" label-width="100px" >
+          <el-form-item label="文章标题：" prop="title" class="is-required">
             <el-input v-model="publishForm.title" clearable placeholder="请输入文章标题"/>
           </el-form-item>
-          <el-form-item label="文章简介：" prop="summary">
-            <el-input type="textarea" v-model="publishForm.summary" :autosize="{ minRows: 4, maxRows: 4}" maxlength="200" show-word-limit placeholder="请输入文章简介，如果不填会根据文章内容自动生成" />
-          </el-form-item>
-          <el-form-item label="文章引用：" prop="quoteInfo">
-            <el-input type="textarea" v-model="publishForm.quoteInfo" :autosize="{ minRows: 4, maxRows: 4}" maxlength="200" show-word-limit placeholder="请输入文章引文信息" />
-          </el-form-item>
-          <el-form-item label="文章类型：" prop="categoryId">
+          <el-form-item label="文章类型：" prop="categoryId" class="is-required">
             <el-select style="width: 100%" v-model="publishForm.categoryId" clearable filterable placeholder="请选择文章类型">
               <el-option
                 v-for="category in categoryList"
@@ -113,11 +109,11 @@
                 v-for="tag in tagList"
                 :key="tag.id"
                 :label="tag.name"
-                :value="tag.id">
+                :value="tag.name">
               </el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="文章设定：">
+          <el-form-item label="文章设定：" class="is-required">
             <el-radio-group v-model="publishForm.recommend" class="mr30">
               <el-radio :label="1">推荐</el-radio>
               <el-radio :label="0">不推荐</el-radio>
@@ -131,49 +127,93 @@
               <el-radio :label="2">转载</el-radio>
             </el-radio-group>
           </el-form-item>
+          <el-form-item label="文章简介：" prop="summary">
+            <el-input type="textarea" v-model="publishForm.summary" :autosize="{ minRows: 4, maxRows: 4}" maxlength="200" show-word-limit placeholder="请输入文章简介，如果不填会根据文章内容自动生成"/>
+          </el-form-item>
+          <el-form-item label="文章引用：" prop="quoteInfo">
+            <el-input type="textarea" v-model="publishForm.quoteInfo" :autosize="{ minRows: 4, maxRows: 4}" maxlength="200" show-word-limit placeholder="请输入文章引文信息"/>
+          </el-form-item>
           <el-form-item label="文章封面：">
             <el-upload
-              action="#"
-              list-type="picture-card"
-              :auto-upload="false">
-              <i slot="default" class="el-icon-plus" />
-              <div slot="file" slot-scope="{file}">
-                <img class="el-upload-list__item-thumbnail" :src="file.url" alt="">
-                <span class="el-upload-list__item-actions">
-                  <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
-                    <i class="el-icon-zoom-in"></i>
+              :action="articleCoverUploadUrl"
+              :httpRequest="uploadArticleCover"
+              :onSuccess="uploadArticleCoverSuccess"
+              :onExceed="uploadArticleCoverExceed"
+              :fileList="articleCoverFileList"
+              accept="jpeg,png,gif"
+              listType="picture-card"
+              :limit="1"
+              :multiple="false"
+              auto-upload>
+              <template v-slot:default>
+                <i class="el-icon-plus"/>
+              </template>
+              <template v-slot:file="{file}">
+                <div class="test" v-if="file.url">
+                  <img class="el-upload-list__item-thumbnail" :src="file.url" :alt="file.url"/>
+                  <span class="el-upload-list__item-actions">
+                    <span class="el-upload-list__item-preview" @click="uploadArticleCoverPreview(file)">
+                      <i class="el-icon-zoom-in"/>
+                    </span>
+                    <span class="el-upload-list__item-delete" @click="uploadArticleCoverRemove(file)">
+                      <i class="el-icon-delete"/>
+                    </span>
                   </span>
-                  <span v-if="!disabled" class="el-upload-list__item-delete" @click="handleDownload(file)">
-                    <i class="el-icon-download"></i>
-                  </span>
-                  <span v-if="!disabled" class="el-upload-list__item-delete" @click="handleRemove(file)">
-                    <i class="el-icon-delete"></i>
-                  </span>
-                </span>
-              </div>
-              <div slot="tip" class="el-upload__tip">
-                只能上传jpg/png文件，且不超过500kb
-              </div>
+                </div>
+              </template>
+              <template v-slot:tip>
+                <div class="el-upload__tip">图片的格式为jpeg/png/gif，大小不能超过2M</div>
+              </template>
             </el-upload>
-            <el-dialog :visible.sync="dialogVisible">
-              <img width="100%" :src="dialogImageUrl" :alt="dialogImageUrl">
-            </el-dialog>
           </el-form-item>
         </el-form>
       </el-dialog>
     </div>
+    <!-- 文章封面缩略图查看弹窗 -->
+    <el-dialog :visible.sync="articleCoverUrlPreviewVisible">
+      <img width="100%" :src="articleCoverUrl" :alt="articleCoverUrl">
+    </el-dialog>
   </div>
 </template>
 
 <script>
 
-import {EDITOR_CONFIG} from "../config/commonConfig";
+import {EDITOR_CONFIG, ELEMENT_PAGE_LOADING_CONFIG} from "../config/commonConfig";
 import DateUtil from "@/util/dateUtil";
-import {deleteDraft, findDraftDetail, findDraftList, saveOrUpdateDraft} from "../api/article";
+import {deleteDraft, findDraftDetail, findDraftList, publishArticle, saveOrUpdateDraft} from "../api/article";
 import articleUtil from "@/util/articleUtil";
 import commonUtil from "@/util/commonUtil";
 import {uploadFile} from "@/api/common";
 import {mapState} from "vuex";
+import {
+  ARTICLE_COVER_SIZE_LIMIT,
+  ARTICLE_CREATION_TYPE_VALUES,
+  ARTICLE_CREATION_YC,
+  ARTICLE_CREATION_ZZ,
+  ARTICLE_NOT_RECOMMEND,
+  ARTICLE_NOT_TOP,
+  ARTICLE_RECOMMEND_VALUES,
+  ARTICLE_TOP_VALUES,
+  BASE_URL, ROUT_WORKSPACE_NAME
+} from "@/constant/commonConstant";
+import {
+  ARTICLE_PUBLISH_CATEGORY_EMPTY_ERROR,
+  ARTICLE_PUBLISH_MARKDOWN_CONTENT_EMPTY_ERROR,
+  ARTICLE_PUBLISH_NO_TRANSPORT_INFO_ERROR_MESSAGE,
+  ARTICLE_PUBLISH_SUMMARY_FORMAT_ERROR,
+  ARTICLE_PUBLISH_TAG_NAME_FORMAT_ERROR_MESSAGE,
+  ARTICLE_PUBLISH_TITLE_EMPTY_ERROR,
+  ARTICLE_PUBLISH_TITLE_FORMAT_ERROR,
+  ILLEGAL_PARAM_ERROR
+} from "@/constant/errorMessageConstant";
+import {
+  ARTICLE_PUBLISH_SUMMARY_REGEX,
+  ARTICLE_PUBLISH_TAG_REGEX,
+  ARTICLE_PUBLISH_TITLE_REGEX
+} from "@/constant/regexConstant";
+import router from "@/router";
+import {findTagList} from "@/api/tag";
+
 
 export default {
   name: "WriteArticle",
@@ -195,30 +235,26 @@ export default {
       publishFormVisible: false,
       // markdown编辑器配置
       editorConfig: EDITOR_CONFIG,
-      dialogImageUrl: "",
-      dialogVisible: false,
-      disabled: false,
-      fileList: [
-        {
-          name: "food.jpeg",
-          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100"
-        },
-        {
-          name: "food2.jpeg",
-          url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100"
-        }
-      ],
+      // 文章封面上传地址
+      articleCoverUploadUrl: BASE_URL + "/api-backend/file/uploadFile",
+      // 文章封面路径
+      articleCoverUrl: null,
+      // 文章封面缩略图可见状态
+      articleCoverUrlPreviewVisible: false,
+      // 文章封面上传文件列表
+      articleCoverFileList: null,
       // 文章发布表单
       publishForm: {
-        title: null,
         draftId: null,
+        title: null,
         markdownContent: null,
+        htmlContent: null,
         summary: null,
         categoryId: null,
         tagList: [],
-        recommend: 0,
-        top: 0,
-        creationType: 1,
+        recommend: ARTICLE_NOT_RECOMMEND,
+        top: ARTICLE_NOT_TOP,
+        creationType: ARTICLE_CREATION_YC,
         coverUrl: null,
         transportInfo: null,
         quoteInfo: null
@@ -242,43 +278,255 @@ export default {
     }
   },
   methods: {
-    // TODO 当发布文章表单打开时进行处理
+    // 当发布文章表单打开时进行处理
     publishFormOpen() {
       let that = this;
       that.publishForm = {
         title: that.currentDraftTitle,
         draftId: that.currentDraftId,
+        htmlContent: null,
         markdownContent: that.currentDraftMarkdownContent,
         summary: that.title,
         categoryId: null,
         tagList: [],
-        recommend: 0,
-        top: 0,
-        creationType: 1,
-        coverUrl: "",
+        recommend: ARTICLE_NOT_RECOMMEND,
+        top: ARTICLE_NOT_TOP,
+        creationType: ARTICLE_CREATION_YC,
+        coverUrl: null,
         transportInfo: null,
         quoteInfo: null
       }
     },
-    // TODO 提交发布文章表单
-    commitPublishForm() {
+    // 上传文章封面图片
+    async uploadArticleCover(request) {
+      let size = request.file.size;
+      // 不能超过2M
+      if (ARTICLE_COVER_SIZE_LIMIT < size) {
+        return false;
+      }
+      let result;
+      let data = new FormData();
+      data.append("file", request.file);
+      this.articleCoverUrl = request.url;
+      await uploadFile(data).then(res => {
+        result = res.data.data;
+      }).catch(e => {
+        this.$message({
+          message: "上传失败",
+          type: "error",
+          duration: 2000,
+          center: false
+        });
+      });
+      return result;
+    },
+    // 上传文章封面图片成功回调函数
+    uploadArticleCoverSuccess(response, file, fileList) {
+      if (response) {
+        this.articleCoverUrl = response;
+        this.publishForm.coverUrl = response;
+        this.$message({
+          message: "上传成功",
+          type: "success",
+          duration: 2000,
+          center: false
+        });
+      }
+    },
+    // 上传文章封面移除图片
+    uploadArticleCoverRemove(file) {
+      file.url = null;
+      this.articleCoverUrl = null;
+      this.articleCoverUrlPreviewVisible = false;
+      this.articleCoverFileList = [];
+      this.publishForm.coverUrl = null;
+    },
+    // 上传文章封面查看缩略图
+    uploadArticleCoverPreview(file) {
+      this.articleCoverUrlPreviewVisible = true;
+    },
+    // 上传文件多个报错
+    uploadArticleCoverExceed() {
+      this.$message({
+        message: "只允许上传一个封面",
+        type: "error",
+        duration: 2000,
+        center: false
+      });
+    },
+    // 校验文章发布表单
+    validatePublishForm() {
       let that = this;
-      that.publishFormVisible = false;
+      let form = that.publishForm;
+      let title = form.title;
+      let markdownContent = form.markdownContent;
+      let summary = form.summary;
+      let categoryId = form.categoryId;
+      let recommend = form.recommend;
+      let creationType = form.creationType;
+      let top = form.top;
+      let transportInfo = form.transportInfo;
+      let tagList = form.tagList;
+      // 空值校验
+      // 标题不能为空
+      if (title === null || title === undefined || title === "") {
+        this.$message({
+          message: ARTICLE_PUBLISH_TITLE_EMPTY_ERROR,
+          type: "error",
+          duration: 2000,
+          center: false
+        });
+        return false;
+      }
+      // 文章内容不能为空
+      if (markdownContent === null || markdownContent === undefined || markdownContent === "") {
+        this.$message({
+          message: ARTICLE_PUBLISH_MARKDOWN_CONTENT_EMPTY_ERROR,
+          type: "error",
+          duration: 2000,
+          center: false
+        });
+        return false;
+      }
+      // 文章分类不能为null 或者小于0
+      if (categoryId === null || categoryId === undefined || categoryId < 0) {
+        this.$message({
+          message: ARTICLE_PUBLISH_CATEGORY_EMPTY_ERROR,
+          type: "error",
+          duration: 2000,
+          center: false
+        });
+        return false;
+      }
+      if (!recommend) {
+        // 默认不推荐
+        recommend = ARTICLE_NOT_RECOMMEND;
+        form.recommend = ARTICLE_NOT_RECOMMEND;
+      }
+      if (!creationType) {
+        // 默认原创
+        creationType = ARTICLE_CREATION_YC;
+        form.creationType = ARTICLE_CREATION_YC;
+      }
+      if (!top) {
+        top = ARTICLE_NOT_TOP;
+        form.top = ARTICLE_NOT_TOP;
+      }
+      // 校验规则校验
+      // 标题不能超过100个字符
+      if (!ARTICLE_PUBLISH_TITLE_REGEX.test(title)) {
+        this.$message({
+          message: ARTICLE_PUBLISH_TITLE_FORMAT_ERROR,
+          type: "error",
+          duration: 2000,
+          center: false
+        });
+        return false;
+      }
+      // 简介不能超过200个字符
+      if (!ARTICLE_PUBLISH_SUMMARY_REGEX.test(summary)) {
+        this.$message({
+          message: ARTICLE_PUBLISH_SUMMARY_FORMAT_ERROR,
+          type: "error",
+          duration: 2000,
+          center: false
+        });
+        return false;
+      }
+      // 校验推荐值是否存在
+      if (!ARTICLE_RECOMMEND_VALUES.includes(recommend)) {
+        this.$message({
+          message: ILLEGAL_PARAM_ERROR,
+          type: "error",
+          duration: 2000,
+          center: false
+        });
+        return false;
+      }
+      // 校验创作类型值是否存在
+      if (!ARTICLE_CREATION_TYPE_VALUES.includes(creationType)) {
+        this.$message({
+          message: ILLEGAL_PARAM_ERROR,
+          type: "error",
+          duration: 2000,
+          center: false
+        });
+        return false;
+      }
+      // 校验置顶值是否存在
+      if (!ARTICLE_TOP_VALUES.includes(top)) {
+        this.$message({
+          message: ILLEGAL_PARAM_ERROR,
+          type: "error",
+          duration: 2000,
+          center: false
+        });
+        return false;
+      }
+      // 当文章是转载类型时，必须有转载说明
+      if (ARTICLE_CREATION_ZZ === creationType) {
+        if (transportInfo === null || transportInfo === undefined || transportInfo === "") {
+          this.$message({
+            message: ARTICLE_PUBLISH_NO_TRANSPORT_INFO_ERROR_MESSAGE,
+            type: "error",
+            duration: 2000,
+            center: false
+          });
+          return false;
+        }
+      }
+      if (tagList !== [] && tagList !== null && tagList !== undefined && tagList.length > 0) {
+        let flag = true;
+        for (let tag of tagList) {
+          if (!ARTICLE_PUBLISH_TAG_REGEX.test(tag)) {
+            this.$message({
+              message: ARTICLE_PUBLISH_TAG_NAME_FORMAT_ERROR_MESSAGE,
+              type: "error",
+              duration: 2000,
+              center: false
+            });
+            flag = false;
+          }
+        }
+        if (!flag) {
+          return false;
+        }
+      }
+      return true;
     },
-    // TODO 获取文章标签列表
-    getArticleTagList() {
+    // 提交发布文章表单
+    commitPublishForm(formName) {
       let that = this;
-      that.publishForm.tagList = ["fdasfs"]
-    },
-    handleRemove(file) {
-      console.log(file);
-    },
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
-    },
-    handleDownload(file) {
-      console.log(file);
+      let form = that.publishForm;
+      form.htmlContent = this.$refs.md.d_render;
+      if (that.validatePublishForm()) {
+        that.$loading(ELEMENT_PAGE_LOADING_CONFIG);
+        publishArticle({...form}).then(async res => {
+          that.$loading().close();
+          this.$message({
+            type: "success",
+            message: "发布成功",
+            duration: 2000,
+            center: false,
+          });
+          that.publishFormVisible = false;
+          // 再请求一次列表
+          await that.refreshDraftList();
+          // 再获取一次标签列表
+          await findTagList().then(res => {
+            that.$store.commit("common/changeTagList", res.data.data);
+          });
+        }).catch(e => {
+          that.$loading().close();
+        });
+      } else {
+        this.$message({
+          type: "error",
+          message: "参数校验失败，请检查",
+          duration: 2000,
+          center: false,
+        });
+      }
     },
     // 刷新草稿列表并显示第index草稿的内容
     async refreshDraftList(showIndex) {
@@ -377,7 +625,7 @@ export default {
       data.append("file", file);
       // 第一步.将图片上传到服务器.
       uploadFile(data).then(res => {
-        // 第二步.将返回的url替换到文本原位置![...](0) -> ![...](url)
+        // 第二步.将返回的url替换到文本原位置
         let url = res.data.data;
         vm.$img2Url(pos, url);
       });
@@ -387,8 +635,6 @@ export default {
     let that = this;
     // 获取草稿列表
     that.refreshDraftList();
-    // 获取标签列表
-    that.getArticleTagList();
   },
   async beforeDestroy() {
     let that = this;
@@ -421,9 +667,11 @@ export default {
   position: relative;
   overflow: hidden;
 }
+
 .avatar-uploader .el-upload:hover {
   border-color: #409EFF;
 }
+
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
@@ -432,6 +680,7 @@ export default {
   line-height: 178px;
   text-align: center;
 }
+
 .avatar {
   width: 178px;
   height: 178px;
@@ -520,5 +769,8 @@ export default {
     height: 850px;
   }
 
+  .publish-form-container {
+
+  }
 }
 </style>
