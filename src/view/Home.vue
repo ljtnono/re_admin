@@ -15,6 +15,8 @@
 <script>
 import Header from "@c/Header.vue";
 import Navigation from "@c/Navigation.vue";
+import {findCategoryList} from "@/api/category";
+import {findTagList} from "@/api/tag";
 
 export default {
   name: "Home",
@@ -72,6 +74,12 @@ export default {
     this.getMenus();
     this.setUserInfo();
     this.windowOnResize();
+    findCategoryList().then(res => {
+      this.$store.commit("common/changeCategoryList", res.data.data);
+    });
+    findTagList().then(res => {
+      this.$store.commit("common/changeTagList", res.data.data);
+    })
   },
 };
 </script>

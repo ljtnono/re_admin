@@ -11,7 +11,7 @@ const requestMapping = "/api-backend/article";
  *
  * @returns {Promise<AxiosResponse<any>>}
  */
-export const getDraftList = () => {
+export const findDraftList = () => {
   return axios.get(BASE_URL + requestMapping + "/draftList");
 };
 
@@ -20,7 +20,7 @@ export const getDraftList = () => {
  *
  * @returns {Promise<AxiosResponse<any>>}
  */
-export const getDraftDetail = (draftId) => {
+export const findDraftDetail = (draftId) => {
   return axios.get(BASE_URL + requestMapping + "/draft/" + draftId);
 };
 

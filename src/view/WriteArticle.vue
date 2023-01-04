@@ -17,7 +17,7 @@
              :class="index === currentDraftIndex ? 'draft-item-container flex flex-direction-row flex-justify-content-space-between ' + 'draft-item-container-current' : 'draft-item-container flex flex-direction-row flex-justify-content-space-between'">
           <i class="flex iconfont icon-icon-article"/>
           <span class="flex draft-title">{{ item.title }}</span>
-          <span class="flex draft-date">{{ item.saveTime | dateFormat('yyyy-MM-D') }}</span>
+          <span class="flex draft-date">{{ item.saveTime | dateFormat('yyyy-MM-DD') }}</span>
           <el-dropdown class="flex" v-if="currentDraftIndex === index" @command="handleDraftDropdownCommand" trigger="click">
             <i class="iconfont icon-setting" style="font-size: 16px;line-height: 40px;color: #4a4a4a"/>
             <el-dropdown-menu slot="dropdown">
@@ -71,6 +71,8 @@
       <el-dialog
         title="发布文章"
         @open="publishFormOpen"
+        top="4vh"
+        center
         :visible.sync="publishFormVisible">
         <template slot="footer">
           <span class="dialog-footer">
@@ -78,7 +80,7 @@
             <el-button type="primary" @click="commitPublishForm">确 定</el-button>
           </span>
         </template>
-        <el-form ref="publishForm" :model="publishForm" label-width="120px">
+        <el-form ref="publishForm" :model="publishForm" label-width="100px">
           <el-form-item label="文章标题：" prop="title">
             <el-input v-model="publishForm.title" clearable placeholder="请输入文章标题"/>
           </el-form-item>
@@ -91,10 +93,10 @@
           <el-form-item label="文章类型：" prop="categoryId">
             <el-select style="width: 100%" v-model="publishForm.categoryId" clearable filterable placeholder="请选择文章类型">
               <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value">
+                v-for="category in categoryList"
+                :key="category.id"
+                :label="category.name"
+                :value="category.id">
               </el-option>
             </el-select>
           </el-form-item>
@@ -107,6 +109,12 @@
                        allow-create
                        default-first-option
                        placeholder="请输入文章标签">
+              <el-option
+                v-for="tag in tagList"
+                :key="tag.id"
+                :label="tag.name"
+                :value="tag.id">
+              </el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="文章设定：">
@@ -161,10 +169,11 @@
 
 import {EDITOR_CONFIG} from "../config/commonConfig";
 import DateUtil from "@/util/dateUtil";
-import {deleteDraft, getDraftDetail, getDraftList, saveOrUpdateDraft} from "../api/article";
+import {deleteDraft, findDraftDetail, findDraftList, saveOrUpdateDraft} from "../api/article";
 import articleUtil from "@/util/articleUtil";
 import commonUtil from "@/util/commonUtil";
 import {uploadFile} from "@/api/common";
+import {mapState} from "vuex";
 
 export default {
   name: "WriteArticle",
@@ -199,22 +208,6 @@ export default {
           url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100"
         }
       ],
-      options: [{
-        value: "选项1",
-        label: "黄金糕"
-      }, {
-        value: "选项2",
-        label: "双皮奶"
-      }, {
-        value: "选项3",
-        label: "蚵仔煎"
-      }, {
-        value: "选项4",
-        label: "龙须面"
-      }, {
-        value: "选项5",
-        label: "北京烤鸭"
-      }],
       // 文章发布表单
       publishForm: {
         title: null,
@@ -222,7 +215,7 @@ export default {
         markdownContent: null,
         summary: null,
         categoryId: null,
-        tagList: ["a", "b"],
+        tagList: [],
         recommend: 0,
         top: 0,
         creationType: 1,
@@ -233,6 +226,10 @@ export default {
     }
   },
   computed: {
+    ...mapState({
+      categoryList: state => state.common.categoryList,
+      tagList: state => state.common.tagList
+    }),
     saveStatusStr() {
       let saveStatus = this.saveStatus;
       if (saveStatus === 0) {
@@ -254,7 +251,7 @@ export default {
         markdownContent: that.currentDraftMarkdownContent,
         summary: that.title,
         categoryId: null,
-        tagList: ["a", "b"],
+        tagList: [],
         recommend: 0,
         top: 0,
         creationType: 1,
@@ -286,14 +283,14 @@ export default {
     // 刷新草稿列表并显示第index草稿的内容
     async refreshDraftList(showIndex) {
       let that = this;
-      getDraftList().then(async res => {
+      findDraftList().then(async res => {
         that.draftList = res.data.data;
         if (!showIndex) {
           showIndex = 0;
         }
         let showDraftId = that.draftList[showIndex].draftId;
         // 获取当前数据
-        await getDraftDetail(showDraftId).then(r => {
+        await findDraftDetail(showDraftId).then(r => {
           let draft = r.data.data;
           that.currentDraftId = draft.draftId;
           that.currentDraftIndex = showIndex;
@@ -313,11 +310,11 @@ export default {
         // 先保存当前的内容
         if (that.saveStatus === 0) {
           let currentDraftMarkdownContent = that.currentDraftMarkdownContent;
-          let currentDraftTitle = articleUtil.getTitleFromMarkdownContent(currentDraftMarkdownContent) || DateUtil.getNowDate("yyyy-MM-D");
+          let currentDraftTitle = articleUtil.getTitleFromMarkdownContent(currentDraftMarkdownContent) || DateUtil.getNowDate("yyyy-MM-DD");
           let currentDraftId = that.currentDraftId;
           await saveOrUpdateDraft(currentDraftId, currentDraftTitle, currentDraftMarkdownContent);
         }
-        await getDraftDetail(showDraftId).then(r => {
+        await findDraftDetail(showDraftId).then(r => {
           let draft = r.data.data;
           that.currentDraftIndex = index;
           that.currentDraftMarkdownContent = draft.markdownContent;
@@ -333,7 +330,7 @@ export default {
       let that = this;
       // 只监听当前草稿的改动
       that.currentDraftMarkdownContent = value;
-      that.currentDraftTitle = articleUtil.getTitleFromMarkdownContent(value) || DateUtil.getNowDate("yyyy-MM-D");
+      that.currentDraftTitle = articleUtil.getTitleFromMarkdownContent(value) || DateUtil.getNowDate("yyyy-MM-DD");
       that.saveStatus = 0;
     },
     // 保存草稿
@@ -341,7 +338,7 @@ export default {
       let that = this;
       that.saveStatus = 1;
       // 保存或更新草稿
-      let draftTitle = articleUtil.getTitleFromMarkdownContent(value) || DateUtil.getNowDate("yyyy-MM-D");
+      let draftTitle = articleUtil.getTitleFromMarkdownContent(value) || DateUtil.getNowDate("yyyy-MM-DD");
       await saveOrUpdateDraft(that.currentDraftId, draftTitle, value);
       // 重新获取草稿列表
       await that.refreshDraftList();
@@ -350,7 +347,7 @@ export default {
     // 新建文章
     newArticle: commonUtil.throttle(async function () {
       let that = this;
-      let now = DateUtil.getNowDate("yyyy-MM-D");
+      let now = DateUtil.getNowDate("yyyy-MM-DD");
       let markdownContent = "# " + now;
       let title = articleUtil.getTitleFromMarkdownContent(markdownContent) || now;
       that.saveStatus = 1;
