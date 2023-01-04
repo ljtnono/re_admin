@@ -1,6 +1,5 @@
 class UrlUtil {
 
-
   /**
    * 删除url中的parameter
    *

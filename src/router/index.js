@@ -2,6 +2,8 @@ import Router from "vue-router";
 import routers from "./routers";
 import { ROUT_HOME_NAME } from "@/constant/commonConstant";
 import message from "element-ui/packages/message";
+import store from "../store";
+import RouteUtil from "@/util/routeUtil";
 
 // 创建导航，使用历史模式
 const router = new Router({
@@ -23,7 +25,10 @@ Router.prototype.push = function push(location) {
 router.beforeEach((to, from, next) => {
   let toPath = to.path;
   let toName = to.name;
-  // TODO 如果token存在，并且路由路径为/,那么直接跳转到工作台页面
+  let breadcrumbList = RouteUtil.getBreadcrumb(toName);
+  store.commit("systemSetting/changeBreadcrumbList", breadcrumbList);
+
+  // 如果token存在，并且路由路径为/,那么直接跳转到工作台页面
   if (toPath === "/" + ROUT_HOME_NAME) {
     next({ name: "Workspace" });
   }

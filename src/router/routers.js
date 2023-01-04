@@ -23,6 +23,9 @@ export default [
       hideInMenu: true
     },
     component: () => import("@v/Home.vue"),
+    redirect: {
+      name: "Workspace"
+    },
     children: [
       {
         path: "/updatePassword",

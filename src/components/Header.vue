@@ -14,8 +14,7 @@
     <!-- 面包屑导航 -->
     <div class="bread-crumb-container flex">
       <el-breadcrumb separator-class="el-icon-arrow-right">
-        <el-breadcrumb-item>系统管理</el-breadcrumb-item>
-        <el-breadcrumb-item>用户管理</el-breadcrumb-item>
+        <el-breadcrumb-item v-for="breadcrumb in breadcrumbList" :key="breadcrumb">{{ breadcrumb }}</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <!-- 用户头像和信息 -->
@@ -45,21 +44,26 @@
 import router from "@/router";
 import {logout} from "@/api/auth";
 import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
-
+import {mapState} from "vuex";
 
 export default {
   name: "Header",
   data() {
-    return {};
+    return {
+
+    };
   },
   computed: {
+    ...mapState({
+      breadcrumbList: state => state.systemSetting.breadcrumbList
+    }),
     navTriggerClass() {
       // TODO 计算当前切换导航栏icon的class属性值
       return "nav-trigger-a";
     },
   },
   props: {
-    avatar: String,
+    avatar: String
   },
   components: {},
   methods: {
@@ -89,7 +93,6 @@ export default {
             name: "Login",
           });
         }).catch(e => {
-          debugger
           that.$loading().close();
           this.$message({
             type: "error",
@@ -107,7 +110,7 @@ export default {
           name: "Personal",
         });
       }
-    },
+    }
   },
   mounted() {
     //
