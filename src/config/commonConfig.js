@@ -54,7 +54,7 @@ export const EDITOR_CONFIG = {
   // 是否允许编辑
   editable: true,
   // code-github	markdown样式： 默认github, 可选配色方案
-  codeStyle: "code-github",
+  codeStyle: "atom-one-dark-reasonable",
   // 工具栏是否显示
   toolbarsFlag: true,
   // 默认展示目录

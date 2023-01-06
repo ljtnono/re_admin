@@ -194,7 +194,7 @@ import {
   ARTICLE_NOT_TOP,
   ARTICLE_RECOMMEND_VALUES,
   ARTICLE_TOP_VALUES,
-  BASE_URL, ROUT_WORKSPACE_NAME
+  BASE_URL
 } from "@/constant/commonConstant";
 import {
   ARTICLE_PUBLISH_CATEGORY_EMPTY_ERROR,
@@ -211,7 +211,6 @@ import {
   ARTICLE_PUBLISH_TAG_REGEX,
   ARTICLE_PUBLISH_TITLE_REGEX
 } from "@/constant/regexConstant";
-import router from "@/router";
 import {findTagList} from "@/api/tag";
 
 
@@ -518,13 +517,6 @@ export default {
           });
         }).catch(e => {
           that.$loading().close();
-        });
-      } else {
-        this.$message({
-          type: "error",
-          message: "参数校验失败，请检查",
-          duration: 2000,
-          center: false,
         });
       }
     },

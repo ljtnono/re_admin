@@ -3,8 +3,7 @@
     <Navigation
       class="flex navigation"
       :collapseStatus="collapseStatus"
-      :menus="menus"
-    />
+      :menus="menus"/>
     <div class="content-container flex flex1 flex-direction-column">
       <Header class="flex" @toggleNav="toggleNav" :avatar="avatar" />
       <router-view />
@@ -79,7 +78,7 @@ export default {
     });
     findTagList().then(res => {
       this.$store.commit("common/changeTagList", res.data.data);
-    })
+    });
   },
 };
 </script>

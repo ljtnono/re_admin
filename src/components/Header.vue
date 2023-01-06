@@ -2,12 +2,10 @@
   <div class="header-bar flex flex-direction-row">
     <!-- 折叠菜单图标 -->
     <div class="toggle-icon-container mr30 flex flex-direction-column flex-justify-content-center">
-      <a
-        type="text"
-        href="javascript:"
+      <a type="text"
+        href="javascript:;"
         :class="navTriggerClass"
-        @click="toggleNav"
-      >
+        @click="toggleNav">
         <i class="iconfont icon-zhedie"/>
       </a>
     </div>
