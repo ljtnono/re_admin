@@ -1,9 +1,9 @@
 import Router from "vue-router";
 import routers from "./routers";
 import { ROUT_HOME_NAME } from "@/constant/commonConstant";
-import message from "element-ui/packages/message";
 import store from "../store";
 import RouteUtil from "@/util/routeUtil";
+import ElementUI from "element-ui";
 
 // 创建导航，使用历史模式
 const router = new Router({
@@ -11,10 +11,8 @@ const router = new Router({
   base: "/",
   mode: "history",
 });
-
 // 特殊页面数组
 const SPECIAL_PAGES = ["/login", "/404", "/500", "/401"];
-
 // 解决重复点击路由报错的BUG
 const originalPush = Router.prototype.push;
 Router.prototype.push = function push(location) {
@@ -25,6 +23,7 @@ Router.prototype.push = function push(location) {
 router.beforeEach((to, from, next) => {
   let toPath = to.path;
   let toName = to.name;
+  // 设置面包屑导航
   let breadcrumbList = RouteUtil.getBreadcrumb(toName);
   store.commit("systemSetting/changeBreadcrumbList", breadcrumbList);
 
@@ -41,8 +40,11 @@ router.beforeEach((to, from, next) => {
     if (menus && tokeInfo && userInfo) {
       next();
     } else {
-      message.error({
+      // 弹出错误消息
+      ElementUI.Message.error({
         message: "用户未认证",
+        duration: 2000,
+        center: false
       });
       next({ name: "Login" });
     }
