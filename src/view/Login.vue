@@ -49,9 +49,7 @@ export default {
         let userInfo = innerData.userInfo;
         let tokenInfo = innerData.tokenInfo;
         let menus = innerData.menus;
-        this.$store.commit("user/changeUserInfo", userInfo);
-        this.$store.commit("user/changeTokenInfo", tokenInfo);
-        this.$store.commit("user/changeMenus", menus);
+        this.$store.commit("user/login", {userInfo, tokenInfo, menus});
         // 跳转到home页面
         this.$message({
           type: "success",

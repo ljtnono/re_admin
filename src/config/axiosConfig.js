@@ -56,9 +56,7 @@ INSTANCE.interceptors.response.use((response) => {
       // 如果token异常，需要清除缓存，并跳转到登录页面
       if (TOKEN_ERROR_CODE_ARRAY.includes(code)) {
         // 删除当前token信息,并返回到登录界面
-        store.commit("user/changeUserInfo", null);
-        store.commit("user/changeTokenInfo", null);
-        store.commit("user/changeMenus", null);
+        store.commit("logout");
         router.push({
           name: "Login"
         });

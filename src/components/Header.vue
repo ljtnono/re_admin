@@ -76,10 +76,7 @@ export default {
       if (command === "logout") {
         that.$loading(ELEMENT_PAGE_LOADING_CONFIG);
         logout().then(res => {
-          // 删除当前token信息,并返回到登录界面
-          this.$store.commit("user/changeUserInfo", null);
-          this.$store.commit("user/changeTokenInfo", null);
-          this.$store.commit("user/changeMenus", null);
+          this.$store.commit("logout");
           that.$loading().close();
           this.$message({
             type: "success",

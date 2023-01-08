@@ -21,6 +21,12 @@ const user = {
     // 修改菜单信息
     changeMenus(state, menus) {
       state.menus = menus;
+    },
+    // 登录
+    login(state, payload) {
+      state.userInfo = payload.userInfo;
+      state.tokenInfo = payload.tokenInfo;
+      state.menus = payload.menus;
     }
   }
 };
