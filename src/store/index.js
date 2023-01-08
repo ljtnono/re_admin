@@ -6,6 +6,7 @@ import user from "@/store/user";
 import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
+const SESSION_STORAGE_KEY = "state";
 // 注册上面引入的各大模块
 const store = new Vuex.Store({
   modules: {
@@ -21,6 +22,7 @@ const store = new Vuex.Store({
       state["systemSetting/breadcrumbList"] = null;
       state["common/categoryList"] = null;
       state["common/tagList"] = null;
+      window.sessionStorage.removeItem(SESSION_STORAGE_KEY);
     }
   },
   // 配置插件
@@ -28,7 +30,7 @@ const store = new Vuex.Store({
     // 该插件默认把state里面的数据存储在localStorage里面
     createPersistedState({
       // 本地存储的key
-      key: "re_admin_state",
+      key: SESSION_STORAGE_KEY,
       // 指定需要存储的模块
       paths: ["systemSetting", "common", "user"],
       storage: window.sessionStorage
