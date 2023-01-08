@@ -77,9 +77,9 @@ export default {
         that.$loading(ELEMENT_PAGE_LOADING_CONFIG);
         logout().then(res => {
           // 删除当前token信息,并返回到登录界面
-          sessionStorage.removeItem("tokenInfo");
-          sessionStorage.removeItem("userInfo");
-          sessionStorage.removeItem("menus");
+          this.$store.commit("user/changeUserInfo", null);
+          this.$store.commit("user/changeTokenInfo", null);
+          this.$store.commit("user/changeMenus", null);
           that.$loading().close();
           this.$message({
             type: "success",

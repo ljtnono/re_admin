@@ -46,13 +46,12 @@ export default {
       await login(username, password, that.verifyCodeKey, verifyCode).then((res) => {
         let outerData = res.data;
         let innerData = outerData.data;
-        // 将用户信息存在sessionStorage中
         let userInfo = innerData.userInfo;
         let tokenInfo = innerData.tokenInfo;
         let menus = innerData.menus;
-        sessionStorage.setItem("userInfo", JSON.stringify(userInfo));
-        sessionStorage.setItem("tokenInfo", JSON.stringify(tokenInfo));
-        sessionStorage.setItem("menus", JSON.stringify(menus));
+        this.$store.commit("user/changeUserInfo", userInfo);
+        this.$store.commit("user/changeTokenInfo", tokenInfo);
+        this.$store.commit("user/changeMenus", menus);
         // 跳转到home页面
         this.$message({
           type: "success",

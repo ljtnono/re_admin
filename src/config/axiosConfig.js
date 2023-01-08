@@ -8,6 +8,7 @@ import ElementUI from "element-ui";
 import urlUtil from "@/util/urlUtil";
 import {TOKEN_ERROR_CODE_ARRAY} from "@/constant/errorConstant";
 import router from "../router";
+import store from "@/store";
 
 const INSTANCE = axios.create();
 // 不需要携带token的请求路径集合
@@ -20,9 +21,9 @@ const PASS_TOKEN_URL = [
 INSTANCE.interceptors.request.use(config => {
   let urlWithoutParameter = urlUtil.removeParameter(config.url);
   if (!PASS_TOKEN_URL.includes(urlWithoutParameter)) {
-    let token = sessionStorage.getItem("tokenInfo");
+    let token = store.state.user.tokenInfo;
     if(token) {
-      config.headers["Authorization"] = "Bearer " + JSON.parse(token)["access_token"];
+      config.headers["Authorization"] = "Bearer " + token["access_token"];
     }
   }
   return config;
@@ -54,9 +55,10 @@ INSTANCE.interceptors.response.use((response) => {
       });
       // 如果token异常，需要清除缓存，并跳转到登录页面
       if (TOKEN_ERROR_CODE_ARRAY.includes(code)) {
-        sessionStorage.removeItem("userInfo");
-        sessionStorage.removeItem("tokenInfo");
-        sessionStorage.removeItem("menus");
+        // 删除当前token信息,并返回到登录界面
+        store.commit("user/changeUserInfo", null);
+        store.commit("user/changeTokenInfo", null);
+        store.commit("user/changeMenus", null);
         router.push({
           name: "Login"
         });

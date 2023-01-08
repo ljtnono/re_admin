@@ -1,7 +1,7 @@
 import Router from "vue-router";
 import routers from "./routers";
 import { ROUT_HOME_NAME } from "@/constant/commonConstant";
-import store from "../store";
+import store from "@/store";
 import RouteUtil from "@/util/routeUtil";
 import ElementUI from "element-ui";
 
@@ -33,10 +33,9 @@ router.beforeEach((to, from, next) => {
   }
   // 除了特殊页面之外，如果跳转到正常页面，需要校验token等信息是否存在
   if (!SPECIAL_PAGES.includes(toPath)) {
-    let userInfo = sessionStorage.getItem("userInfo");
-    let tokeInfo = sessionStorage.getItem("tokenInfo");
-    let menus = sessionStorage.getItem("menus");
-
+    let userInfo = store.state.user.userInfo;
+    let tokeInfo = store.state.user.tokenInfo;
+    let menus = store.state.user.menus;
     if (menus && tokeInfo && userInfo) {
       next();
     } else {

@@ -5,8 +5,8 @@
       :collapseStatus="collapseStatus"
       :menus="menus"/>
     <div class="content-container flex flex1 flex-direction-column">
-      <Header class="flex" @toggleNav="toggleNav" :avatar="avatar" />
-      <router-view />
+      <Header class="flex" @toggleNav="toggleNav" :avatar="avatar"/>
+      <router-view/>
     </div>
   </div>
 </template>
@@ -16,21 +16,26 @@ import Header from "@c/Header.vue";
 import Navigation from "@c/Navigation.vue";
 import {findCategoryList} from "@/api/category";
 import {findTagList} from "@/api/tag";
+import {mapState} from "vuex";
 
 export default {
   name: "Home",
   data() {
     return {
       collapseStatus: false,
-      menus: null,
-      avatar: "",
       clientWidth: document.body.clientWidth,
       clientHeight: document.body.clientHeight,
     };
   },
+  computed: {
+    ...mapState({
+      avatar: state => state.user.userInfo.avatarUrl,
+      menus: state => state.user.menus
+    })
+  },
   components: {
     Header,
-    Navigation,
+    Navigation
   },
   watch: {
     clientWidth(newVal) {
@@ -38,15 +43,6 @@ export default {
     },
   },
   methods: {
-    // 获取menus
-    getMenus() {
-      let menusObj = sessionStorage.getItem("menus");
-      if (menusObj == null) {
-        // 如果sessionStorage中的数据不对，那么应该清除信息，并返回登录界面
-      } else {
-        this.menus = JSON.parse(menusObj);
-      }
-    },
     // 切换导航菜单的折叠状态
     toggleNav() {
       this.collapseStatus = !this.collapseStatus;
@@ -60,18 +56,9 @@ export default {
         that.clientWidth = window.clientWidth;
         that.clientHeight = window.clientHeight;
       };
-    },
-    // 设置用户信息
-    setUserInfo() {
-      let userInfo = sessionStorage.getItem("userInfo");
-      if (userInfo != null) {
-        this.avatar = JSON.parse(userInfo).avatarUrl;
-      }
-    },
+    }
   },
   mounted() {
-    this.getMenus();
-    this.setUserInfo();
     this.windowOnResize();
     findCategoryList().then(res => {
       this.$store.commit("common/changeCategoryList", res.data.data);
