@@ -1,5 +1,6 @@
 import axios from "@/config/axiosConfig";
 import {ARTICLE_CREATION_YC, ARTICLE_NOT_RECOMMEND, ARTICLE_NOT_TOP, BASE_URL} from "@/constant/commonConstant";
+import qs from "qs";
 
 // #################### 草稿相关接口 #################### //
 
@@ -79,4 +80,22 @@ export const publishArticle = ({draftId, title, markdownContent, htmlContent, su
     transportInfo,
     quoteInfo
   });
+};
+
+/**
+ * 获取文章列表
+ *
+ * @param searchCondition 搜索条件
+ * @param category 分页筛选条件
+ * @param recommend 是否推荐
+ * @param top 是否置顶
+ * @param orderFieldList 排序字段列表
+ * @param orderFlagList 排序标记列表
+ * @param pageNum 请求页数
+ * @param pageSize 每页条数
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const findArticleList = ({searchCondition, category, recommend, top, orderFieldList, orderFlagList, pageNum, pageSize}) => {
+  let param = qs.stringify({searchCondition, category, recommend, top, orderFieldList, orderFlagList, pageNum, pageSize});
+  return axios.get(BASE_URL + requestMapping + "/list?" + param);
 };
