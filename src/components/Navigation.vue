@@ -1,7 +1,6 @@
 <template>
   <div>
     <el-menu
-      class="nav-menu"
       background-color="#001529"
       text-color="#ffffff"
       active-text-color="rgba(255, 255, 255, 0.7);"
@@ -9,8 +8,8 @@
       :collapse="collapseStatus">
       <!-- 导航栏上面的logo -->
       <div class="nav-logo-container mb10">
-        <img class="nav-logo-max" v-show="!collapseStatus" src="@a/images/logo.png" />
-        <img class="nav-logo-min" v-show="collapseStatus" src="@a/images/logo-min.png" />
+        <img class="nav-logo-max" v-show="!collapseStatus" src="@a/images/logo.png"/>
+        <img class="nav-logo-min" v-show="collapseStatus" src="@a/images/logo-min.png"/>
       </div>
       <!-- 工作台 -->
       <el-menu-item style="text-align: center; cursor: pointer" @click="$router.push({ name: 'Workspace' })">
@@ -19,7 +18,7 @@
         </a>
         <div v-show="collapseStatus">
           <a href="javascript:;" style="width: 100%; height: 100%; display: inline-block">
-            <i class="el-icon-location" style="display: inline-block !important" />
+            <i class="el-icon-location" style="display: inline-block !important"/>
           </a>
         </div>
       </el-menu-item>
@@ -29,7 +28,7 @@
         <div v-if="m1.children !== null && m1.children !== undefined">
           <el-submenu :index="i1 + ''">
             <div slot="title">
-              <i :class="'iconfont' + ' ' + m1.icon" />
+              <i :class="'iconfont' + ' ' + m1.icon"/>
               <span style="margin-left: 15px" v-show="!collapseStatus">
                 {{ m1.title }}
               </span>
@@ -44,7 +43,8 @@
           </el-submenu>
         </div>
         <!-- 不包含子菜单 -->
-        <el-menu-item v-if="m1.children === null || m1.children === undefined" :index="i1" @click="$router.push({ path: m1.path })">
+        <el-menu-item v-if="m1.children === null || m1.children === undefined" :index="i1"
+                      @click="$router.push({ path: m1.path })">
           <a href="javascript:;"> {{ m1.name }} </a>
         </el-menu-item>
       </div>
@@ -57,7 +57,7 @@ export default {
   name: "Navigation",
   data() {
     return {
-      collapseTransition: false,
+      collapseTransition: true
     };
   },
   props: {
@@ -67,9 +67,7 @@ export default {
     },
   },
   components: {},
-  methods: {
-
-  },
+  methods: {},
   mounted() {
 
   },
@@ -77,9 +75,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.nav-menu {
+.el-menu {
+  width: 256px;
   overflow-x: hidden;
-  min-width: 256px;
   height: 100%;
   position: relative;
 
@@ -100,7 +98,7 @@ export default {
 
 // 折叠菜单后隐藏小箭头
 .el-menu--collapse {
-  min-width: 0;
+  width: 64px;
 
   ::v-deep .el-submenu__title {
     text-align: center;
@@ -115,6 +113,7 @@ export default {
     height: 64px;
     padding: 0;
     position: relative;
+    transition: width .2s;
 
     img {
       display: block;

@@ -142,6 +142,13 @@ body {
   visibility: hidden;
 }
 
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-break: keep-all;
+}
+
 .pr {
   position: relative;
 }

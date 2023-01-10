@@ -523,7 +523,7 @@ export default {
     // 刷新草稿列表并显示第index草稿的内容
     async refreshDraftList(showIndex) {
       let that = this;
-      findDraftList().then(async res => {
+      await findDraftList().then(async res => {
         that.draftList = res.data.data;
         if (!showIndex) {
           showIndex = 0;
@@ -623,10 +623,14 @@ export default {
       });
     }
   },
-  mounted() {
+  async mounted() {
     let that = this;
     // 获取草稿列表
-    that.refreshDraftList();
+    that.$loading(ELEMENT_PAGE_LOADING_CONFIG);
+    await that.refreshDraftList().catch(e => {
+      that.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
+    });
+    that.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
   },
   async beforeDestroy() {
     let that = this;

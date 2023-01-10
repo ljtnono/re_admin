@@ -6,7 +6,16 @@ const common = {
     // 文章标签列表
     tagList: []
   }),
-  getters:{},
+  getters:{
+    categoryFilters(state) {
+      return state.categoryList.map(category => {
+        return {
+          text: category.name,
+          value: category.name
+        }
+      });
+    }
+  },
   actions:{
 
   },

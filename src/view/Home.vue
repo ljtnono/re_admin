@@ -3,9 +3,10 @@
     <Navigation
       class="flex navigation"
       :collapseStatus="collapseStatus"
+
       :menus="menus"/>
     <div class="content-container flex flex1 flex-direction-column">
-      <Header class="flex" @toggleNav="toggleNav" :avatar="avatar"/>
+      <Header class="flex" @toggleNav="toggleNav" :avatar="avatar" :toggle-icon-class="toggleIconClass"/>
       <router-view/>
     </div>
   </div>
@@ -25,6 +26,7 @@ export default {
       collapseStatus: false,
       clientWidth: document.body.clientWidth,
       clientHeight: document.body.clientHeight,
+      toggleIconClass: "nav-toggle-a"
     };
   },
   computed: {
@@ -43,9 +45,18 @@ export default {
     },
   },
   methods: {
+    navToggleClass() {
+      let collapseStatus = this.collapseStatus;
+      if (collapseStatus) {
+        this.toggleIconClass = "nav-toggle-a-collapse";
+      } else {
+        this.toggleIconClass = "nav-toggle-a";
+      }
+    },
     // 切换导航菜单的折叠状态
     toggleNav() {
       this.collapseStatus = !this.collapseStatus;
+      this.navToggleClass();
     },
     // 监听窗口大小改变
     windowOnResize() {

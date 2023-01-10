@@ -3,10 +3,10 @@
     <!-- 折叠菜单图标 -->
     <div class="toggle-icon-container mr30 flex flex-direction-column flex-justify-content-center">
       <a type="text"
-        href="javascript:;"
-        :class="navTriggerClass"
-        @click="toggleNav">
-        <i class="iconfont icon-zhedie"/>
+         href="javascript:;"
+         :class="toggleIconClass"
+         @click="toggleNav">
+        <i class="iconfont icon-zhedie" />
       </a>
     </div>
     <!-- 面包屑导航 -->
@@ -19,7 +19,7 @@
     <div class="user-info-content flex flex1 flex-justify-content-end">
       <el-dropdown trigger="click" @command="handleCommand">
         <div class="flex flex-direction-row flex-justify-content-center">
-          <div class="write-article mr40"  @click.stop="$router.push({name: 'WriteArticle'})">
+          <div class="write-article mr40" @click.stop="$router.push({name: 'WriteArticle'})">
             写文章
           </div>
           <div class="mr5 avatar-container flex flex-direction-column flex-justify-content-center">
@@ -54,20 +54,16 @@ export default {
   computed: {
     ...mapState({
       breadcrumbList: state => state.systemSetting.breadcrumbList
-    }),
-    navTriggerClass() {
-      // TODO 计算当前切换导航栏icon的class属性值
-      return "nav-trigger-a";
-    },
+    })
   },
   props: {
-    avatar: String
+    avatar: String,
+    toggleIconClass: String
   },
   components: {},
   methods: {
     // 折叠左边的菜单栏
     toggleNav() {
-      // TODO 设置当前标签为.nav-trigger-a-collapse
       this.$emit("toggleNav");
     },
     // 注销
@@ -77,7 +73,7 @@ export default {
         that.$loading(ELEMENT_PAGE_LOADING_CONFIG);
         logout().then(res => {
           this.$store.commit("logout");
-          that.$loading().close();
+          that.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
           this.$message({
             type: "success",
             message: "注销成功",
@@ -88,13 +84,7 @@ export default {
             name: "Login",
           });
         }).catch(e => {
-          that.$loading().close();
-          this.$message({
-            type: "error",
-            message: "注销失败",
-            duration: 2000,
-            center: false,
-          });
+          that.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
         });
       } else if (command === "updatePassword") {
         router.push({
@@ -102,14 +92,14 @@ export default {
         });
       } else if (command === "personal") {
         router.push({
-          name: "Personal",
+          name: "Personal"
         });
       }
     }
   },
   mounted() {
-    //
-  },
+
+  }
 };
 </script>
 
@@ -123,13 +113,8 @@ export default {
 
   .toggle-icon-container {
     height: 100%;
-
-    // 收起状态
-    .nav-trigger-a-collapse {
-      transform: rotateY(-90deg);
-    }
-
-    .nav-trigger-a {
+    cursor: pointer;
+    a {
       line-height: 40px;
       font-size: 30px;
       color: #5c6b77;
@@ -137,6 +122,16 @@ export default {
       i {
         font-size: 26px;
       }
+    }
+
+    .nav-toggle-a-collapse {
+      transform: rotate(90deg);
+      transition: transform .3s;
+    }
+
+    .nav-toggle-a {
+      transform: rotate(0);
+      transition: transform .3s;
     }
   }
 
