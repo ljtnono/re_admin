@@ -127,10 +127,10 @@
                   <i class="el-icon-arrow-down el-icon--right" />
                 </el-button>
                 <el-dropdown-menu>
-                  <el-dropdown-item :command="{opt: 'recommend', id: row.id}">推荐</el-dropdown-item>
-                  <el-dropdown-item :command="{opt: 'top', id: row.id}">置顶</el-dropdown-item>
-                  <el-dropdown-item :command="{opt: row.deleted === ENTITY_DELETE_STATE_NORMAL ? 'hidden' : 'show', id: row.id}">{{ row.deleted === ENTITY_DELETE_STATE_NORMAL ? '隐藏' : '显示' }}</el-dropdown-item>
-                  <el-dropdown-item :command="{opt: 'delete', id: row.id}">删除</el-dropdown-item>
+                  <el-dropdown-item :command="{opt: 'recommend', row}">推荐</el-dropdown-item>
+                  <el-dropdown-item :command="{opt: 'top', row}">置顶</el-dropdown-item>
+                  <el-dropdown-item :command="{opt: row.deleted === ENTITY_DELETE_STATE_NORMAL ? 'hidden' : 'show', row}">{{ row.deleted === ENTITY_DELETE_STATE_NORMAL ? '隐藏' : '显示' }}</el-dropdown-item>
+                  <el-dropdown-item :command="{opt: 'delete', row}">删除</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </template>
@@ -162,14 +162,22 @@ import {
   updateArticleTopBatch
 } from "@/api/article";
 import CountUp from "vue-countup-v2";
-import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
+import {
+  ELEMENT_FAILED_MESSAGE_CONFIG,
+  ELEMENT_PAGE_LOADING_CONFIG,
+  ELEMENT_SUCCESS_MESSAGE_CONFIG
+} from "@/config/commonConfig";
 import {mapGetters} from "vuex";
 import {
   ARTICLE_NOT_RECOMMEND,
   ARTICLE_NOT_TOP,
   ARTICLE_RECOMMEND,
   ARTICLE_TOP,
-  ENTITY_DELETE_STATE_DELETE, ENTITY_DELETE_STATE_NORMAL,
+  ENTITY_DELETE_STATE_DELETE,
+  ENTITY_DELETE_STATE_NORMAL,
+  getArticleRecommendContrary,
+  getArticleTopContrary,
+  getEntityStateContrary,
   ORDER_BY_ASC,
   ORDER_BY_DESC
 } from "@/constant/commonConstant";
@@ -258,7 +266,7 @@ export default {
       } else if (command === "delete") {
         await deleteArticleBatch(articleIdList);
       }
-      await this.search();
+      this.search();
     },
     // 当多选栏改变时
     handleSelectionChange(selection) {
@@ -266,47 +274,92 @@ export default {
       this.selectedArticleIdList = selection.map(s => s.id);
     },
     // 当置顶参数改变时
-    async changeTopStatus(index) {
+    changeTopStatus(index) {
       let article = this.articleList[index];
-      let top = article.top === ARTICLE_TOP ? ARTICLE_NOT_TOP : ARTICLE_TOP;
-      let articleId = article.id;
-      await updateArticleTopBatch([articleId], top);
-      await this.search();
+      let top = getArticleTopContrary(article.top);
+      article.top = top;
+      updateArticleTopBatch([article.id], top).then(res => {
+        this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+      }).catch(e => {
+        this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
+        article.top = getArticleTopContrary(top);
+      });
     },
     // 当推荐参数改变时
-    async changeRecommendStatus(index) {
+    changeRecommendStatus(index) {
       let article = this.articleList[index];
-      let recommend = article.recommend === ARTICLE_RECOMMEND ? ARTICLE_NOT_RECOMMEND : ARTICLE_RECOMMEND;
-      let articleId = article.id;
-      await updateArticleRecommendBatch([articleId], recommend);
-      await this.search();
+      let recommend = getArticleRecommendContrary(article.recommend);
+      article.recommend = recommend;
+      updateArticleRecommendBatch([article.id], recommend).then(res => {
+        this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+      }).catch(e => {
+        this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
+        article.recommend = getArticleRecommendContrary(recommend);
+      });
     },
     // 处理操作事件
-    async handleOperation(command) {
+    handleOperation(command) {
       let opt = command.opt;
-      let articleId = command.id;
+      let article = command.row;
+      let articleId = article.id;
       if (opt === "recommend") {
-        await updateArticleRecommendBatch([articleId], ARTICLE_RECOMMEND);
+        let recommend = article.recommend;
+        article.recommend = ARTICLE_RECOMMEND;
+        updateArticleRecommendBatch([articleId], ARTICLE_RECOMMEND).then(res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        }).catch(e => {
+          this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
+          article.recommend = recommend;
+        });
       } else if (opt === "top") {
-        await updateArticleTopBatch([articleId], ARTICLE_TOP);
+        let top = article.top;
+        article.top = ARTICLE_TOP;
+        updateArticleTopBatch([articleId], ARTICLE_TOP).then(res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        }).catch(e => {
+          this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
+          article.top = top;
+        });
       } else if (opt === "hidden") {
-        await updateArticleDeleteBatch([articleId], ENTITY_DELETE_STATE_DELETE);
+        let deleted = article.deleted;
+        article.deleted = ENTITY_DELETE_STATE_DELETE;
+        updateArticleDeleteBatch([articleId], ENTITY_DELETE_STATE_DELETE).then(res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        }).catch(e => {
+          this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
+          article.deleted = deleted;
+        });
       } else if (opt === "show") {
-        await updateArticleDeleteBatch([articleId], ENTITY_DELETE_STATE_NORMAL);
+        let deleted = article.deleted;
+        article.deleted = ENTITY_DELETE_STATE_NORMAL;
+        updateArticleDeleteBatch([articleId], ENTITY_DELETE_STATE_NORMAL).then(res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        }).catch(e => {
+          this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
+          article.deleted = deleted;
+        });
       } else if (opt === "delete") {
-        await deleteArticleBatch([articleId]);
+        deleteArticleBatch([articleId]).then(async res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+          await this.search();
+        }).catch(e => {
+          this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
+        });
       }
-      await this.search();
     },
     // 处理点击眼睛按钮
-    async handleDeleteIconChange(row) {
-      let articleId = row.id;
-      let deleteStatus = row.deleted === ENTITY_DELETE_STATE_NORMAL ? ENTITY_DELETE_STATE_DELETE : ENTITY_DELETE_STATE_NORMAL;
-      await updateArticleDeleteBatch([articleId], deleteStatus);
-      await this.search();
+    handleDeleteIconChange(row) {
+      let deleteStatus = getEntityStateContrary(row.deleted);
+      row.deleted = deleteStatus;
+      updateArticleDeleteBatch([row.id], deleteStatus).then(res => {
+        this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+      }).catch(e => {
+        this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
+        row.deleted = getEntityStateContrary(deleteStatus);
+      });
     },
     // 处理筛选变化
-    async handleFilterChange(filterObj) {
+    handleFilterChange(filterObj) {
       if (filterObj.category) {
         this.category = filterObj.category[0];
       } else if (filterObj.recommend) {
@@ -314,10 +367,10 @@ export default {
       } else if (filterObj.top) {
         this.top = filterObj.top[0];
       }
-      await this.search();
+      this.search();
     },
     // 处理排序变化
-    async handleSortChange(sortObj) {
+    handleSortChange(sortObj) {
       // 目前只支持单字段排序，这里由于逻辑是按照多字段排序写的，所以可能会有些迷
       let orderFieldList = [];
       let orderFlagList = [];
@@ -346,20 +399,20 @@ export default {
       }
       this.orderFieldList = orderFieldList;
       this.orderFlagList = orderFlagList;
-      await this.search();
+      this.search();
     },
     // 处理每页条数变化
-    async handleSizeChange(val) {
+    handleSizeChange(val) {
       this.pageSize = val;
-      await this.search();
+      this.search();
     },
     // 处理当前页数变化
-    async handleCurrentChange(val) {
+    handleCurrentChange(val) {
       this.pageNum = val;
-      await this.search();
+      this.search();
     },
     // 分页查询
-    async search() {
+    search() {
       let param = {
         searchCondition: this.searchCondition,
         pageNum: this.pageNum,
@@ -371,20 +424,21 @@ export default {
         category: this.category
       };
       this.$loading(ELEMENT_PAGE_LOADING_CONFIG);
-      await findArticleList({...param}).then(res => {
+      findArticleList({...param}).then(res => {
         let data = res.data.data;
         this.articleList = data.records;
         this.total = data.total;
         this.pageNum = data.current;
         this.pageSize = data.size;
+        this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
+      }).catch(e => {
+        this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG)
+        this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
       });
-      this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
     }
   },
   mounted() {
-    this.search().catch(e => {
-      this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
-    });
+    this.search();
   }
 };
 </script>

@@ -38,3 +38,23 @@ export const ARTICLE_COVER_SIZE_LIMIT = 2 * 1024 * 1024;
 export const ORDER_BY_ASC = 1;
 // 降序
 export const ORDER_BY_DESC = 2;
+
+
+// #################### 相关方法 #################### //
+
+// 取删除状态的反
+export const getEntityStateContrary = (deleteStatus) => {
+  return deleteStatus === ENTITY_DELETE_STATE_DELETE ? ENTITY_DELETE_STATE_NORMAL : ENTITY_DELETE_STATE_DELETE;
+};
+// 取推荐状态的反
+export const getArticleRecommendContrary = (recommend) => {
+  return recommend === ARTICLE_RECOMMEND ? ARTICLE_NOT_RECOMMEND : ARTICLE_RECOMMEND;
+};
+// 取置顶状态的反
+export const getArticleTopContrary = (top) => {
+  return top === ARTICLE_TOP ? ARTICLE_NOT_TOP : ARTICLE_TOP;
+};
+// 取排序的反
+export const getOrderContrary = (order) => {
+  return order === ORDER_BY_ASC ? ORDER_BY_DESC : ORDER_BY_ASC;
+}
