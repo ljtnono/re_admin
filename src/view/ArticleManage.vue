@@ -8,13 +8,32 @@
           v-model="searchCondition"
           placeholder="输入文章标题"
           clearable @keyup.enter.native="search"/>
-        <el-button class="btn-submit" type="primary" @click="search">搜索</el-button>
+        <el-button
+          size="mini"
+          type="primary"
+          @click="search"
+          icon="el-icon-search">
+          搜索
+        </el-button>
+        <el-dropdown class="ml10" trigger="click" @command="handleSelectionOperation">
+          <el-button type="info" :disabled="selectionButtonDisabled" icon="el-icon-arrow-down">
+            更多操作
+            <el-dropdown-menu>
+              <el-dropdown-item command="recommend">推荐</el-dropdown-item>
+              <el-dropdown-item command="top">置顶</el-dropdown-item>
+              <el-dropdown-item command="hidden">隐藏</el-dropdown-item>
+              <el-dropdown-item command="show">显示</el-dropdown-item>
+              <el-dropdown-item command="delete">删除</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-button>
+        </el-dropdown>
       </div>
       <!-- 表格 -->
       <div class="article-table-container">
         <el-table :data="articleList"
                   header-row-class-name="table-header"
                   @filter-change="handleFilterChange"
+                  @selection-change="handleSelectionChange"
                   @sort-change="handleSortChange"
                   max-height="650">
           <el-table-column type="selection" align="center" width="50"/>
@@ -25,8 +44,7 @@
                 :content="row.title"
                 placement="top">
                 <span class="ellipsis">
-                  <i v-if="row.deleted === 1" class="iconfont icon-hidden mr5" />
-                  <i v-if="row.deleted === 0" class="iconfont icon-show mr5" />
+                  <i :class="'iconfont mr5 cursor-pointer ' + (row.deleted === ENTITY_DELETE_STATE_DELETE ? 'icon-hidden' : 'icon-show')"  @click="handleDeleteIconChange(row)"/>
                   {{ row.title }}
                 </span>
               </el-tooltip>
@@ -61,8 +79,7 @@
                 :value="row.recommend"
                 :active-value="1"
                 :inactive-value="0"
-                @change="changeRecommendStatus(row.id)"
-              />
+                @change="changeRecommendStatus($index)"/>
             </template>
           </el-table-column>
           <el-table-column prop="top" align="center" label="置顶" width="100" :filters="topFilters" :filter-multiple="false" column-key="top">
@@ -72,7 +89,7 @@
                 :value="row.top"
                 :active-value="1"
                 :inactive-value="0"
-                @change="changeTopStatus(row.id)"
+                @change="changeTopStatus($index)"
               />
             </template>
           </el-table-column>
@@ -100,20 +117,20 @@
             </template>
           </el-table-column>
           <el-table-column fixed="right" label="操作" align="center">
-            <template #default>
-              <el-button type="text" size="mini" style="margin-right: 10px">
+            <template #default="{ row, column, $index }">
+              <el-button type="text" size="mini" style="margin-right: 10px; color: #909399">
                 编辑
               </el-button>
-              <el-dropdown trigger="click">
-                <el-button type="text" size="mini">
-                  更多操作
+              <el-dropdown trigger="click" @command="handleOperation">
+                <el-button type="text" size="mini" style="color: #909399">
+                  更多
                   <i class="el-icon-arrow-down el-icon--right" />
                 </el-button>
                 <el-dropdown-menu>
-                  <el-dropdown-item>推荐</el-dropdown-item>
-                  <el-dropdown-item>置顶</el-dropdown-item>
-                  <el-dropdown-item>隐藏</el-dropdown-item>
-                  <el-dropdown-item>删除</el-dropdown-item>
+                  <el-dropdown-item :command="{opt: 'recommend', id: row.id}">推荐</el-dropdown-item>
+                  <el-dropdown-item :command="{opt: 'top', id: row.id}">置顶</el-dropdown-item>
+                  <el-dropdown-item :command="{opt: row.deleted === ENTITY_DELETE_STATE_NORMAL ? 'hidden' : 'show', id: row.id}">{{ row.deleted === ENTITY_DELETE_STATE_NORMAL ? '隐藏' : '显示' }}</el-dropdown-item>
+                  <el-dropdown-item :command="{opt: 'delete', id: row.id}">删除</el-dropdown-item>
                 </el-dropdown-menu>
               </el-dropdown>
             </template>
@@ -137,14 +154,22 @@
 </template>
 
 <script>
-import {findArticleList} from "@/api/article";
+import {
+  deleteArticleBatch,
+  findArticleList,
+  updateArticleDeleteBatch,
+  updateArticleRecommendBatch,
+  updateArticleTopBatch
+} from "@/api/article";
 import CountUp from "vue-countup-v2";
 import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
 import {mapGetters} from "vuex";
 import {
-  ARTICLE_NOT_RECOMMEND, ARTICLE_NOT_TOP,
+  ARTICLE_NOT_RECOMMEND,
+  ARTICLE_NOT_TOP,
   ARTICLE_RECOMMEND,
   ARTICLE_TOP,
+  ENTITY_DELETE_STATE_DELETE, ENTITY_DELETE_STATE_NORMAL,
   ORDER_BY_ASC,
   ORDER_BY_DESC
 } from "@/constant/commonConstant";
@@ -157,8 +182,13 @@ export default {
   },
   data() {
     return {
+      ENTITY_DELETE_STATE_DELETE,
+      ENTITY_DELETE_STATE_NORMAL,
       // 文章列表
       articleList: [],
+      // 多选操作按钮点击状态
+      selectionButtonDisabled: true,
+      selectedArticleIdList: [],
       // countUp配置
       countUpOptions: {
         useEasing: true,
@@ -214,35 +244,66 @@ export default {
     })
   },
   methods: {
-    // 当置顶参数改变时
-    changeTopStatus(id) {
-      let articleList = this.articleList;
-      for (let index in articleList) {
-        let article = articleList[index];
-        if (article.id === id) {
-          let oldTop = article.top;
-          if (oldTop === ARTICLE_NOT_TOP) {
-            this.articleList[index].top = ARTICLE_TOP;
-          } else {
-            this.articleList[index].top = ARTICLE_NOT_TOP;
-          }
-        }
+    // 处理多选栏操作
+    async handleSelectionOperation(command) {
+      let articleIdList = this.selectedArticleIdList;
+      if (command === "recommend") {
+        await updateArticleRecommendBatch(articleIdList, ARTICLE_RECOMMEND);
+      } else if (command === "top") {
+        await updateArticleTopBatch(articleIdList, ARTICLE_TOP);
+      } else if (command === "hidden") {
+        await updateArticleDeleteBatch(articleIdList, ENTITY_DELETE_STATE_DELETE);
+      } else if (command === "show") {
+        await updateArticleDeleteBatch(articleIdList, ENTITY_DELETE_STATE_NORMAL);
+      } else if (command === "delete") {
+        await deleteArticleBatch(articleIdList);
       }
+      await this.search();
+    },
+    // 当多选栏改变时
+    handleSelectionChange(selection) {
+      this.selectionButtonDisabled = !this.selectionButtonDisabled;
+      this.selectedArticleIdList = selection.map(s => s.id);
+    },
+    // 当置顶参数改变时
+    async changeTopStatus(index) {
+      let article = this.articleList[index];
+      let top = article.top === ARTICLE_TOP ? ARTICLE_NOT_TOP : ARTICLE_TOP;
+      let articleId = article.id;
+      await updateArticleTopBatch([articleId], top);
+      await this.search();
     },
     // 当推荐参数改变时
-    changeRecommendStatus(id) {
-      let articleList = this.articleList;
-      for (let index in articleList) {
-        let article = articleList[index];
-        if (article.id === id) {
-          let oldRecommend = article.recommend;
-          if (oldRecommend === ARTICLE_NOT_RECOMMEND) {
-            this.articleList[index].recommend = ARTICLE_RECOMMEND;
-          } else {
-            this.articleList[index].recommend = ARTICLE_NOT_RECOMMEND;
-          }
-        }
+    async changeRecommendStatus(index) {
+      let article = this.articleList[index];
+      let recommend = article.recommend === ARTICLE_RECOMMEND ? ARTICLE_NOT_RECOMMEND : ARTICLE_RECOMMEND;
+      let articleId = article.id;
+      await updateArticleRecommendBatch([articleId], recommend);
+      await this.search();
+    },
+    // 处理操作事件
+    async handleOperation(command) {
+      let opt = command.opt;
+      let articleId = command.id;
+      if (opt === "recommend") {
+        await updateArticleRecommendBatch([articleId], ARTICLE_RECOMMEND);
+      } else if (opt === "top") {
+        await updateArticleTopBatch([articleId], ARTICLE_TOP);
+      } else if (opt === "hidden") {
+        await updateArticleDeleteBatch([articleId], ENTITY_DELETE_STATE_DELETE);
+      } else if (opt === "show") {
+        await updateArticleDeleteBatch([articleId], ENTITY_DELETE_STATE_NORMAL);
+      } else if (opt === "delete") {
+        await deleteArticleBatch([articleId]);
       }
+      await this.search();
+    },
+    // 处理点击眼睛按钮
+    async handleDeleteIconChange(row) {
+      let articleId = row.id;
+      let deleteStatus = row.deleted === ENTITY_DELETE_STATE_NORMAL ? ENTITY_DELETE_STATE_DELETE : ENTITY_DELETE_STATE_NORMAL;
+      await updateArticleDeleteBatch([articleId], deleteStatus);
+      await this.search();
     },
     // 处理筛选变化
     async handleFilterChange(filterObj) {

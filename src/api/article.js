@@ -1,5 +1,5 @@
 import axios from "@/config/axiosConfig";
-import {ARTICLE_CREATION_YC, ARTICLE_NOT_RECOMMEND, ARTICLE_NOT_TOP, BASE_URL} from "@/constant/commonConstant";
+import {BASE_URL} from "@/constant/commonConstant";
 import qs from "qs";
 
 // #################### 草稿相关接口 #################### //
@@ -98,4 +98,61 @@ export const publishArticle = ({draftId, title, markdownContent, htmlContent, su
 export const findArticleList = ({searchCondition, category, recommend, top, orderFieldList, orderFlagList, pageNum, pageSize}) => {
   let param = qs.stringify({searchCondition, category, recommend, top, orderFieldList, orderFlagList, pageNum, pageSize});
   return axios.get(BASE_URL + requestMapping + "/list?" + param);
+};
+
+
+/**
+ * 批量更新文章推荐状态
+ *
+ * @param articleIdList 文章id列表
+ * @param recommend 推荐状态 1 推荐 0 不推荐
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updateArticleRecommendBatch = (articleIdList, recommend) => {
+  return axios.put(BASE_URL + requestMapping + "/updateArticleRecommendBatch", {
+    articleIdList,
+    recommend
+  });
+};
+
+/**
+ * 批量更新文章置顶状态
+ *
+ * @param articleIdList 文章id列表
+ * @param top 置顶状态 1 置顶 0 不置顶
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updateArticleTopBatch = (articleIdList, top) => {
+  return axios.put(BASE_URL + requestMapping + "/updateArticleTopBatch", {
+    articleIdList,
+    top
+  });
+};
+
+/**
+ * 批量更新文章删除状态
+ *
+ * @param articleIdList 文章id列表
+ * @param deleteStatus 删除状态 1 删除 0 正常
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updateArticleDeleteBatch = (articleIdList, deleteStatus) => {
+  return axios.put(BASE_URL + requestMapping + "/updateArticleDeleteBatch", {
+    articleIdList,
+    delete: deleteStatus
+  });
+};
+
+/**
+ * 批量删除文章
+ *
+ * @param articleIdList 文章id列表
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const deleteArticleBatch = (articleIdList) => {
+  return axios.delete(BASE_URL + requestMapping + "/deleteBatch", {
+    data: {
+      articleIdList
+    }
+  });
 };
