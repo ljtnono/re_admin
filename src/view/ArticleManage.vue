@@ -162,11 +162,7 @@ import {
   updateArticleTopBatch
 } from "@/api/article";
 import CountUp from "vue-countup-v2";
-import {
-  ELEMENT_FAILED_MESSAGE_CONFIG,
-  ELEMENT_PAGE_LOADING_CONFIG,
-  ELEMENT_SUCCESS_MESSAGE_CONFIG
-} from "@/config/commonConfig";
+import {ELEMENT_PAGE_LOADING_CONFIG, ELEMENT_SUCCESS_MESSAGE_CONFIG} from "@/config/commonConfig";
 import {mapGetters} from "vuex";
 import {
   ARTICLE_NOT_RECOMMEND,
@@ -256,15 +252,25 @@ export default {
     async handleSelectionOperation(command) {
       let articleIdList = this.selectedArticleIdList;
       if (command === "recommend") {
-        await updateArticleRecommendBatch(articleIdList, ARTICLE_RECOMMEND);
+        await updateArticleRecommendBatch(articleIdList, ARTICLE_RECOMMEND).then(res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        });
       } else if (command === "top") {
-        await updateArticleTopBatch(articleIdList, ARTICLE_TOP);
+        await updateArticleTopBatch(articleIdList, ARTICLE_TOP).then(res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        });
       } else if (command === "hidden") {
-        await updateArticleDeleteBatch(articleIdList, ENTITY_DELETE_STATE_DELETE);
+        await updateArticleDeleteBatch(articleIdList, ENTITY_DELETE_STATE_DELETE).then(res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        });
       } else if (command === "show") {
-        await updateArticleDeleteBatch(articleIdList, ENTITY_DELETE_STATE_NORMAL);
+        await updateArticleDeleteBatch(articleIdList, ENTITY_DELETE_STATE_NORMAL).then(res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        });
       } else if (command === "delete") {
-        await deleteArticleBatch(articleIdList);
+        await deleteArticleBatch(articleIdList).then(res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        });
       }
       this.search();
     },

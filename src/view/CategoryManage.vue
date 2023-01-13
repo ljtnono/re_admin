@@ -1,5 +1,9 @@
 <template>
-  <div>分类管理</div>
+  <div class="category-manage-container p20 flex flex1 flex-direction-row">
+    <el-card style="width: 100%">
+      分类管理
+    </el-card>
+  </div>
 </template>
 
 <script>
@@ -8,4 +12,6 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+
+</style>
