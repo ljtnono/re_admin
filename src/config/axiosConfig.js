@@ -22,18 +22,11 @@ INSTANCE.interceptors.request.use(config => {
   let urlWithoutParameter = urlUtil.removeParameter(config.url);
   if (!PASS_TOKEN_URL.includes(urlWithoutParameter)) {
     let token = store.state.user.tokenInfo;
-    if(token) {
+    if (token) {
       config.headers["Authorization"] = "Bearer " + token["access_token"];
     }
   }
   return config;
-}, error => {
-  ElementUI.Message.error({
-    message: "操作失败！请检查网络",
-    duration: 2000,
-    center: false
-  });
-  return Promise.reject(error);
 });
 
 // 添加响应拦截器
@@ -47,6 +40,7 @@ INSTANCE.interceptors.response.use((response) => {
     if (HTTP_RESULT_SUCCESS_CODE === code && HTTP_RESULT_SUCCESS_MESSAGE === message) {
       return response;
     } else {
+      // 在这里处理自定义异常，这里处理完之后，如果调用axios时有自定义的catch也会进行处理
       // 弹出错误消息
       ElementUI.Message.error({
         message: message,
@@ -61,17 +55,33 @@ INSTANCE.interceptors.response.use((response) => {
           name: "Login"
         });
       }
-      return Promise.reject();
+      return Promise.reject(response);
     }
   }
   return response;
 }, error => {
-  ElementUI.Message.error({
-    message: "操作失败！请检查网络",
-    duration: 2000,
-    center: false
-  });
-  return Promise.reject(error);
+  let message = error.message;
+  if (message.indexOf("status code 503") !== -1) {
+    // 这里处理HTTP非200的情况，这里处理完之后，如果axios有自定义的catch也会进行处理
+    ElementUI.Message.error({
+      message: "后台服务异常，请联系管理员！",
+      duration: 2000,
+      center: false
+    });
+  } else if (message.indexOf("Network Error") !== -1) {
+    ElementUI.Message.error({
+      message: "操作失败！请检查网络",
+      duration: 2000,
+      center: false
+    });
+  } else {
+    console.log(error);
+    ElementUI.Message.error({
+      message: "未知异常",
+      duration: 2000,
+      center: false
+    });
+  }
 });
 
 export default INSTANCE;

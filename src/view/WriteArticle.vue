@@ -178,9 +178,9 @@
 
 <script>
 
-import {EDITOR_CONFIG, ELEMENT_PAGE_LOADING_CONFIG} from "../config/commonConfig";
+import {EDITOR_CONFIG, ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
 import DateUtil from "@/util/dateUtil";
-import {deleteDraft, findDraftDetail, findDraftList, publishArticle, saveOrUpdateDraft} from "../api/article";
+import {deleteDraft, findDraftDetail, findDraftList, publishArticle, saveOrUpdateDraft} from "@/api/article";
 import articleUtil from "@/util/articleUtil";
 import commonUtil from "@/util/commonUtil";
 import {uploadFile} from "@/api/common";
@@ -212,7 +212,6 @@ import {
   ARTICLE_PUBLISH_TITLE_REGEX
 } from "@/constant/regexConstant";
 import {findTagList} from "@/api/tag";
-
 
 export default {
   name: "WriteArticle",
@@ -309,13 +308,6 @@ export default {
       this.articleCoverUrl = request.url;
       await uploadFile(data).then(res => {
         result = res.data.data;
-      }).catch(e => {
-        this.$message({
-          message: "上传失败",
-          type: "error",
-          duration: 2000,
-          center: false
-        });
       });
       return result;
     },
@@ -501,7 +493,7 @@ export default {
       if (that.validatePublishForm()) {
         that.$loading(ELEMENT_PAGE_LOADING_CONFIG);
         publishArticle({...form}).then(async res => {
-          that.$loading().close();
+          that.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
           this.$message({
             type: "success",
             message: "发布成功",
@@ -516,7 +508,7 @@ export default {
             that.$store.commit("common/changeTagList", res.data.data);
           });
         }).catch(e => {
-          that.$loading().close();
+          that.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
         });
       }
     },

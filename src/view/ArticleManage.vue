@@ -281,7 +281,6 @@ export default {
       updateArticleTopBatch([article.id], top).then(res => {
         this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
       }).catch(e => {
-        this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
         article.top = getArticleTopContrary(top);
       });
     },
@@ -293,7 +292,6 @@ export default {
       updateArticleRecommendBatch([article.id], recommend).then(res => {
         this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
       }).catch(e => {
-        this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
         article.recommend = getArticleRecommendContrary(recommend);
       });
     },
@@ -308,7 +306,6 @@ export default {
         updateArticleRecommendBatch([articleId], ARTICLE_RECOMMEND).then(res => {
           this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
         }).catch(e => {
-          this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
           article.recommend = recommend;
         });
       } else if (opt === "top") {
@@ -317,7 +314,6 @@ export default {
         updateArticleTopBatch([articleId], ARTICLE_TOP).then(res => {
           this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
         }).catch(e => {
-          this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
           article.top = top;
         });
       } else if (opt === "hidden") {
@@ -326,7 +322,6 @@ export default {
         updateArticleDeleteBatch([articleId], ENTITY_DELETE_STATE_DELETE).then(res => {
           this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
         }).catch(e => {
-          this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
           article.deleted = deleted;
         });
       } else if (opt === "show") {
@@ -335,15 +330,12 @@ export default {
         updateArticleDeleteBatch([articleId], ENTITY_DELETE_STATE_NORMAL).then(res => {
           this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
         }).catch(e => {
-          this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
           article.deleted = deleted;
         });
       } else if (opt === "delete") {
         deleteArticleBatch([articleId]).then(async res => {
           this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
           await this.search();
-        }).catch(e => {
-          this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
         });
       }
     },
@@ -354,7 +346,6 @@ export default {
       updateArticleDeleteBatch([row.id], deleteStatus).then(res => {
         this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
       }).catch(e => {
-        this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG);
         row.deleted = getEntityStateContrary(deleteStatus);
       });
     },
@@ -432,7 +423,6 @@ export default {
         this.pageSize = data.size;
         this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
       }).catch(e => {
-        this.$message.error(ELEMENT_FAILED_MESSAGE_CONFIG)
         this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
       });
     }
