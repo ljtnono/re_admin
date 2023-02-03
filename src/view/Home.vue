@@ -3,7 +3,6 @@
     <Navigation
       class="flex navigation"
       :collapseStatus="collapseStatus"
-
       :menus="menus"/>
     <div class="content-container flex flex1 flex-direction-column">
       <Header class="flex" @toggleNav="toggleNav" :avatar="avatar" :toggle-icon-class="toggleIconClass"/>

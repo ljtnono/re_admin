@@ -1,5 +1,5 @@
 import Router from "vue-router";
-import routers from "./routers";
+import routes from "./routers";
 import { ROUT_HOME_NAME } from "@/constant/commonConstant";
 import store from "@/store";
 import RouteUtil from "@/util/routeUtil";
@@ -7,7 +7,7 @@ import ElementUI from "element-ui";
 
 // 创建导航，使用历史模式
 const router = new Router({
-  routes: routers,
+  routes,
   base: "/",
   mode: "history",
 });
