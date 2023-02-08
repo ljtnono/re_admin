@@ -604,6 +604,7 @@ export default {
     },
     // 处理图片上传
     imgAdd(pos, file) {
+      // TODO 这里修改为使用base64形式，如果使用blob的形式会出现退出登录之后再刷新验证码显示不出来的BUG
       let vm = this.$refs.md;
       const data = new FormData();
       data.append("file", file);
