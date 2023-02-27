@@ -1,144 +1,177 @@
 <template>
-  <div class="user-manage-container">
-    <div class="table-container">
-      <el-card class="card">
-        <!-- 用户名、手机号、邮箱搜索栏 -->
-        <div class="table-search-container flex flex-direction-row flex-justify-content-start mb20">
-          <el-input
-            class="mr20"
-            v-model="searchCondition"
-            placeholder="输入用户名、邮箱、手机号搜索"
-            clearable/>
-          <el-button class="btn-submit" type="primary" @click="search">搜索</el-button>
-          <el-button class="btn-submit" type="primary">更多</el-button>
-        </div>
-        <!-- 表格显示栏 -->
-        <div class="flex table-content-container">
-          <el-table :data="userList" stripe border max-height="600">
-            <el-table-column type="selection" width="40" />
-            <el-table-column prop="avatarUrl" label="头像" min-width="80">
-              <template slot-scope="scope">
-                <div class="img-avatar-container">
-                  <img :src="scope.row.avatarUrl" :alt="scope.row.username" />
-                </div>
-              </template>
-            </el-table-column>
-            <el-table-column prop="username" label="用户名" min-width="160" />
-            <el-table-column prop="phone" label="手机号码" min-width="120" />
-            <el-table-column prop="email" label="邮箱" min-width="200" />
-            <el-table-column
-              prop="createTime"
-              sortable
-              label="创建时间"
-              min-width="160"
-            />
-            <el-table-column
-              prop="modifyTime"
-              sortable
-              label="最后修改时间"
-              min-width="160"
-            />
-            <el-table-column prop="roleIdList" label="角色" min-width="160">
-              <template slot-scope="scope">
-                <span>{{ scope.row.deleted === 1 ? "已删除" : "正常" }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="deleted" label="是否删除" min-width="160">
-              <template slot-scope="scope">
-                <span>{{ scope.row.deleted === 1 ? "已删除" : "正常" }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column fixed="right" label="操作" min-width="160">
-              <template slot-scope="scope">
-                <el-button size="mini">编辑</el-button>
-                <el-button size="mini" type="danger">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
-        <div class="flex mt30">
-          <!-- 分页按钮 -->
-          <el-pagination background layout="prev, pager, next" :total="1000" />
-        </div>
-      </el-card>
-    </div>
+  <div class="user-manage-container p20 flex flex1 flex-direction-row">
+    <el-card style="width: 100%">
+      <!-- 查询表单 -->
+      <div class="search-container flex flex-direction-row flex-justify-content-start mb20">
+        <el-input
+          class="mr20"
+          v-model="searchCondition"
+          placeholder="请输入用户账号、手机号、邮箱"
+          clearable @keyup.enter.native="search"/>
+        <el-button
+          size="mini"
+          type="primary"
+          @click="search"
+          icon="el-icon-search">
+          搜索
+        </el-button>
+      </div>
+      <!-- 表格数据 -->
+      <div class="user-table-container">
+        <el-table :data="userList"
+                  header-row-class-name="table-header"
+                  @filter-change="handleFilterChange"
+                  @selection-change="handleSelectionChange"
+                  @sort-change="handleSortChange"
+                  max-height="650">
+          <el-table-column type="selection" align="center" width="50"/>
+          <el-table-column fixed="left" prop="username" label="用户名" width="200" />
+          <el-table-column prop="phone" label="手机号码" width="160" />
+          <el-table-column prop="email" label="电子邮箱" width="160"/>
+          <el-table-column prop="avatar" label="头像" width="200" align="center" >
+            <template #default="{ row, column, $index }">
+              <img :src="row.avatarUrl" :alt="row.username" style="width: 60px; height: 60px"/>
+            </template>
+          </el-table-column>
+          <el-table-column prop="createTime" label="创建时间" align="center" sortable="custom" width="160">
+            <template #default="{ row, column, $index }">
+              <span class="cell-time">
+                <i class="el-icon-time"/>
+                {{ row.createTime }}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="modifyTime" label="最后更新" align="center" sortable="custom" width="160">
+            <template #default="{ row, column, $index }">
+              <span class="cell-time">
+                <i class="el-icon-time"/>
+                {{ row.modifyTime }}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column fixed="right" label="操作" align="center">
+            <template #default="{ row, column, $index }">
+              <el-button type="text" size="mini" style="margin-right: 10px; color: #909399">
+                编辑
+              </el-button>
+              <el-dropdown trigger="click" @command="handleOperation">
+                <el-button type="text" size="mini" style="color: #909399">
+                  更多
+                  <i class="el-icon-arrow-down el-icon--right" />
+                </el-button>
+                <el-dropdown-menu>
+                  <el-dropdown-item :command="{opt: 'recommend', row}">推荐</el-dropdown-item>
+                  <el-dropdown-item :command="{opt: 'top', row}">置顶</el-dropdown-item>
+                  <el-dropdown-item :command="{opt: row.deleted === ENTITY_DELETE_STATE_NORMAL ? 'hidden' : 'show', row}">{{ row.deleted === ENTITY_DELETE_STATE_NORMAL ? '隐藏' : '显示' }}</el-dropdown-item>
+                  <el-dropdown-item :command="{opt: 'delete', row}">删除</el-dropdown-item>
+                </el-dropdown-menu>
+              </el-dropdown>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <!-- 分页 -->
+      <div class="mt50 mb30 fr">
+        <!-- 分页按钮 -->
+        <el-pagination
+          layout="total, sizes, prev, pager, next, jumper"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :total="total"
+          :current-page="pageNum"
+          :page-sizes="[10, 20, 30, 40, 50]"
+          :page-size="pageSize"/>
+      </div>
+    </el-card>
   </div>
 </template>
 
 <script>
-import "../mock/system";
-import axios from "axios";
+import {findUserList} from "@/api/user";
+import {ENTITY_DELETE_STATE_DELETE, ENTITY_DELETE_STATE_NORMAL} from "@/constant/commonConstant";
 
 export default {
   name: "UserManage",
   data() {
     return {
+      ENTITY_DELETE_STATE_DELETE,
+      ENTITY_DELETE_STATE_NORMAL,
       // 当前查询条件
       searchCondition: "",
       userList: [],
       // 当前页数
-      page: 1,
+      pageNum: 1,
       // 每页条数
-      size: 10,
+      pageSize: 10,
+      total: 0,
     };
   },
   methods: {
-    search(page, size, searchCondition) {
-      axios.get("/api-backend/system/user/list").then((res) => {
-        let outerData = res.data;
-        let innerData = outerData.data;
-        this.userList = innerData;
+    // 分页查询用户列表
+    search() {
+      let param = {
+        pageNum: this.pageNum,
+        pageSize: this.pageSize,
+        searchCondition: this.searchCondition
+      }
+      findUserList({...param}).then(res => {
+        let data = res.data.data;
+        this.userList = data.records;
+        this.total = data.total;
+        this.pageNum = data.current;
+        this.pageSize = data.size;
       });
+    },
+    // 处理每页条数变化
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.search();
+    },
+    // 处理当前页数变化
+    handleCurrentChange(val) {
+      this.pageNum = val;
+      this.search();
     },
   },
   mounted() {
-    this.search(this.page, this.size, this.searchCondition);
+    this.search();
   },
 };
 </script>
 
 <style lang="scss" scoped>
+::v-deep .table-header {
+  th {
+    background: #fafafa;
+    font-size: 14px;
+    color: #000000;
+  }
+}
+
+::v-deep table {
+  border-spacing: 0px;
+}
+
+::v-deep .el-table {
+  tr {
+    font-size: 14px;
+    border: none;
+    height: 80px;
+  }
+
+  .cell-time {
+    font-size: 12px;
+  }
+}
+
 .user-manage-container {
-  height: calc(100% - 60px);
-  margin: 20px auto;
-  width: 1100px;
+  .search-container {
+    width: auto;
+    height: 40px;
 
-  .table-container {
-    width: 100%;
-    height: 100%;
-
-    .img-avatar-container {
-      width: 40px;
-      height: 40px;
-      margin: 0 auto;
-      overflow: hidden;
-      border-radius: 50%;
-
-      img {
-        margin: 0 auto;
-        display: block;
-        width: 100%;
-        height: 100%;
-        cursor: pointer;
-      }
-    }
-
-    .el-table .el-table__cell {
-      padding: 0;
-    }
-
-    .card {
-      min-height: 760px;
-    }
-
-    .table-search-container {
+    .el-input {
       width: auto;
-      height: 40px;
-
-      .el-input {
-        width: auto;
-        min-width: 280px;
-      }
+      min-width: 280px;
     }
   }
 }
