@@ -2,7 +2,7 @@ import axios from "@/config/axiosConfig";
 import { BASE_URL } from "@/constant/commonConstant";
 import qs from "qs";
 
-// #################### 文章标签相关接口 #################### //
+// #################### 用户相关接口 #################### //
 
 // url通用前缀
 const requestMapping = "/api-backend/user";

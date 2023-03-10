@@ -4,7 +4,9 @@ const common = {
     // 文章分类列表
     categoryList: [],
     // 文章标签列表
-    tagList: []
+    tagList: [],
+    // 角色列表
+    roleList: []
   }),
   getters:{
     categoryFilters(state) {
@@ -27,6 +29,10 @@ const common = {
     // 修改文章标签列表
     changeTagList(state, tagList) {
       state.tagList = tagList;
+    },
+    // 修改角色列表
+    changeRoleList(state, roleList) {
+      state.roleList = roleList;
     }
   }
 };

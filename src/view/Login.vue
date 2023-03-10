@@ -33,9 +33,8 @@ export default {
       let verifyCodeKey = randomUtil.getUUID();
       that.verifyCodeKey = verifyCodeKey;
       refreshVerifyCode(verifyCodeKey).then(res => {
-        let b = new window.Blob([res.data], {type: "image/jpeg"});
-        let url = window.URL.createObjectURL(b);
-        that.verifyCodeImageUrl = url;
+        let data = res.data.data;
+        that.verifyCodeImageUrl = "data:image/jpeg;base64," + data;
       });
     },
     // 用户登录

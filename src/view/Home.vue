@@ -12,11 +12,13 @@
 </template>
 
 <script>
+
 import Header from "@c/Header.vue";
 import Navigation from "@c/Navigation.vue";
 import {findCategoryList} from "@/api/category";
 import {findTagList} from "@/api/tag";
 import {mapState} from "vuex";
+import {findRoleList} from "@/api/role";
 
 export default {
   name: "Home",
@@ -70,14 +72,21 @@ export default {
   },
   mounted() {
     this.windowOnResize();
+    // 获取文章分类列表
     findCategoryList().then(res => {
       this.$store.commit("common/changeCategoryList", res.data.data);
     });
+    // 获取文章标签列表
     findTagList().then(res => {
       this.$store.commit("common/changeTagList", res.data.data);
     });
+    // 获取角色列表
+    findRoleList().then(res => {
+      this.$store.commit("common/changeRoleList", res.data.data);
+    });
   },
 };
+
 </script>
 
 <style lang="scss" scoped>

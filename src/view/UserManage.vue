@@ -15,14 +15,32 @@
           icon="el-icon-search">
           搜索
         </el-button>
+        <!-- 新增用户接口 -->
+        <el-button
+          size="mini"
+          type="success"
+          @click="addFormVisible = true"
+          icon="el-icon-plus">
+          新增
+        </el-button>
+        <!-- 更多操作下拉菜单 -->
+        <el-dropdown class="ml10" trigger="click" @command="handleSelectionOperation">
+          <el-button type="info" :disabled="selectionButtonDisabled" icon="el-icon-arrow-down">
+            更多操作
+            <el-dropdown-menu>
+              <el-dropdown-item command="recommend">推荐</el-dropdown-item>
+              <el-dropdown-item command="top">置顶</el-dropdown-item>
+              <el-dropdown-item command="hidden">隐藏</el-dropdown-item>
+              <el-dropdown-item command="show">显示</el-dropdown-item>
+              <el-dropdown-item command="delete">删除</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-button>
+        </el-dropdown>
       </div>
       <!-- 表格数据 -->
       <div class="user-table-container">
         <el-table :data="userList"
                   header-row-class-name="table-header"
-                  @filter-change="handleFilterChange"
-                  @selection-change="handleSelectionChange"
-                  @sort-change="handleSortChange"
                   max-height="650">
           <el-table-column type="selection" align="center" width="50"/>
           <el-table-column fixed="left" prop="username" label="用户名" width="200" />
@@ -33,7 +51,7 @@
               <img :src="row.avatarUrl" :alt="row.username" style="width: 60px; height: 60px"/>
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="创建时间" align="center" sortable="custom" width="160">
+          <el-table-column prop="createTime" label="创建时间" align="center" sortable="custom" width="200">
             <template #default="{ row, column, $index }">
               <span class="cell-time">
                 <i class="el-icon-time"/>
@@ -41,7 +59,7 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column prop="modifyTime" label="最后更新" align="center" sortable="custom" width="160">
+          <el-table-column prop="modifyTime" label="最后更新" align="center" sortable="custom" width="200">
             <template #default="{ row, column, $index }">
               <span class="cell-time">
                 <i class="el-icon-time"/>
@@ -54,18 +72,9 @@
               <el-button type="text" size="mini" style="margin-right: 10px; color: #909399">
                 编辑
               </el-button>
-              <el-dropdown trigger="click" @command="handleOperation">
-                <el-button type="text" size="mini" style="color: #909399">
-                  更多
-                  <i class="el-icon-arrow-down el-icon--right" />
-                </el-button>
-                <el-dropdown-menu>
-                  <el-dropdown-item :command="{opt: 'recommend', row}">推荐</el-dropdown-item>
-                  <el-dropdown-item :command="{opt: 'top', row}">置顶</el-dropdown-item>
-                  <el-dropdown-item :command="{opt: row.deleted === ENTITY_DELETE_STATE_NORMAL ? 'hidden' : 'show', row}">{{ row.deleted === ENTITY_DELETE_STATE_NORMAL ? '隐藏' : '显示' }}</el-dropdown-item>
-                  <el-dropdown-item :command="{opt: 'delete', row}">删除</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
+              <el-button type="text" size="mini" style="margin-right: 10px; color: #909399">
+                删除
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -82,13 +91,59 @@
           :page-sizes="[10, 20, 30, 40, 50]"
           :page-size="pageSize"/>
       </div>
+      <!-- 新增用户表单模态弹窗 -->
+      <div class="publish-form-container">
+        <el-dialog
+          title="新增用户"
+          @open="addFormOpen"
+          top="4vh"
+          center
+          :visible.sync="addFormVisible">
+          <template slot="footer">
+            <span class="dialog-footer">
+              <el-button @click="addFormVisible = false">取 消</el-button>
+              <el-button type="primary" @click="commitAddForm('addForm')">确 定</el-button>
+            </span>
+          </template>
+          <!-- 新增用户表单 -->
+          <el-form ref="addForm" :model="addForm" label-width="100px" >
+            <el-form-item label="用户名：" prop="title" class="is-required">
+              <el-input v-model="addForm.username" clearable placeholder="请输入用户名"/>
+            </el-form-item>
+            <el-form-item label="密码：" prop="title" class="is-required">
+              <el-input v-model="addForm.username" clearable placeholder="请输入密码"/>
+            </el-form-item>
+            <el-form-item label="确认密码：" prop="title" class="is-required">
+              <el-input v-model="addForm.username" clearable placeholder="请重新输入密码"/>
+            </el-form-item>
+            <el-form-item label="电子邮箱：" prop="title" class="is-required">
+              <el-input v-model="addForm.username" clearable placeholder="请输入电子邮箱"/>
+            </el-form-item>
+            <el-form-item label="角色：" prop="categoryId" class="is-required">
+              <el-select style="width: 100%" v-model="addForm.categoryId" clearable filterable placeholder="请选择角色">
+                <el-option
+                  v-for="role in roleList"
+                  :key="role.id"
+                  :label="role.name"
+                  :value="role.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+        </el-dialog>
+      </div>
     </el-card>
   </div>
 </template>
 
 <script>
 import {findUserList} from "@/api/user";
-import {ENTITY_DELETE_STATE_DELETE, ENTITY_DELETE_STATE_NORMAL} from "@/constant/commonConstant";
+import {
+  ENTITY_DELETE_STATE_DELETE,
+  ENTITY_DELETE_STATE_NORMAL
+} from "@/constant/commonConstant";
+import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
+import {mapState} from "vuex";
 
 export default {
   name: "UserManage",
@@ -98,15 +153,43 @@ export default {
       ENTITY_DELETE_STATE_NORMAL,
       // 当前查询条件
       searchCondition: "",
+      // 用户列表
       userList: [],
       // 当前页数
       pageNum: 1,
       // 每页条数
       pageSize: 10,
+      // 总条数
       total: 0,
+      // 新增用户表单是否显示
+      addFormVisible: false,
+      // 表单中显示的用户具体信息
+      addForm: {
+        id: null,
+        username: null,
+        email: null,
+        phone: null,
+        avatarUrl: null,
+        createTime: null,
+        modifyTime: null,
+        roleIdList: []
+      }
     };
   },
+  computed: {
+    ...mapState({
+      roleList: state => state.common.roleList
+    })
+  },
   methods: {
+    // 打开新增用户弹窗
+    addFormOpen() {
+      let that = this;
+    },
+    // 提交新增用户表单
+    commitAddForm(addForm) {
+
+    },
     // 分页查询用户列表
     search() {
       let param = {
@@ -114,12 +197,16 @@ export default {
         pageSize: this.pageSize,
         searchCondition: this.searchCondition
       }
+      this.$loading(ELEMENT_PAGE_LOADING_CONFIG);
       findUserList({...param}).then(res => {
         let data = res.data.data;
         this.userList = data.records;
         this.total = data.total;
         this.pageNum = data.current;
         this.pageSize = data.size;
+        this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
+      }).catch(e => {
+        this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
       });
     },
     // 处理每页条数变化

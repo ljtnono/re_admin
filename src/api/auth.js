@@ -14,9 +14,7 @@ const requestMapping = "/re-auth";
  * @returns {Promise<AxiosResponse<any>>}
  */
 export const refreshVerifyCode = (verifyCodeKey) => {
-  return axios.get(BASE_URL + requestMapping + "/user/refreshVerifyCode?verifyCodeKey=" + verifyCodeKey, {
-    responseType: "blob"
-  });
+  return axios.get(BASE_URL + requestMapping + "/user/refreshVerifyCode?verifyCodeKey=" + verifyCodeKey);
 };
 
 /**

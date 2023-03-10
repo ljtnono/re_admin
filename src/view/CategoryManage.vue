@@ -3,9 +3,6 @@
     <el-card style="width: 100%">
       分类管理
     </el-card>
-    <div>
-        hello world
-    </div>
   </div>
 </template>
 
