@@ -11,7 +11,7 @@
         <el-button
           size="mini"
           type="primary"
-          @click="search"
+          @click="search(1, 10)"
           icon="el-icon-search">
           搜索
         </el-button>
@@ -409,7 +409,13 @@ export default {
       this.search();
     },
     // 分页查询
-    search() {
+    search(pageNum, pageSize) {
+      if (pageNum != null) {
+        this.pageNum = pageNum;
+      }
+      if (pageSize != null) {
+        this.pageSize = pageSize;
+      }
       let param = {
         searchCondition: this.searchCondition,
         pageNum: this.pageNum,

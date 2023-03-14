@@ -111,23 +111,13 @@
               <el-input v-model="addForm.username" clearable placeholder="请输入用户名"/>
             </el-form-item>
             <el-form-item label="密码：" prop="title" class="is-required">
-              <el-input v-model="addForm.username" clearable placeholder="请输入密码"/>
+              <el-input v-model="addForm.password" clearable placeholder="请输入密码"/>
             </el-form-item>
             <el-form-item label="确认密码：" prop="title" class="is-required">
-              <el-input v-model="addForm.username" clearable placeholder="请重新输入密码"/>
+              <el-input v-model="addForm.repassword" clearable placeholder="请重新输入密码"/>
             </el-form-item>
             <el-form-item label="电子邮箱：" prop="title" class="is-required">
-              <el-input v-model="addForm.username" clearable placeholder="请输入电子邮箱"/>
-            </el-form-item>
-            <el-form-item label="角色：" prop="categoryId" class="is-required">
-              <el-select style="width: 100%" v-model="addForm.categoryId" clearable filterable placeholder="请选择角色">
-                <el-option
-                  v-for="role in roleList"
-                  :key="role.id"
-                  :label="role.name"
-                  :value="role.id">
-                </el-option>
-              </el-select>
+              <el-input v-model="addForm.email" clearable placeholder="请输入电子邮箱"/>
             </el-form-item>
           </el-form>
         </el-dialog>
