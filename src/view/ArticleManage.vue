@@ -192,6 +192,8 @@ export default {
       articleList: [],
       // 多选操作按钮点击状态
       selectionButtonDisabled: true,
+      // 被选中的行列表
+      selection: [],
       selectedArticleIdList: [],
       // countUp配置
       countUpOptions: {
@@ -276,7 +278,12 @@ export default {
     },
     // 当多选栏改变时
     handleSelectionChange(selection) {
-      this.selectionButtonDisabled = !this.selectionButtonDisabled;
+      // 需要判断被选中的行是否大于0
+      if (selection.length > 0) {
+        this.selectionButtonDisabled = false;
+      } else {
+        this.selectionButtonDisabled = true;
+      }
       this.selectedArticleIdList = selection.map(s => s.id);
     },
     // 当置顶参数改变时
