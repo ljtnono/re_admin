@@ -22,7 +22,7 @@ export default {
 }
 
 ::v-deep table {
-  border-spacing: 0px;
+  border-spacing: 0;
 }
 
 ::v-deep .el-table {

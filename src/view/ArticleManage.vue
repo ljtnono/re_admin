@@ -147,7 +147,7 @@
           :total="total"
           :current-page="pageNum"
           :page-sizes="[10, 20, 30, 40, 50]"
-          :page-size="pageSize"/>
+          :page-size="pageSize" />
       </div>
     </el-card>
   </div>
@@ -462,7 +462,7 @@ export default {
 }
 
 ::v-deep table {
-  border-spacing: 0px;
+  border-spacing: 0;
 }
 
 ::v-deep .el-table {

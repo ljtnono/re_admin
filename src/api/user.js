@@ -13,9 +13,11 @@ const requestMapping = "/api-backend/user";
  * @param searchCondition 查询条件
  * @param pageNum 页数
  * @param pageSize 每页条数
+ * @param orderFieldList 排序字段列表
+ * @param orderFlagList 排序标记列表
  * @returns {Promise<AxiosResponse<any>>}
  */
-export const findUserList = ({searchCondition, pageNum, pageSize}) => {
-  let param = qs.stringify({searchCondition, pageNum, pageSize});
+export const findUserList = ({searchCondition, pageNum, pageSize, orderFieldList, orderFlagList}) => {
+  let param = qs.stringify({searchCondition, pageNum, pageSize, orderFieldList, orderFlagList});
   return axios.get(BASE_URL + requestMapping + "/list?" + param);
 };

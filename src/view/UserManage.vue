@@ -7,7 +7,7 @@
           class="mr20"
           v-model="searchCondition"
           placeholder="请输入用户账号、手机号、邮箱"
-          clearable @keyup.enter.native="search"/>
+          clearable @keyup.enter.native="search" />
         <el-button
           size="mini"
           type="primary"
@@ -41,17 +41,31 @@
       <div class="user-table-container">
         <el-table :data="userList"
                   header-row-class-name="table-header"
+                  @sort-change="handleSortChange"
                   max-height="650">
           <el-table-column type="selection" align="center" width="50"/>
-          <el-table-column fixed="left" prop="username" label="用户名" width="200" />
-          <el-table-column prop="phone" label="手机号码" width="160" />
+          <el-table-column fixed="left" prop="username" label="用户名" width="160" >
+            <template #default="{ row, column, $index }">
+              <el-tooltip
+                effect="dark"
+                :content="row.username"
+                placement="top">
+                <span class="ellipsis">
+                  <i :class="'iconfont mr5 cursor-pointer ' + (row.deleted === ENTITY_DELETE_STATE_DELETE ? 'icon-hidden' : 'icon-show')"  @click="handleDeleteIconChange(row)"/>
+                  {{ row.username }}
+                </span>
+              </el-tooltip>
+            </template>
+          </el-table-column>
+          <el-table-column prop="phone" label="手机号码" width="140" />
           <el-table-column prop="email" label="电子邮箱" width="160"/>
-          <el-table-column prop="avatar" label="头像" width="200" align="center" >
+          <el-table-column prop="role" label="角色" width="140" />
+          <el-table-column prop="avatar" label="头像" width="140" align="center" >
             <template #default="{ row, column, $index }">
               <img :src="row.avatarUrl" :alt="row.username" style="width: 60px; height: 60px"/>
             </template>
           </el-table-column>
-          <el-table-column prop="createTime" label="创建时间" align="center" sortable="custom" width="200">
+          <el-table-column prop="createTime" label="创建时间" align="center" sortable="custom" width="160">
             <template #default="{ row, column, $index }">
               <span class="cell-time">
                 <i class="el-icon-time"/>
@@ -59,14 +73,15 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column prop="modifyTime" label="最后更新" align="center" sortable="custom" width="200">
+          <el-table-column prop="lastLoginTime" label="最近登录" align="center" width="160">
             <template #default="{ row, column, $index }">
               <span class="cell-time">
                 <i class="el-icon-time"/>
-                {{ row.modifyTime }}
+                {{ row.lastLoginTime }}
               </span>
             </template>
           </el-table-column>
+          <el-table-column prop="ip" label="ip" align="center" width="160" />
           <el-table-column fixed="right" label="操作" align="center">
             <template #default="{ row, column, $index }">
               <el-button type="text" size="mini" style="margin-right: 10px; color: #909399">
@@ -130,10 +145,12 @@
 import {findUserList} from "@/api/user";
 import {
   ENTITY_DELETE_STATE_DELETE,
-  ENTITY_DELETE_STATE_NORMAL
+  ENTITY_DELETE_STATE_NORMAL,
+  getEntityStateContrary, ORDER_BY_ASC, ORDER_BY_DESC
 } from "@/constant/commonConstant";
 import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
 import {mapState} from "vuex";
+import S from "string";
 
 export default {
   name: "UserManage",
@@ -145,6 +162,10 @@ export default {
       searchCondition: "",
       // 用户列表
       userList: [],
+      // 排序字段条件
+      orderFieldList: [],
+      // 排序标记条件
+      orderFlagList: [],
       // 当前页数
       pageNum: 1,
       // 每页条数
@@ -180,12 +201,60 @@ export default {
     commitAddForm(addForm) {
 
     },
+    // 处理用户状态变化
+    changeStatus(status) {
+
+    },
+    // 处理排序变化
+    handleSortChange(sortObj) {
+      // 目前只支持单字段排序，这里由于逻辑是按照多字段排序写的，所以可能会有些迷
+      let orderFieldList = [];
+      let orderFlagList = [];
+      // 转为下划线形式
+      let prop = S(sortObj.prop).underscore().s;
+      let order = sortObj.order;
+      // 取消某个排序
+      if (order === null) {
+        let index = orderFieldList.indexOf(prop);
+        // 已存在该排序字段则删除
+        if (index !== -1) {
+          orderFieldList.splice(index, 1);
+          orderFlagList.splice(index, 1);
+        }
+      } else {
+        order = order === "ascending" ? ORDER_BY_ASC : ORDER_BY_DESC;
+        // 新增某个排序
+        let index = orderFieldList.indexOf(prop);
+        if (index !== -1) {
+          // 已存在该排序字段则修改其排序flag
+          orderFlagList[index] = order;
+        } else {
+          orderFieldList.push(prop);
+          orderFlagList.push(order);
+        }
+      }
+      this.orderFieldList = orderFieldList;
+      this.orderFlagList = orderFlagList;
+      this.search();
+    },
+    // 处理隐藏图标变化
+    handleDeleteIconChange(row) {
+      let deleteStatus = getEntityStateContrary(row.deleted);
+      row.deleted = deleteStatus;
+      // updateArticleDeleteBatch([row.id], deleteStatus).then(res => {
+      //   this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+      // }).catch(e => {
+      //   row.deleted = getEntityStateContrary(deleteStatus);
+      // });
+    },
     // 分页查询用户列表
     search() {
       let param = {
         pageNum: this.pageNum,
         pageSize: this.pageSize,
-        searchCondition: this.searchCondition
+        searchCondition: this.searchCondition,
+        orderFieldList: this.orderFieldList,
+        orderFlagList: this.orderFlagList
       }
       this.$loading(ELEMENT_PAGE_LOADING_CONFIG);
       findUserList({...param}).then(res => {
@@ -226,7 +295,7 @@ export default {
 }
 
 ::v-deep table {
-  border-spacing: 0px;
+  border-spacing: 0;
 }
 
 ::v-deep .el-table {
