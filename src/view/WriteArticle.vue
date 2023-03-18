@@ -360,7 +360,7 @@ export default {
       let tagList = form.tagList;
       // 空值校验
       // 标题不能为空
-      if (title === null || title === undefined || title === "") {
+      if (title === null || title === "") {
         this.$message({
           message: ARTICLE_PUBLISH_TITLE_EMPTY_ERROR,
           type: "error",
@@ -370,7 +370,7 @@ export default {
         return false;
       }
       // 文章内容不能为空
-      if (markdownContent === null || markdownContent === undefined || markdownContent === "") {
+      if (markdownContent === null || markdownContent === "") {
         this.$message({
           message: ARTICLE_PUBLISH_MARKDOWN_CONTENT_EMPTY_ERROR,
           type: "error",
@@ -380,7 +380,7 @@ export default {
         return false;
       }
       // 文章分类不能为null 或者小于0
-      if (categoryId === null || categoryId === undefined || categoryId < 0) {
+      if (categoryId === null || categoryId < 0) {
         this.$message({
           message: ARTICLE_PUBLISH_CATEGORY_EMPTY_ERROR,
           type: "error",
@@ -456,7 +456,7 @@ export default {
       }
       // 当文章是转载类型时，必须有转载说明
       if (ARTICLE_CREATION_ZZ === creationType) {
-        if (transportInfo === null || transportInfo === undefined || transportInfo === "") {
+        if (transportInfo === null || transportInfo === "") {
           this.$message({
             message: ARTICLE_PUBLISH_NO_TRANSPORT_INFO_ERROR_MESSAGE,
             type: "error",
@@ -466,7 +466,7 @@ export default {
           return false;
         }
       }
-      if (tagList !== [] && tagList !== null && tagList !== undefined && tagList.length > 0) {
+      if (tagList !== [] && tagList !== null && tagList.length > 0) {
         let flag = true;
         for (let tag of tagList) {
           if (!ARTICLE_PUBLISH_TAG_REGEX.test(tag)) {
@@ -604,7 +604,6 @@ export default {
     },
     // 处理图片上传
     imgAdd(pos, file) {
-      // TODO 这里修改为使用base64形式，如果使用blob的形式会出现退出登录之后再刷新验证码显示不出来的BUG
       let vm = this.$refs.md;
       const data = new FormData();
       data.append("file", file);

@@ -21,3 +21,15 @@ export const findUserList = ({searchCondition, pageNum, pageSize, orderFieldList
   let param = qs.stringify({searchCondition, pageNum, pageSize, orderFieldList, orderFlagList});
   return axios.get(BASE_URL + requestMapping + "/list?" + param);
 };
+
+/**
+ * 新增用户
+ *
+ * @param username 用户名
+ * @param password 用户密码
+ * @param email 邮箱
+ * @param roleId 角色id
+ */
+export const saveUser = ({username, password, email, roleId}) => {
+
+};

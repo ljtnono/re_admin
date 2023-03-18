@@ -24,18 +24,18 @@
           新增
         </el-button>
         <!-- 更多操作下拉菜单 -->
-        <el-dropdown class="ml10" trigger="click" @command="handleSelectionOperation">
-          <el-button type="info" :disabled="selectionButtonDisabled" icon="el-icon-arrow-down">
-            更多操作
-            <el-dropdown-menu>
-              <el-dropdown-item command="recommend">推荐</el-dropdown-item>
-              <el-dropdown-item command="top">置顶</el-dropdown-item>
-              <el-dropdown-item command="hidden">隐藏</el-dropdown-item>
-              <el-dropdown-item command="show">显示</el-dropdown-item>
-              <el-dropdown-item command="delete">删除</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-button>
-        </el-dropdown>
+<!--        <el-dropdown class="ml10" trigger="click" @command="handleSelectionOperation">-->
+<!--          <el-button type="info" :disabled="selectionButtonDisabled" icon="el-icon-arrow-down">-->
+<!--            更多操作-->
+<!--            <el-dropdown-menu>-->
+<!--              <el-dropdown-item command="recommend">推荐</el-dropdown-item>-->
+<!--              <el-dropdown-item command="top">置顶</el-dropdown-item>-->
+<!--              <el-dropdown-item command="hidden">隐藏</el-dropdown-item>-->
+<!--              <el-dropdown-item command="show">显示</el-dropdown-item>-->
+<!--              <el-dropdown-item command="delete">删除</el-dropdown-item>-->
+<!--            </el-dropdown-menu>-->
+<!--          </el-button>-->
+<!--        </el-dropdown>-->
       </div>
       <!-- 表格数据 -->
       <div class="user-table-container">
@@ -107,34 +107,49 @@
           :page-size="pageSize"/>
       </div>
       <!-- 新增用户表单模态弹窗 -->
-      <div class="publish-form-container">
-        <el-dialog
-          title="新增用户"
-          @open="addFormOpen"
-          top="4vh"
-          center
-          :visible.sync="addFormVisible">
+      <div class="add-form-container">
+        <el-dialog title="新增用户"
+                   @open="addFormOpen"
+                   top="4vh"
+                   width="700px"
+                   center
+                   :visible.sync="addFormVisible">
+          <template slot="default">
+            <div style="padding: 10px 10px">
+              <!-- 新增用户表单 -->
+              <el-form ref="addForm" :model="addForm" label-width="100px" inline>
+                <el-form-item label="用户名：" prop="title" class="is-required" >
+                  <el-input v-model="addForm.username" size="small" clearable placeholder="请输入用户名" />
+                </el-form-item>
+                <el-form-item label="邮箱：" prop="title" class="is-required" >
+                  <el-input v-model="addForm.email" size="small" clearable placeholder="请输入电子邮箱" />
+                </el-form-item>
+                <el-form-item label="密码：" prop="title" class="is-required" >
+                  <el-input v-model="addForm.password" size="small" clearable placeholder="请输入密码" />
+                </el-form-item>
+                <el-form-item label="确认密码：" prop="title" class="is-required">
+                  <el-input v-model="addForm.repassword" size="small" clearable placeholder="请重新输入密码" />
+                </el-form-item>
+                <!-- 选择角色列表 -->
+                <el-form-item label="选择角色：" prop="title" class="is-required">
+                  <el-select style="width: 100%" v-model="addForm.roleId" clearable filterable placeholder="请选择角色">
+                    <el-option
+                      v-for="role in roleList"
+                      :key="role.id"
+                      :label="role.name"
+                      :value="role.id">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-form>
+            </div>
+          </template>
           <template slot="footer">
             <span class="dialog-footer">
               <el-button @click="addFormVisible = false">取 消</el-button>
               <el-button type="primary" @click="commitAddForm('addForm')">确 定</el-button>
             </span>
           </template>
-          <!-- 新增用户表单 -->
-          <el-form ref="addForm" :model="addForm" label-width="100px" >
-            <el-form-item label="用户名：" prop="title" class="is-required">
-              <el-input v-model="addForm.username" clearable placeholder="请输入用户名"/>
-            </el-form-item>
-            <el-form-item label="密码：" prop="title" class="is-required">
-              <el-input v-model="addForm.password" clearable placeholder="请输入密码"/>
-            </el-form-item>
-            <el-form-item label="确认密码：" prop="title" class="is-required">
-              <el-input v-model="addForm.repassword" clearable placeholder="请重新输入密码"/>
-            </el-form-item>
-            <el-form-item label="电子邮箱：" prop="title" class="is-required">
-              <el-input v-model="addForm.email" clearable placeholder="请输入电子邮箱"/>
-            </el-form-item>
-          </el-form>
         </el-dialog>
       </div>
     </el-card>
@@ -146,11 +161,19 @@ import {findUserList} from "@/api/user";
 import {
   ENTITY_DELETE_STATE_DELETE,
   ENTITY_DELETE_STATE_NORMAL,
-  getEntityStateContrary, ORDER_BY_ASC, ORDER_BY_DESC
+  getEntityStateContrary,
+  ORDER_BY_ASC,
+  ORDER_BY_DESC
 } from "@/constant/commonConstant";
 import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
 import {mapState} from "vuex";
 import S from "string";
+import {
+  USER_ADD_EMAIL_EMPTY_ERROR_MESSAGE,
+  USER_ADD_PASSWORD_EMPTY_ERROR_MESSAGE,
+  USER_ADD_ROLE_EMPTY_ERROR_MESSAGE,
+  USER_ADD_USERNAME_EMPTY_ERROR_MESSAGE
+} from "@/constant/errorMessageConstant";
 
 export default {
   name: "UserManage",
@@ -173,17 +196,16 @@ export default {
       // 总条数
       total: 0,
       // 新增用户表单是否显示
-      addFormVisible: false,
+      addFormVisible: true,
       // 表单中显示的用户具体信息
       addForm: {
-        id: null,
         username: null,
         email: null,
         phone: null,
-        avatarUrl: null,
-        createTime: null,
-        modifyTime: null,
-        roleIdList: []
+        roleId: null
+      },
+      addFormRule: {
+        
       }
     };
   },
@@ -199,11 +221,57 @@ export default {
     },
     // 提交新增用户表单
     commitAddForm(addForm) {
-
+      let that = this;
+      let form = that.addForm;
+      if (that.validatePublishForm()) {
+        that.$loading(ELEMENT_PAGE_LOADING_CONFIG);
+      }
     },
-    // 处理用户状态变化
-    changeStatus(status) {
-
+    // 校验新增用户表单
+    validateAddForm() {
+      let that = this;
+      let form = that.publishForm;
+      let username = form.username;
+      let password = form.password;
+      let email = form.email;
+      let roleId = form.roleId;
+      // 非空检验
+      if (username === null || username === "") {
+        this.$message({
+          message: USER_ADD_USERNAME_EMPTY_ERROR_MESSAGE,
+          type: "error",
+          duration: 2000,
+          center: false
+        });
+        return false;
+      }
+      if (password === null || password === "") {
+        this.$message({
+          message: USER_ADD_PASSWORD_EMPTY_ERROR_MESSAGE,
+          type: "error",
+          duration: 2000,
+          center: false
+        });
+        return false;
+      }
+      if (email === null || email === "") {
+        this.$message({
+          message: USER_ADD_EMAIL_EMPTY_ERROR_MESSAGE,
+          type: "error",
+          duration: 2000,
+          center: false
+        });
+        return false;
+      }
+      if (roleId === null) {
+        this.$message({
+          message: USER_ADD_ROLE_EMPTY_ERROR_MESSAGE,
+          type: "error",
+          duration: 2000,
+          center: false
+        });
+        return false;
+      }
     },
     // 处理排序变化
     handleSortChange(sortObj) {
