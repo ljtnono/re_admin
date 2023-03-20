@@ -26,8 +26,11 @@ export const ARTICLE_PUBLISH_TAG_NAME_FORMAT_ERROR_MESSAGE = "标签名为2-20�
 // #################### 新增用户表单相关错误消息 #################### //
 export const USER_ADD_USERNAME_EMPTY_ERROR_MESSAGE = "用户名不能为空";
 export const USER_ADD_USERNAME_FORMAT_ERROR_MESSAGE = "用户名为4-20位英文数字字符串";
+export const USER_ADD_USERNAME_DUPLICATE_ERROR_MESSAGE = "用户名已存在";
 export const USER_ADD_PASSWORD_EMPTY_ERROR_MESSAGE = "密码不能为空";
 export const USER_ADD_PASSWORD_FORMAT_ERROR_MESSAGE = "密码必须包含大写字母和小写字母，然后特殊符号和数字其中的一种（，,。.+=[]），并且长度在8-20位之间";
+export const USER_ADD_RE_PASSWORD_EMPTY_ERROR_MESSAGE = "请重新输入密码";
+export const USER_ADD_RE_PASSWORD_ERROR_MESSAGE = "两次输入密码不一致";
 export const USER_ADD_EMAIL_EMPTY_ERROR_MESSAGE = "邮箱不能为空";
 export const USER_ADD_EMAIL_FORMAT_ERROR_MESSAGE = "邮箱格式错误";
 export const USER_ADD_ROLE_EMPTY_ERROR_MESSAGE = "请选择角色";

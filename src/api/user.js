@@ -33,3 +33,14 @@ export const findUserList = ({searchCondition, pageNum, pageSize, orderFieldList
 export const saveUser = ({username, password, email, roleId}) => {
 
 };
+
+
+/**
+ * 测试用户名是否重复
+ *
+ * @param username 用户名
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const testUsernameDuplicate = (username) => {
+  return axios.get(BASE_URL + requestMapping + "/testUsernameDuplicate?username=" + username);
+};

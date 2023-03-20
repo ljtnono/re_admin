@@ -111,27 +111,27 @@
         <el-dialog title="新增用户"
                    @open="addFormOpen"
                    top="4vh"
-                   width="700px"
+                   width="800px"
                    center
                    :visible.sync="addFormVisible">
           <template slot="default">
             <div style="padding: 10px 10px">
               <!-- 新增用户表单 -->
-              <el-form ref="addForm" :model="addForm" label-width="100px" inline>
-                <el-form-item label="用户名：" prop="title" class="is-required" >
+              <el-form ref="addForm" :model="addForm" :rules="addFormRule" label-width="100px" inline>
+                <el-form-item label="用户名：" prop="username" class="is-required" >
                   <el-input v-model="addForm.username" size="small" clearable placeholder="请输入用户名" />
                 </el-form-item>
-                <el-form-item label="邮箱：" prop="title" class="is-required" >
+                <el-form-item label="邮箱：" prop="email" class="is-required" >
                   <el-input v-model="addForm.email" size="small" clearable placeholder="请输入电子邮箱" />
                 </el-form-item>
-                <el-form-item label="密码：" prop="title" class="is-required" >
+                <el-form-item label="密码：" prop="password" class="is-required" >
                   <el-input v-model="addForm.password" size="small" clearable placeholder="请输入密码" />
                 </el-form-item>
-                <el-form-item label="确认密码：" prop="title" class="is-required">
-                  <el-input v-model="addForm.repassword" size="small" clearable placeholder="请重新输入密码" />
+                <el-form-item label="确认密码：" prop="rePassword" class="is-required">
+                  <el-input v-model="addForm.rePassword" size="small" clearable placeholder="请重新输入密码" />
                 </el-form-item>
                 <!-- 选择角色列表 -->
-                <el-form-item label="选择角色：" prop="title" class="is-required">
+                <el-form-item label="选择角色：" prop="title" class="is-required mt20">
                   <el-select style="width: 100%" v-model="addForm.roleId" clearable filterable placeholder="请选择角色">
                     <el-option
                       v-for="role in roleList"
@@ -157,7 +157,7 @@
 </template>
 
 <script>
-import {findUserList} from "@/api/user";
+import {findUserList, testUsernameDuplicate} from "@/api/user";
 import {
   ENTITY_DELETE_STATE_DELETE,
   ENTITY_DELETE_STATE_NORMAL,
@@ -170,10 +170,20 @@ import {mapState} from "vuex";
 import S from "string";
 import {
   USER_ADD_EMAIL_EMPTY_ERROR_MESSAGE,
+  USER_ADD_EMAIL_FORMAT_ERROR_MESSAGE,
   USER_ADD_PASSWORD_EMPTY_ERROR_MESSAGE,
-  USER_ADD_ROLE_EMPTY_ERROR_MESSAGE,
-  USER_ADD_USERNAME_EMPTY_ERROR_MESSAGE
+  USER_ADD_PASSWORD_FORMAT_ERROR_MESSAGE,
+  USER_ADD_RE_PASSWORD_EMPTY_ERROR_MESSAGE, USER_ADD_RE_PASSWORD_ERROR_MESSAGE,
+  USER_ADD_ROLE_EMPTY_ERROR_MESSAGE, USER_ADD_USERNAME_DUPLICATE_ERROR_MESSAGE,
+  USER_ADD_USERNAME_EMPTY_ERROR_MESSAGE,
+  USER_ADD_USERNAME_FORMAT_ERROR_MESSAGE
 } from "@/constant/errorMessageConstant";
+import {
+  LOGIN_PASSWORD_REGEX,
+  LOGIN_USERNAME_REGEX,
+  USER_ADD_EMAIL_REGEX,
+  USER_ADD_USERNAME_REGEX
+} from "@/constant/regexConstant";
 
 export default {
   name: "UserManage",
@@ -196,16 +206,62 @@ export default {
       // 总条数
       total: 0,
       // 新增用户表单是否显示
-      addFormVisible: true,
+      addFormVisible: false,
       // 表单中显示的用户具体信息
       addForm: {
         username: null,
+        password: null,
+        rePassword: null,
         email: null,
         phone: null,
         roleId: null
       },
       addFormRule: {
-        
+        username: [
+          {
+            required: true,
+            validator: this.usernameCheck,
+            trigger: "blur"
+          }
+        ],
+        password: [
+          {
+            required: true,
+            message: USER_ADD_PASSWORD_EMPTY_ERROR_MESSAGE,
+            trigger: "blur"
+          },
+          {
+            pattern: LOGIN_PASSWORD_REGEX,
+            message: USER_ADD_PASSWORD_FORMAT_ERROR_MESSAGE,
+            trigger: "blur"
+          },
+        ],
+        rePassword: [
+          {
+            required: true,
+            validator: this.rePasswordCheck,
+            trigger: "blur"
+          },
+        ],
+        email: [
+          {
+            required: true,
+            message: USER_ADD_EMAIL_EMPTY_ERROR_MESSAGE,
+            trigger: "blur"
+          },
+          {
+            pattern: USER_ADD_EMAIL_REGEX,
+            message: USER_ADD_EMAIL_FORMAT_ERROR_MESSAGE,
+            trigger: "blur"
+          }
+        ],
+        roleId: [
+          {
+            require: true,
+            message: USER_ADD_ROLE_EMPTY_ERROR_MESSAGE,
+            trigger: "blur"
+          }
+        ]
       }
     };
   },
@@ -218,6 +274,36 @@ export default {
     // 打开新增用户弹窗
     addFormOpen() {
       let that = this;
+
+    },
+    // 校验重复输入密码是否和密码一致
+    rePasswordCheck(rule, value, callback) {
+      let password = this.addForm.password;
+      let rePassword = this.addForm.rePassword;
+      if (rePassword === null || rePassword === "") {
+        return callback(new Error(USER_ADD_RE_PASSWORD_EMPTY_ERROR_MESSAGE));
+      }
+      if (rePassword !== password) {
+        return callback(new Error(USER_ADD_RE_PASSWORD_ERROR_MESSAGE));
+      }
+    },
+    // 用户名校验
+    async usernameCheck(rule, value, callback) {
+      let username = this.addForm.username;
+      if (username === null || username === "") {
+        return callback(new Error(USER_ADD_USERNAME_EMPTY_ERROR_MESSAGE));
+      }
+      if (!USER_ADD_USERNAME_REGEX.test(username)) {
+        return callback(new Error(USER_ADD_USERNAME_FORMAT_ERROR_MESSAGE));
+      }
+      // 重复性校验
+      let duplicate = false;
+      await testUsernameDuplicate(username).then(res => {
+        duplicate = res.data.data;
+      });
+      if (duplicate) {
+        return callback(new Error(USER_ADD_USERNAME_DUPLICATE_ERROR_MESSAGE));
+      }
     },
     // 提交新增用户表单
     commitAddForm(addForm) {
@@ -229,49 +315,7 @@ export default {
     },
     // 校验新增用户表单
     validateAddForm() {
-      let that = this;
-      let form = that.publishForm;
-      let username = form.username;
-      let password = form.password;
-      let email = form.email;
-      let roleId = form.roleId;
-      // 非空检验
-      if (username === null || username === "") {
-        this.$message({
-          message: USER_ADD_USERNAME_EMPTY_ERROR_MESSAGE,
-          type: "error",
-          duration: 2000,
-          center: false
-        });
-        return false;
-      }
-      if (password === null || password === "") {
-        this.$message({
-          message: USER_ADD_PASSWORD_EMPTY_ERROR_MESSAGE,
-          type: "error",
-          duration: 2000,
-          center: false
-        });
-        return false;
-      }
-      if (email === null || email === "") {
-        this.$message({
-          message: USER_ADD_EMAIL_EMPTY_ERROR_MESSAGE,
-          type: "error",
-          duration: 2000,
-          center: false
-        });
-        return false;
-      }
-      if (roleId === null) {
-        this.$message({
-          message: USER_ADD_ROLE_EMPTY_ERROR_MESSAGE,
-          type: "error",
-          duration: 2000,
-          center: false
-        });
-        return false;
-      }
+
     },
     // 处理排序变化
     handleSortChange(sortObj) {
