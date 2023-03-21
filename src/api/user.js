@@ -31,7 +31,12 @@ export const findUserList = ({searchCondition, pageNum, pageSize, orderFieldList
  * @param roleId 角色id
  */
 export const saveUser = ({username, password, email, roleId}) => {
-
+  return axios.post(BASE_URL + requestMapping, {
+    username,
+    password,
+    email,
+    roleId
+  })
 };
 
 

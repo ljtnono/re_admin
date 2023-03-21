@@ -125,10 +125,10 @@
                   <el-input v-model="addForm.email" size="small" clearable placeholder="请输入电子邮箱" />
                 </el-form-item>
                 <el-form-item label="密码：" prop="password" class="is-required" >
-                  <el-input v-model="addForm.password" size="small" clearable placeholder="请输入密码" />
+                  <el-input v-model="addForm.password" type="password" size="small" clearable placeholder="请输入密码" />
                 </el-form-item>
                 <el-form-item label="确认密码：" prop="rePassword" class="is-required">
-                  <el-input v-model="addForm.rePassword" size="small" clearable placeholder="请重新输入密码" />
+                  <el-input v-model="addForm.rePassword" size="small" type="password" clearable placeholder="请重新输入密码" />
                 </el-form-item>
                 <!-- 选择角色列表 -->
                 <el-form-item label="选择角色：" prop="title" class="is-required mt20">
@@ -157,11 +157,11 @@
 </template>
 
 <script>
-import {findUserList, testUsernameDuplicate} from "@/api/user";
+import {findUserList, saveUser, testUsernameDuplicate} from "@/api/user";
 import {
   ENTITY_DELETE_STATE_DELETE,
   ENTITY_DELETE_STATE_NORMAL,
-  getEntityStateContrary,
+  getEntityStateContrary, HTTP_RESULT_SUCCESS_CODE,
   ORDER_BY_ASC,
   ORDER_BY_DESC
 } from "@/constant/commonConstant";
@@ -273,8 +273,6 @@ export default {
   methods: {
     // 打开新增用户弹窗
     addFormOpen() {
-      let that = this;
-
     },
     // 校验重复输入密码是否和密码一致
     rePasswordCheck(rule, value, callback) {
@@ -286,6 +284,7 @@ export default {
       if (rePassword !== password) {
         return callback(new Error(USER_ADD_RE_PASSWORD_ERROR_MESSAGE));
       }
+      return callback();
     },
     // 用户名校验
     async usernameCheck(rule, value, callback) {
@@ -304,18 +303,41 @@ export default {
       if (duplicate) {
         return callback(new Error(USER_ADD_USERNAME_DUPLICATE_ERROR_MESSAGE));
       }
+      return callback();
     },
     // 提交新增用户表单
-    commitAddForm(addForm) {
+    commitAddForm(formName) {
       let that = this;
-      let form = that.addForm;
-      if (that.validatePublishForm()) {
-        that.$loading(ELEMENT_PAGE_LOADING_CONFIG);
-      }
-    },
-    // 校验新增用户表单
-    validateAddForm() {
-
+      this.$refs[formName].validate(async (valid, error) => {
+        // 校验成功，请求保存用户接口
+        let username = this.addForm.username;
+        let password = this.addForm.password;
+        let email = this.addForm.email;
+        let roleId = this.addForm.roleId;
+        if (valid) {
+          this.$loading(ELEMENT_PAGE_LOADING_CONFIG);
+          await saveUser({username, password, email, roleId}).then(res => {
+            this.$message({
+              type: "success",
+              message: "操作成功",
+              duration: 2000
+            });
+            this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
+            that.addFormVisible = false;
+          }).catch(e => {
+            this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
+            that.addFormVisible = false;
+          });
+          await that.search();
+        } else {
+          // 校验失败
+          this.$message({
+            type: "error",
+            message: Object.values(error)[0][0]["message"],
+            duration: 2000
+          });
+        }
+      });
     },
     // 处理排序变化
     handleSortChange(sortObj) {
