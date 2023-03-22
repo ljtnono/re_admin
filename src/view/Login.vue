@@ -59,9 +59,9 @@ export default {
         router.push({
           name: ROUT_WORKSPACE_NAME
         });
-        that.$loading().close();
+        that.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
       }).catch(e => {
-        that.$loading().close();
+        that.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
       });
     },
   },

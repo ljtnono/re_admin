@@ -23,9 +23,9 @@
             写文章
           </div>
           <div class="mr5 avatar-container flex flex-direction-column flex-justify-content-center">
-            <img class="flex" :src="avatar" alt="用户头像"/>
+            <img class="flex" :src="userInfo.avatarUrl" alt="用户头像"/>
           </div>
-          <span class="flex">杂技程序员老凌</span>
+          <span class="flex">{{userInfo.username}}</span>
           <i class="el-icon-arrow-down el-icon--right flex"/>
         </div>
         <el-dropdown-menu slot="dropdown">
@@ -53,11 +53,11 @@ export default {
   },
   computed: {
     ...mapState({
-      breadcrumbList: state => state.systemSetting.breadcrumbList
+      breadcrumbList: state => state.systemSetting.breadcrumbList,
+      userInfo: state => state.user.userInfo
     })
   },
   props: {
-    avatar: String,
     toggleIconClass: String
   },
   components: {},

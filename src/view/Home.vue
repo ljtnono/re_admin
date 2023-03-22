@@ -5,7 +5,7 @@
       :collapseStatus="collapseStatus"
       :menus="menus"/>
     <div class="content-container flex flex1 flex-direction-column">
-      <Header class="flex" @toggleNav="toggleNav" :avatar="avatar" :toggle-icon-class="toggleIconClass"/>
+      <Header class="flex" @toggleNav="toggleNav" :toggle-icon-class="toggleIconClass"/>
       <router-view/>
     </div>
   </div>
@@ -32,7 +32,6 @@ export default {
   },
   computed: {
     ...mapState({
-      avatar: state => state.user.userInfo.avatarUrl,
       menus: state => state.user.menus
     })
   },
