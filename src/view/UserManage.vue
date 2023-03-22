@@ -23,19 +23,17 @@
           icon="el-icon-plus">
           新增
         </el-button>
-        <!-- 更多操作下拉菜单 -->
-<!--        <el-dropdown class="ml10" trigger="click" @command="handleSelectionOperation">-->
-<!--          <el-button type="info" :disabled="selectionButtonDisabled" icon="el-icon-arrow-down">-->
-<!--            更多操作-->
-<!--            <el-dropdown-menu>-->
-<!--              <el-dropdown-item command="recommend">推荐</el-dropdown-item>-->
-<!--              <el-dropdown-item command="top">置顶</el-dropdown-item>-->
-<!--              <el-dropdown-item command="hidden">隐藏</el-dropdown-item>-->
-<!--              <el-dropdown-item command="show">显示</el-dropdown-item>-->
-<!--              <el-dropdown-item command="delete">删除</el-dropdown-item>-->
-<!--            </el-dropdown-menu>-->
-<!--          </el-button>-->
-<!--        </el-dropdown>-->
+        <!-- 更多操作下拉菜单-->
+        <el-dropdown class="ml10" trigger="click" @command="handleSelectionOperation">
+          <el-button type="info" :disabled="selectionButtonDisabled" icon="el-icon-arrow-down">
+            更多操作
+            <el-dropdown-menu>
+              <el-dropdown-item command="hidden">隐藏</el-dropdown-item>
+              <el-dropdown-item command="show">显示</el-dropdown-item>
+              <el-dropdown-item command="delete">删除</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-button>
+        </el-dropdown>
       </div>
       <!-- 表格数据 -->
       <div class="user-table-container">
@@ -76,7 +74,7 @@
           <el-table-column prop="lastLoginTime" label="最近登录" align="center" width="160">
             <template #default="{ row, column, $index }">
               <span class="cell-time">
-                <i class="el-icon-time"/>
+                <i v-if="row.lastLoginTime !== null" class="el-icon-time"/>
                 {{ row.lastLoginTime }}
               </span>
             </template>
@@ -84,10 +82,10 @@
           <el-table-column prop="ip" label="ip" align="center" width="160" />
           <el-table-column fixed="right" label="操作" align="center">
             <template #default="{ row, column, $index }">
-              <el-button type="text" size="mini" style="margin-right: 10px; color: #909399">
+              <el-button type="text" size="mini" style="color: #909399">
                 编辑
               </el-button>
-              <el-button type="text" size="mini" style="margin-right: 10px; color: #909399">
+              <el-button type="text" size="mini" style="color: #909399" @click="handleDeleteUser(row.id)">
                 删除
               </el-button>
             </template>
@@ -109,7 +107,6 @@
       <!-- 新增用户表单模态弹窗 -->
       <div class="add-form-container">
         <el-dialog title="新增用户"
-                   @open="addFormOpen"
                    top="4vh"
                    width="800px"
                    center
@@ -157,7 +154,14 @@
 </template>
 
 <script>
-import {findUserList, saveUser, testUsernameDuplicate} from "@/api/user";
+import {
+  deleteUserBatch,
+  findUserList,
+  saveUser,
+  testEmailDuplicate,
+  testUsernameDuplicate,
+  updateUserDeleteStatusBatch
+} from "@/api/user";
 import {
   ENTITY_DELETE_STATE_DELETE,
   ENTITY_DELETE_STATE_NORMAL,
@@ -165,25 +169,23 @@ import {
   ORDER_BY_ASC,
   ORDER_BY_DESC
 } from "@/constant/commonConstant";
-import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
+import {ELEMENT_PAGE_LOADING_CONFIG, ELEMENT_SUCCESS_MESSAGE_CONFIG} from "@/config/commonConfig";
 import {mapState} from "vuex";
 import S from "string";
 import {
+  USER_ADD_EMAIL_DUPLICATE_ERROR_MESSAGE,
   USER_ADD_EMAIL_EMPTY_ERROR_MESSAGE,
   USER_ADD_EMAIL_FORMAT_ERROR_MESSAGE,
   USER_ADD_PASSWORD_EMPTY_ERROR_MESSAGE,
   USER_ADD_PASSWORD_FORMAT_ERROR_MESSAGE,
-  USER_ADD_RE_PASSWORD_EMPTY_ERROR_MESSAGE, USER_ADD_RE_PASSWORD_ERROR_MESSAGE,
-  USER_ADD_ROLE_EMPTY_ERROR_MESSAGE, USER_ADD_USERNAME_DUPLICATE_ERROR_MESSAGE,
+  USER_ADD_RE_PASSWORD_EMPTY_ERROR_MESSAGE,
+  USER_ADD_RE_PASSWORD_ERROR_MESSAGE,
+  USER_ADD_ROLE_EMPTY_ERROR_MESSAGE,
+  USER_ADD_USERNAME_DUPLICATE_ERROR_MESSAGE,
   USER_ADD_USERNAME_EMPTY_ERROR_MESSAGE,
   USER_ADD_USERNAME_FORMAT_ERROR_MESSAGE
 } from "@/constant/errorMessageConstant";
-import {
-  LOGIN_PASSWORD_REGEX,
-  LOGIN_USERNAME_REGEX,
-  USER_ADD_EMAIL_REGEX,
-  USER_ADD_USERNAME_REGEX
-} from "@/constant/regexConstant";
+import {LOGIN_PASSWORD_REGEX, USER_ADD_EMAIL_REGEX, USER_ADD_USERNAME_REGEX} from "@/constant/regexConstant";
 
 export default {
   name: "UserManage",
@@ -246,12 +248,7 @@ export default {
         email: [
           {
             required: true,
-            message: USER_ADD_EMAIL_EMPTY_ERROR_MESSAGE,
-            trigger: "blur"
-          },
-          {
-            pattern: USER_ADD_EMAIL_REGEX,
-            message: USER_ADD_EMAIL_FORMAT_ERROR_MESSAGE,
+            validator: this.emailCheck,
             trigger: "blur"
           }
         ],
@@ -271,9 +268,6 @@ export default {
     })
   },
   methods: {
-    // 打开新增用户弹窗
-    addFormOpen() {
-    },
     // 校验重复输入密码是否和密码一致
     rePasswordCheck(rule, value, callback) {
       let password = this.addForm.password;
@@ -305,6 +299,25 @@ export default {
       }
       return callback();
     },
+    // 邮箱校验
+    async emailCheck(rule, value, callback) {
+      let email = this.addForm.email;
+      if (email === null || email === "") {
+        return callback(new Error(USER_ADD_EMAIL_EMPTY_ERROR_MESSAGE));
+      }
+      if (!USER_ADD_EMAIL_REGEX.test(email)) {
+        return callback(new Error(USER_ADD_EMAIL_FORMAT_ERROR_MESSAGE));
+      }
+      // 重复性校验
+      let duplicate = false;
+      await testEmailDuplicate(email).then(res => {
+        duplicate = res.data.data;
+      });
+      if (duplicate) {
+        return callback(new Error(USER_ADD_EMAIL_DUPLICATE_ERROR_MESSAGE));
+      }
+      return callback();
+    },
     // 提交新增用户表单
     commitAddForm(formName) {
       let that = this;
@@ -322,10 +335,10 @@ export default {
               message: "操作成功",
               duration: 2000
             });
-            this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
+            this.$loading().close();
             that.addFormVisible = false;
           }).catch(e => {
-            this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
+            this.$loading().close();
             that.addFormVisible = false;
           });
           await that.search();
@@ -375,11 +388,20 @@ export default {
     handleDeleteIconChange(row) {
       let deleteStatus = getEntityStateContrary(row.deleted);
       row.deleted = deleteStatus;
-      // updateArticleDeleteBatch([row.id], deleteStatus).then(res => {
-      //   this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
-      // }).catch(e => {
-      //   row.deleted = getEntityStateContrary(deleteStatus);
-      // });
+      updateUserDeleteStatusBatch([row.id], deleteStatus).then(res => {
+        this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+      }).catch(e => {
+        row.deleted = getEntityStateContrary(deleteStatus);
+      });
+    },
+    // 删除用户
+    handleDeleteUser(userId) {
+      deleteUserBatch([userId]).catch(res => {
+        if (HTTP_RESULT_SUCCESS_CODE === res.data.code) {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        }
+        this.search();
+      })
     },
     // 分页查询用户列表
     search() {
@@ -397,9 +419,9 @@ export default {
         this.total = data.total;
         this.pageNum = data.current;
         this.pageSize = data.size;
-        this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
+        this.$loading().close();
       }).catch(e => {
-        this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
+        this.$loading().close();
       });
     },
     // 处理每页条数变化

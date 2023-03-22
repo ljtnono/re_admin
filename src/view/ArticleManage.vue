@@ -440,9 +440,9 @@ export default {
         this.total = data.total;
         this.pageNum = data.current;
         this.pageSize = data.size;
-        this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
+        this.$loading().close();
       }).catch(e => {
-        this.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
+        this.$loading().close();
       });
     }
   },

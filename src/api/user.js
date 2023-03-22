@@ -49,3 +49,41 @@ export const saveUser = ({username, password, email, roleId}) => {
 export const testUsernameDuplicate = (username) => {
   return axios.get(BASE_URL + requestMapping + "/testUsernameDuplicate?username=" + username);
 };
+
+/**
+ * 测试邮箱是否重复
+ *
+ * @param email 邮箱
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const testEmailDuplicate = (email) => {
+  return axios.get(BASE_URL + requestMapping + "/testEmailDuplicate?email=" + email);
+};
+
+/**
+ * 批量更新用户删除状态
+ *
+ * @param userIdList 用户id列表
+ * @param deleteStatus 删除状态
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updateUserDeleteStatusBatch = (userIdList, deleteStatus) => {
+  return axios.put(BASE_URL + requestMapping + "/updateUserDeleteStatusBatch", {
+    userIdList,
+    deleteStatus
+  })
+};
+
+/**
+ * 批量删除用户
+ *
+ * @param userIdList 用户id列表
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const deleteUserBatch = (userIdList) => {
+  return axios.delete(BASE_URL + requestMapping + "/deleteUserBatch", {
+    data: {
+      userIdList
+    }
+  })
+}
