@@ -176,7 +176,7 @@
                 <el-form-item label="邮箱：" prop="email" class="is-required" >
                   <el-input v-model="editForm.email" size="small" clearable placeholder="请输入电子邮箱" />
                 </el-form-item>
-                <el-form-item label="密码：" prop="password" class="is-required">
+                <el-form-item label="密码：" prop="password" >
                   <el-input v-model="editForm.password" type="password" size="small" clearable placeholder="请输入新密码" />
                 </el-form-item>
                 <!-- 选择角色列表 -->
@@ -230,7 +230,6 @@ import {
   ADMIN_USER_EDIT_EMAIL_AVAILABILITY_ERROR_MESSAGE,
   ADMIN_USER_EDIT_EMAIL_EMPTY_ERROR_MESSAGE,
   ADMIN_USER_EDIT_EMAIL_FORMAT_ERROR_MESSAGE,
-  ADMIN_USER_EDIT_PASSWORD_EMPTY_ERROR_MESSAGE,
   ADMIN_USER_EDIT_PASSWORD_FORMAT_ERROR_MESSAGE,
   ADMIN_USER_EDIT_ROLE_EMPTY_ERROR_MESSAGE,
   USER_ADD_EMAIL_DUPLICATE_ERROR_MESSAGE,
@@ -340,11 +339,6 @@ export default {
       },
       editFormRule: {
         password: [
-          {
-            required: true,
-            message: ADMIN_USER_EDIT_PASSWORD_EMPTY_ERROR_MESSAGE,
-            trigger: "blur"
-          },
           {
             pattern: LOGIN_PASSWORD_REGEX,
             message: ADMIN_USER_EDIT_PASSWORD_FORMAT_ERROR_MESSAGE,
@@ -514,6 +508,10 @@ export default {
           });
         }
       });
+    },
+    // 提交管理员编辑用户表单
+    commitEditForm(formName) {
+
     },
     // 处理排序变化
     handleSortChange(sortObj) {
