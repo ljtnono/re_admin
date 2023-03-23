@@ -40,6 +40,7 @@
         <el-table :data="userList"
                   header-row-class-name="table-header"
                   @sort-change="handleSortChange"
+                  @selection-change="handleSelectionChange"
                   max-height="650">
           <el-table-column type="selection" align="center" width="50"/>
           <el-table-column fixed="left" prop="username" label="用户名" width="160" >
@@ -177,7 +178,8 @@ import {
 import {
   ENTITY_DELETE_STATE_DELETE,
   ENTITY_DELETE_STATE_NORMAL,
-  getEntityStateContrary, HTTP_RESULT_SUCCESS_CODE,
+  getEntityStateContrary,
+  HTTP_RESULT_SUCCESS_CODE,
   ORDER_BY_ASC,
   ORDER_BY_DESC
 } from "@/constant/commonConstant";
@@ -205,6 +207,11 @@ export default {
     return {
       ENTITY_DELETE_STATE_DELETE,
       ENTITY_DELETE_STATE_NORMAL,
+      // 多选操作按钮点击状态
+      selectionButtonDisabled: true,
+      // 被选中的行列表
+      selection: [],
+      selectedUserIdList: [],
       // 当前查询条件
       searchCondition: "",
       // 用户列表
@@ -280,6 +287,33 @@ export default {
     })
   },
   methods: {
+    async handleSelectionOperation(command) {
+      let userIdList = this.selectedUserIdList;
+      if (command === "hidden") {
+        await updateUserDeleteStatusBatch(userIdList, ENTITY_DELETE_STATE_DELETE).then(res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        });
+      } else if (command === "show") {
+        await updateUserDeleteStatusBatch(userIdList, ENTITY_DELETE_STATE_NORMAL).then(res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        });
+      } else if (command === "delete") {
+        await deleteUserBatch(userIdList).then(res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        });
+      }
+      this.search();
+    },
+    // 当多选栏改变时
+    handleSelectionChange(selection) {
+      // 需要判断被选中的行是否大于0
+      if (selection.length > 0) {
+        this.selectionButtonDisabled = false;
+      } else {
+        this.selectionButtonDisabled = true;
+      }
+      this.selectedUserIdList = selection.map(s => s.id);
+    },
     // 校验重复输入密码是否和密码一致
     rePasswordCheck(rule, value, callback) {
       let password = this.addForm.password;
