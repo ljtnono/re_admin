@@ -61,6 +61,17 @@ export const testEmailDuplicate = (email) => {
 };
 
 /**
+ * 管理员编辑用户表单测试邮箱是否可用接口
+ *
+ * @param email 邮箱
+ * @param userId 用户id
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const adminEditUserTestEmailAvailability = (email, userId) => {
+  return axios.get(BASE_URL + requestMapping + "/adminEditUserTestEmailAvailability?email=" + email + "&userId=" + userId);
+};
+
+/**
  * 批量更新用户删除状态
  *
  * @param userIdList 用户id列表

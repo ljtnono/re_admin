@@ -19,3 +19,6 @@ export const ARTICLE_PUBLISH_TAG_REGEX = /^[\u4e00-\u9fa5\S]{2,20}$/;
 export const USER_ADD_USERNAME_REGEX = LOGIN_USERNAME_REGEX;
 // 用户邮箱正则表达式
 export const USER_ADD_EMAIL_REGEX = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
+
+// #################### 管理员编辑用户表单相关正则表达式 #################### //
+export const ADMIN_USER_EDIT_EMAIL_REGEX = USER_ADD_EMAIL_REGEX;

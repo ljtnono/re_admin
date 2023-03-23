@@ -95,7 +95,7 @@
           </el-table-column>
           <el-table-column fixed="right" label="操作" align="center">
             <template #default="{ row, column, $index }">
-              <el-button type="text" size="mini" style="color: #909399">
+              <el-button type="text" size="mini" style="color: #909399" @click="openEditForm(row)">
                 编辑
               </el-button>
               <el-button type="text" size="mini" style="color: #909399" @click="handleDeleteUser(row.id)">
@@ -141,7 +141,7 @@
                   <el-input v-model="addForm.rePassword" size="small" type="password" clearable placeholder="请重新输入密码" />
                 </el-form-item>
                 <!-- 选择角色列表 -->
-                <el-form-item label="选择角色：" prop="title" class="is-required mt20">
+                <el-form-item label="选择角色：" prop="roleId" class="is-required mt20">
                   <el-select style="width: 100%" v-model="addForm.roleId" clearable filterable placeholder="请选择角色">
                     <el-option
                       v-for="role in roleList"
@@ -162,12 +162,52 @@
           </template>
         </el-dialog>
       </div>
+      <!-- 管理员编辑用户信息模态弹窗 -->
+      <div class="edit-form-container">
+        <el-dialog title="编辑用户"
+                   top="4vh"
+                   width="800px"
+                   center
+                   :visible.sync="editFormVisible">
+          <template slot="default">
+            <div style="padding: 10px 10px">
+              <!-- 编辑用户表单 -->
+              <el-form ref="editForm" :model="editForm" :rules="editFormRule" label-width="100px" inline>
+                <el-form-item label="邮箱：" prop="email" class="is-required" >
+                  <el-input v-model="editForm.email" size="small" clearable placeholder="请输入电子邮箱" />
+                </el-form-item>
+                <el-form-item label="密码：" prop="password" class="is-required">
+                  <el-input v-model="editForm.password" type="password" size="small" clearable placeholder="请输入新密码" />
+                </el-form-item>
+                <!-- 选择角色列表 -->
+                <el-form-item label="选择角色：" prop="roleId" class="is-required mt20">
+                  <el-select style="width: 100%" v-model="editForm.roleId" clearable filterable placeholder="请选择角色">
+                    <el-option
+                      v-for="role in roleList"
+                      :key="role.id"
+                      :label="role.name"
+                      :value="role.id">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </el-form>
+            </div>
+          </template>
+          <template slot="footer">
+            <span class="dialog-footer">
+              <el-button @click="editFormVisible = false">取 消</el-button>
+              <el-button type="primary" @click="commitEditForm('editForm')">确 定</el-button>
+            </span>
+          </template>
+        </el-dialog>
+      </div>
     </el-card>
   </div>
 </template>
 
 <script>
 import {
+  adminEditUserTestEmailAvailability,
   deleteUserBatch,
   findUserList,
   saveUser,
@@ -187,6 +227,12 @@ import {ELEMENT_PAGE_LOADING_CONFIG, ELEMENT_SUCCESS_MESSAGE_CONFIG} from "@/con
 import {mapState} from "vuex";
 import S from "string";
 import {
+  ADMIN_USER_EDIT_EMAIL_AVAILABILITY_ERROR_MESSAGE,
+  ADMIN_USER_EDIT_EMAIL_EMPTY_ERROR_MESSAGE,
+  ADMIN_USER_EDIT_EMAIL_FORMAT_ERROR_MESSAGE,
+  ADMIN_USER_EDIT_PASSWORD_EMPTY_ERROR_MESSAGE,
+  ADMIN_USER_EDIT_PASSWORD_FORMAT_ERROR_MESSAGE,
+  ADMIN_USER_EDIT_ROLE_EMPTY_ERROR_MESSAGE,
   USER_ADD_EMAIL_DUPLICATE_ERROR_MESSAGE,
   USER_ADD_EMAIL_EMPTY_ERROR_MESSAGE,
   USER_ADD_EMAIL_FORMAT_ERROR_MESSAGE,
@@ -199,7 +245,12 @@ import {
   USER_ADD_USERNAME_EMPTY_ERROR_MESSAGE,
   USER_ADD_USERNAME_FORMAT_ERROR_MESSAGE
 } from "@/constant/errorMessageConstant";
-import {LOGIN_PASSWORD_REGEX, USER_ADD_EMAIL_REGEX, USER_ADD_USERNAME_REGEX} from "@/constant/regexConstant";
+import {
+  ADMIN_USER_EDIT_EMAIL_REGEX,
+  LOGIN_PASSWORD_REGEX,
+  USER_ADD_EMAIL_REGEX,
+  USER_ADD_USERNAME_REGEX
+} from "@/constant/regexConstant";
 
 export default {
   name: "UserManage",
@@ -228,13 +279,14 @@ export default {
       total: 0,
       // 新增用户表单是否显示
       addFormVisible: false,
+      // 编辑用户表单是否显示
+      editFormVisible: false,
       // 表单中显示的用户具体信息
       addForm: {
         username: null,
         password: null,
         rePassword: null,
         email: null,
-        phone: null,
         roleId: null
       },
       addFormRule: {
@@ -267,7 +319,7 @@ export default {
         email: [
           {
             required: true,
-            validator: this.emailCheck,
+            validator: this.addFormEmailCheck,
             trigger: "blur"
           }
         ],
@@ -275,6 +327,41 @@ export default {
           {
             require: true,
             message: USER_ADD_ROLE_EMPTY_ERROR_MESSAGE,
+            trigger: "blur"
+          }
+        ]
+      },
+      editForm: {
+        id: null,
+        username: null,
+        password: null,
+        email: null,
+        roleId: null
+      },
+      editFormRule: {
+        password: [
+          {
+            required: true,
+            message: ADMIN_USER_EDIT_PASSWORD_EMPTY_ERROR_MESSAGE,
+            trigger: "blur"
+          },
+          {
+            pattern: LOGIN_PASSWORD_REGEX,
+            message: ADMIN_USER_EDIT_PASSWORD_FORMAT_ERROR_MESSAGE,
+            trigger: "blur"
+          },
+        ],
+        email: [
+          {
+            required: true,
+            validator: this.editFormEmailCheck,
+            trigger: "blur"
+          }
+        ],
+        roleId: [
+          {
+            require: true,
+            message: ADMIN_USER_EDIT_ROLE_EMPTY_ERROR_MESSAGE,
             trigger: "blur"
           }
         ]
@@ -287,6 +374,16 @@ export default {
     })
   },
   methods: {
+    openEditForm(row) {
+      this.editForm = {
+        id: row.id,
+        username: row.username,
+        password: row.password,
+        email: row.email,
+        roleId: row.roleId
+      };
+      this.editFormVisible = true;
+    },
     async handleSelectionOperation(command) {
       let userIdList = this.selectedUserIdList;
       if (command === "hidden") {
@@ -345,8 +442,8 @@ export default {
       }
       return callback();
     },
-    // 邮箱校验
-    async emailCheck(rule, value, callback) {
+    // 新增用户表单邮箱校验
+    async addFormEmailCheck(rule, value, callback) {
       let email = this.addForm.email;
       if (email === null || email === "") {
         return callback(new Error(USER_ADD_EMAIL_EMPTY_ERROR_MESSAGE));
@@ -361,6 +458,26 @@ export default {
       });
       if (duplicate) {
         return callback(new Error(USER_ADD_EMAIL_DUPLICATE_ERROR_MESSAGE));
+      }
+      return callback();
+    },
+    // 管理员编辑用户表单邮箱校验
+    async editFormEmailCheck(rule, value, callback) {
+      let email = this.editForm.email;
+      let id = this.editForm.id;
+      if (email === null || email === "") {
+        return callback(new Error(ADMIN_USER_EDIT_EMAIL_EMPTY_ERROR_MESSAGE));
+      }
+      if (!ADMIN_USER_EDIT_EMAIL_REGEX.test(email)) {
+        return callback(new Error(ADMIN_USER_EDIT_EMAIL_FORMAT_ERROR_MESSAGE));
+      }
+      // 可用性校验
+      let availability = false;
+      await adminEditUserTestEmailAvailability(email, id).then(res => {
+        availability = res.data.data;
+      });
+      if (!availability) {
+        return callback(new Error(ADMIN_USER_EDIT_EMAIL_AVAILABILITY_ERROR_MESSAGE));
       }
       return callback();
     },
