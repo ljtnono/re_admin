@@ -80,6 +80,18 @@
             </template>
           </el-table-column>
           <el-table-column prop="ip" label="ip" align="center" width="160" />
+          <el-table-column prop="browserUA" label="浏览器标识" align="center" width="160" >
+            <template #default="{ row, column, $index }">
+              <el-tooltip
+                effect="dark"
+                :content="row.browserUA"
+                placement="top">
+                <span class="ellipsis">
+                  {{ row.browserUA }}
+                </span>
+              </el-tooltip>
+            </template>
+          </el-table-column>
           <el-table-column fixed="right" label="操作" align="center">
             <template #default="{ row, column, $index }">
               <el-button type="text" size="mini" style="color: #909399">
