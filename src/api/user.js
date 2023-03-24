@@ -98,3 +98,21 @@ export const deleteUserBatch = (userIdList) => {
     }
   })
 }
+
+/**
+ * 管理员用户编辑用户信息
+ *
+ * @param userId 用户id
+ * @param password 用户密码
+ * @param email 用户邮箱
+ * @param roleId 角色id
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const adminEditUser = (userId, password, email, roleId) => {
+  return axios.put(BASE_URL + requestMapping + "/adminEditUser", {
+    userId,
+    password,
+    email,
+    roleId
+  });
+};

@@ -81,7 +81,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="ip" label="ip" align="center" width="160" />
-          <el-table-column prop="browserUA" label="浏览器标识" align="center" width="160" >
+          <el-table-column prop="browserUA" label="浏览器标识" align="center"  >
             <template #default="{ row, column, $index }">
               <el-tooltip
                 effect="dark"
@@ -207,6 +207,7 @@
 
 <script>
 import {
+  adminEditUser,
   adminEditUserTestEmailAvailability,
   deleteUserBatch,
   findUserList,
@@ -324,7 +325,7 @@ export default {
         ],
         roleId: [
           {
-            require: true,
+            required: true,
             message: USER_ADD_ROLE_EMPTY_ERROR_MESSAGE,
             trigger: "blur"
           }
@@ -354,7 +355,7 @@ export default {
         ],
         roleId: [
           {
-            require: true,
+            required: true,
             message: ADMIN_USER_EDIT_ROLE_EMPTY_ERROR_MESSAGE,
             trigger: "blur"
           }
@@ -511,7 +512,37 @@ export default {
     },
     // 提交管理员编辑用户表单
     commitEditForm(formName) {
-
+      let that = this;
+      this.$refs[formName].validate(async (valid, error) => {
+        // 校验成功，请求编辑接口
+        let userId = this.editForm.id;
+        let password = this.editForm.password;
+        let email = this.editForm.email;
+        let roleId = this.editForm.roleId;
+        if (valid) {
+          this.$loading(ELEMENT_PAGE_LOADING_CONFIG);
+          await adminEditUser(userId, password, email, roleId).then(res => {
+            this.$message({
+              type: "success",
+              message: "操作成功",
+              duration: 2000
+            });
+            this.$loading().close();
+            that.editFormVisible = false;
+          }).catch(e => {
+            this.$loading().close();
+            that.editFormVisible = false;
+          });
+          await that.search();
+        } else {
+          // 校验失败
+          this.$message({
+            type: "error",
+            message: Object.values(error)[0][0]["message"],
+            duration: 2000
+          });
+        }
+      });
     },
     // 处理排序变化
     handleSortChange(sortObj) {
