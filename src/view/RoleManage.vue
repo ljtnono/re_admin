@@ -6,7 +6,7 @@
         菜单树
       </template>
       <el-tree
-        :data="data"
+        :data="menuTreeData"
         show-checkbox
         default-expand-all
         node-key="id"
@@ -43,15 +43,15 @@
                   @selection-change="handleSelectionChange"
                   max-height="650">
           <el-table-column type="selection" align="center"/>
-          <el-table-column fixed="left" prop="username" label="名称">
+          <el-table-column fixed="left" prop="name" label="名称">
             <template #default="{ row, column, $index }">
               <el-tooltip
                 effect="dark"
-                :content="row.username"
+                :content="row.name"
                 placement="top">
                 <span class="ellipsis">
                   <i :class="'iconfont mr5 cursor-pointer ' + (row.deleted === ENTITY_DELETE_STATE_DELETE ? 'icon-hidden' : 'icon-show')"  @click="handleDeleteIconChange(row)"/>
-                  {{ row.username }}
+                  {{ row.name }}
                 </span>
               </el-tooltip>
             </template>
@@ -102,7 +102,15 @@
 </template>
 
 <script>
-import {ENTITY_DELETE_STATE_DELETE, ENTITY_DELETE_STATE_NORMAL} from "@/constant/commonConstant";
+import {
+  ENTITY_DELETE_STATE_DELETE,
+  ENTITY_DELETE_STATE_NORMAL,
+  ORDER_BY_ASC,
+  ORDER_BY_DESC
+} from "@/constant/commonConstant";
+import {findRoleMenuTree, findRolePageList} from "@/api/role";
+import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
+import S from "string";
 
 export default {
   name: "RoleManage",
@@ -110,6 +118,11 @@ export default {
     return {
       ENTITY_DELETE_STATE_DELETE,
       ENTITY_DELETE_STATE_NORMAL,
+      // 多选操作按钮点击状态
+      selectionButtonDisabled: true,
+      // 被选中的行列表
+      selection: [],
+      selectedRoleIdList: [],
       // 当前页数
       pageNum: 1,
       // 每页条数
@@ -118,46 +131,166 @@ export default {
       total: 0,
       // 当前查询条件
       searchCondition: "",
-      data: [{
-        id: 1,
-        label: "一级 1",
-        children: [{
-          id: 4,
-          label: "二级 1-1",
-          children: [{
-            id: 9,
-            label: "三级 1-1-1"
-          }, {
-            id: 10,
-            label: "三级 1-1-2"
-          }]
-        }]
-      }, {
-        id: 2,
-        label: "一级 2",
-        children: [{
-          id: 5,
-          label: "二级 2-1"
-        }, {
-          id: 6,
-          label: "二级 2-2"
-        }]
-      }, {
-        id: 3,
-        label: "一级 3",
-        children: [{
-          id: 7,
-          label: "二级 3-1"
-        }, {
-          id: 8,
-          label: "二级 3-2"
-        }]
-      }],
-      defaultProps: {
-        children: "children",
-        label: "label"
-      }
+      // 排序字段条件
+      orderFieldList: [],
+      // 排序标记条件
+      orderFlagList: [],
+      // 角色列表
+      roleList: [],
+      // 角色的菜单树
+      menuTreeData: [],
+      // 显示的菜单树对应的角色id
+      menuTreeRoleId: null,
+      data: [
+        {
+          id: 1,
+          label: "一级 1",
+          children: [
+            {
+              id: 4,
+              label: "二级 1-1",
+              children: [
+                {
+                  id: 9,
+                  label: "三级 1-1-1"
+                },
+                {
+                  id: 10,
+                  label: "三级 1-1-2"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          id: 2,
+          label: "一级 2",
+          children: [
+            {
+              id: 5,
+              label: "二级 2-1"
+            },
+            {
+              id: 6,
+              label: "二级 2-2"
+            }
+          ]
+        },
+        {
+          id: 3,
+          label: "一级 3",
+          children: [
+            {
+              id: 7,
+              label: "二级 3-1"
+            },
+            {
+              id: 8,
+              label: "二级 3-2"
+            }
+          ]
+        }
+      ],
     };
+  },
+  methods: {
+    // 搜索角色列表
+    search() {
+      let param = {
+        pageNum: this.pageNum,
+        pageSize: this.pageSize,
+        searchCondition: this.searchCondition,
+        orderFieldList: this.orderFieldList,
+        orderFlagList: this.orderFlagList
+      }
+      this.$loading(ELEMENT_PAGE_LOADING_CONFIG);
+      findRolePageList({...param}).then(async res => {
+        let data = res.data.data;
+        this.roleList = data.records;
+        this.total = data.total;
+        this.pageNum = data.current;
+        this.pageSize = data.size;
+        await this.menuTree(data.records[0].id);
+        this.$loading().close();
+      }).catch(e => {
+        this.$loading().close();
+      })
+    },
+    // 当多选栏改变时
+    handleSelectionChange(selection) {
+      // 需要判断被选中的行是否大于0
+      if (selection.length > 0) {
+        this.selectionButtonDisabled = false;
+      } else {
+        this.selectionButtonDisabled = true;
+      }
+      this.selectedRoleIdList = selection.map(s => s.id);
+    },
+    // 处理排序变化
+    handleSortChange(sortObj) {
+      // 目前只支持单字段排序，这里由于逻辑是按照多字段排序写的，所以可能会有些迷
+      let orderFieldList = [];
+      let orderFlagList = [];
+      // 转为下划线形式
+      let prop = S(sortObj.prop).underscore().s;
+      let order = sortObj.order;
+      // 取消某个排序
+      if (order === null) {
+        let index = orderFieldList.indexOf(prop);
+        // 已存在该排序字段则删除
+        if (index !== -1) {
+          orderFieldList.splice(index, 1);
+          orderFlagList.splice(index, 1);
+        }
+      } else {
+        order = order === "ascending" ? ORDER_BY_ASC : ORDER_BY_DESC;
+        // 新增某个排序
+        let index = orderFieldList.indexOf(prop);
+        if (index !== -1) {
+          // 已存在该排序字段则修改其排序flag
+          orderFlagList[index] = order;
+        } else {
+          orderFieldList.push(prop);
+          orderFlagList.push(order);
+        }
+      }
+      this.orderFieldList = orderFieldList;
+      this.orderFlagList = orderFlagList;
+      this.search();
+    },
+    // 处理每页条数变化
+    handleSizeChange(val) {
+      this.pageSize = val;
+      this.search();
+    },
+    // 处理当前页数变化
+    handleCurrentChange(val) {
+      this.pageNum = val;
+      this.search();
+    },
+    // 获取并设置角色的菜单树
+    menuTree(roleId) {
+      findRoleMenuTree(roleId).then(res => {
+        let data = res.data.data;
+        this.menuTreeRoleId = data.roleId;
+        let menuTreeData = data.menuTree.map(menuTree => {
+          return {
+            id: menuTree.menuId,
+            label: menuTree.menuTitle,
+            children: menuTree.children.map(child => {
+              return {
+                id: child.menuId,
+                label: child.menuTitle
+              }
+            })
+          }
+        });
+        this.menuTreeData = menuTreeData;
+      });
+    },
+  },
+  mounted() {
+    this.search();
   }
 };
 </script>
