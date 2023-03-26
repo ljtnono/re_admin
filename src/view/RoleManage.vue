@@ -6,7 +6,7 @@
         菜单树
       </template>
       <el-tree
-        :data="menuTreeData"
+        :data="roleMenuTreeData"
         show-checkbox
         default-expand-all
         node-key="id"
@@ -33,6 +33,14 @@
           @click="search"
           icon="el-icon-search">
           搜索
+        </el-button>
+        <!-- 新增角色接口 -->
+        <el-button
+          size="mini"
+          type="success"
+          @click="addFormVisible = true"
+          icon="el-icon-plus">
+          新增
         </el-button>
       </div>
       <!-- 表格数据 -->
@@ -97,6 +105,43 @@
           :page-sizes="[10, 20, 30, 40, 50]"
           :page-size="pageSize"/>
       </div>
+      <!-- 新增角色表单模态弹窗 -->
+      <div class="add-form-container">
+        <el-dialog title="新增角色"
+                   top="4vh"
+                   width="800px"
+                   center
+                   :visible.sync="addFormVisible">
+          <template slot="default">
+            <div style="padding: 10px 10px;">
+              <!-- 新增角色表单 -->
+              <el-form ref="addForm" :model="addForm"  label-width="100px">
+                <el-form-item label="角色名：" prop="name" class="is-required" >
+                  <el-input v-model="addForm.name" size="small" clearable placeholder="请输入角色名" />
+                </el-form-item>
+                <el-form-item label="角色描述：" prop="description">
+                  <el-input type="textarea" :autosize="{ minRows: 4, maxRows: 4}" maxlength="200" show-word-limit v-model="addForm.description" size="small" clearable placeholder="请输入角色描述" />
+                </el-form-item>
+              </el-form>
+            </div>
+            <div style="padding: 10px 10px; height: 300px; overflow-y: auto; ">
+              <el-tree
+                :data="menuTreeData"
+                show-checkbox
+                default-expand-all
+                node-key="id"
+                ref="tree"
+                highlight-current>
+              </el-tree>
+            </div>
+          </template>
+          <template slot="footer">
+            <span class="dialog-footer">
+              <el-button type="primary" @click="commitAddForm('addForm')">下一步</el-button>
+            </span>
+          </template>
+        </el-dialog>
+      </div>
     </el-card>
   </div>
 </template>
@@ -111,6 +156,7 @@ import {
 import {findRoleMenuTree, findRolePageList} from "@/api/role";
 import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
 import S from "string";
+import {findMenuTree} from "@/api/menu";
 
 export default {
   name: "RoleManage",
@@ -138,59 +184,18 @@ export default {
       // 角色列表
       roleList: [],
       // 角色的菜单树
+      roleMenuTreeData: [],
+      // 全部菜单树
       menuTreeData: [],
       // 显示的菜单树对应的角色id
       menuTreeRoleId: null,
-      data: [
-        {
-          id: 1,
-          label: "一级 1",
-          children: [
-            {
-              id: 4,
-              label: "二级 1-1",
-              children: [
-                {
-                  id: 9,
-                  label: "三级 1-1-1"
-                },
-                {
-                  id: 10,
-                  label: "三级 1-1-2"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          id: 2,
-          label: "一级 2",
-          children: [
-            {
-              id: 5,
-              label: "二级 2-1"
-            },
-            {
-              id: 6,
-              label: "二级 2-2"
-            }
-          ]
-        },
-        {
-          id: 3,
-          label: "一级 3",
-          children: [
-            {
-              id: 7,
-              label: "二级 3-1"
-            },
-            {
-              id: 8,
-              label: "二级 3-2"
-            }
-          ]
-        }
-      ],
+      // 新增角色表单是否显示
+      addFormVisible: false,
+      // 新增角色表单
+      addForm: {
+        name: null,
+        description: null
+      }
     };
   },
   methods: {
@@ -285,12 +290,28 @@ export default {
             })
           }
         });
-        this.menuTreeData = menuTreeData;
+        this.roleMenuTreeData = menuTreeData;
       });
     },
   },
   mounted() {
     this.search();
+    findMenuTree().then(res => {
+      let data = res.data.data;
+      let menuTreeData = data.map(menuTree => {
+        return {
+          id: menuTree.menuId,
+          label: menuTree.menuTitle,
+          children: menuTree.children.map(child => {
+            return {
+              id: child.menuId,
+              label: child.menuTitle
+            }
+          })
+        }
+      });
+      this.menuTreeData = menuTreeData;
+    });
   }
 };
 </script>
