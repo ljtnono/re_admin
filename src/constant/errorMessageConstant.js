@@ -38,6 +38,12 @@ export const USER_ADD_EMAIL_DUPLICATE_ERROR_MESSAGE = "邮箱已被其他帐号�
 export const USER_ADD_ROLE_EMPTY_ERROR_MESSAGE = "请选择角色";
 
 
+// #################### 新增角色表单相关错误消息 #################### //
+
+export const ROLE_ADD_NAME_EMPTY_ERROR_MESSAGE = "角色名称不能为空";
+export const ROLE_ADD_NAME_FORMAT_ERROR_MESSAGE = "角色名为中文、英文和数字的字符串，长度为4-30个字符";
+export const ROLE_ADD_NAME_DUPLICATE_ERROR_MESSAGE = "角色名已存在";
+
 // #################### 管理员编辑用户表单相关错误消息 #################### //
 
 export const ADMIN_USER_EDIT_PASSWORD_FORMAT_ERROR_MESSAGE = USER_ADD_PASSWORD_FORMAT_ERROR_MESSAGE;

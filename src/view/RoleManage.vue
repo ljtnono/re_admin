@@ -7,16 +7,11 @@
       </template>
       <el-tree
         :data="roleMenuTreeData"
-        show-checkbox
         default-expand-all
         node-key="id"
         ref="tree"
         highlight-current>
       </el-tree>
-      <!-- 操作按钮容器 -->
-      <el-row class="mt50" style="text-align: center">
-        <el-button type="primary" size="medium">保存配置</el-button>
-      </el-row>
     </el-card>
     <!-- 角色表格卡片 -->
     <el-card class="role-table-container" style="flex: 4 4">
@@ -51,19 +46,7 @@
                   @selection-change="handleSelectionChange"
                   max-height="650">
           <el-table-column type="selection" align="center"/>
-          <el-table-column fixed="left" prop="name" label="名称">
-            <template #default="{ row, column, $index }">
-              <el-tooltip
-                effect="dark"
-                :content="row.name"
-                placement="top">
-                <span class="ellipsis">
-                  <i :class="'iconfont mr5 cursor-pointer ' + (row.deleted === ENTITY_DELETE_STATE_DELETE ? 'icon-hidden' : 'icon-show')"  @click="handleDeleteIconChange(row)"/>
-                  {{ row.name }}
-                </span>
-              </el-tooltip>
-            </template>
-          </el-table-column>
+          <el-table-column fixed="left" prop="name" label="名称" />
           <el-table-column prop="description" label="角色描述" />
           <el-table-column prop="createTime" label="创建时间" align="center" sortable="custom">
             <template #default="{ row, column, $index }">
@@ -115,12 +98,50 @@
           <template slot="default">
             <div style="padding: 10px 10px;">
               <!-- 新增角色表单 -->
-              <el-form ref="addForm" :model="addForm"  label-width="100px">
+              <el-form ref="addForm" :model="addForm" :rules="addFormRule"  label-width="100px">
                 <el-form-item label="角色名：" prop="name" class="is-required" >
                   <el-input v-model="addForm.name" size="small" clearable placeholder="请输入角色名" />
                 </el-form-item>
                 <el-form-item label="角色描述：" prop="description">
                   <el-input type="textarea" :autosize="{ minRows: 4, maxRows: 4}" maxlength="200" show-word-limit v-model="addForm.description" size="small" clearable placeholder="请输入角色描述" />
+                </el-form-item>
+              </el-form>
+            </div>
+            <div style="padding: 10px 10px; height: 300px; overflow-y: auto; ">
+              <el-tree
+                :data="menuTreeData"
+                show-checkbox
+                default-expand-all
+                node-key="id"
+                ref="tree"
+                @check="handleMenuTreeCheck"
+                highlight-current>
+              </el-tree>
+            </div>
+          </template>
+          <template slot="footer">
+            <span class="dialog-footer">
+              <el-button type="primary" @click="commitAddForm('addForm')">提 交</el-button>
+            </span>
+          </template>
+        </el-dialog>
+      </div>
+     <!-- 编辑角色表单模态弹窗 -->
+      <div class="edit-form-container">
+        <el-dialog title="编辑角色"
+                   top="4vh"
+                   width="800px"
+                   center
+                   :visible.sync="editFormVisible">
+          <template slot="default">
+            <div style="padding: 10px 10px;">
+              <!-- 编辑角色表单 -->
+              <el-form ref="editForm" :model="editForm" :rules="editFormRule"  label-width="100px">
+                <el-form-item label="角色名：" prop="name" class="is-required" >
+                  <el-input v-model="editForm.name" size="small" clearable placeholder="请输入角色名" />
+                </el-form-item>
+                <el-form-item label="角色描述：" prop="description">
+                  <el-input type="textarea" :autosize="{ minRows: 4, maxRows: 4}" maxlength="200" show-word-limit v-model="editForm.description" size="small" clearable placeholder="请输入角色描述" />
                 </el-form-item>
               </el-form>
             </div>
@@ -137,7 +158,7 @@
           </template>
           <template slot="footer">
             <span class="dialog-footer">
-              <el-button type="primary" @click="commitAddForm('addForm')">下一步</el-button>
+              <el-button type="primary" @click="commitEditForm('editForm')">提 交</el-button>
             </span>
           </template>
         </el-dialog>
@@ -151,12 +172,16 @@ import {
   ENTITY_DELETE_STATE_DELETE,
   ENTITY_DELETE_STATE_NORMAL,
   ORDER_BY_ASC,
-  ORDER_BY_DESC
+  ORDER_BY_DESC,
+  HTTP_RESULT_SUCCESS_CODE
 } from "@/constant/commonConstant";
 import {findRoleMenuTree, findRolePageList} from "@/api/role";
-import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
+import {ELEMENT_PAGE_LOADING_CONFIG, ELEMENT_SUCCESS_MESSAGE_CONFIG} from "@/config/commonConfig";
 import S from "string";
 import {findMenuTree} from "@/api/menu";
+import { deleteRoleBatch, saveRole, testRoleNameAvailability } from "../api/role";
+import { ROLE_ADD_NAME_DUPLICATE_ERROR_MESSAGE, ROLE_ADD_NAME_EMPTY_ERROR_MESSAGE, ROLE_ADD_NAME_FORMAT_ERROR_MESSAGE } from "../constant/errorMessageConstant";
+import { ROLE_ADD_NAME_REGEX } from "../constant/regexConstant";
 
 export default {
   name: "RoleManage",
@@ -191,14 +216,139 @@ export default {
       menuTreeRoleId: null,
       // 新增角色表单是否显示
       addFormVisible: false,
+      // 编辑角色表单是否显示
+      editFormVisible: false,
       // 新增角色表单
       addForm: {
         name: null,
-        description: null
+        description: null,
+        menuIdSet: []
+      },
+      addFormRule: {
+        name: [
+          {
+            required: true,
+            validator: this.addRoleNameCheck,
+            trigger: "blur"
+          }
+        ],
+      },
+      // 编辑角色表单
+      editForm: {
+        name: null,
+        description: null,
+        menuIdSet: []
+      },
+      editFormRule: {
+        name: [
+          {
+            required: true,
+            validator: this.editRoleNameCheck,
+            trigger: "blur"
+          }
+        ]
       }
     };
   },
   methods: {
+    // 打开编辑角色弹窗
+    openEditForm(row) {
+      let name = row.name;
+      let description = row.description;
+      this.editFormVisible = true;
+      this.editForm.name = name;
+      this.editForm.description = description;
+      this.editForm.menuIdSet = [];
+    },
+    // 处理角色菜单树选中状态改变事件
+    handleMenuTreeCheck(checkedNode, checkedData) {
+      this.addForm.menuIdSet = checkedData.checkedKeys;
+    },
+    // 编辑角色表单校验角色名称
+    async editRoleNameCheck(rule, value, callback) {
+      let name = this.editForm.name;
+      // 角色名判空校验
+      if (name === null || name === "") {
+        return callback(new Error(ROLE_ADD_NAME_EMPTY_ERROR_MESSAGE));
+      }
+      // 角色名称正则校验
+      if (!ROLE_ADD_NAME_REGEX.test(name)) {
+        return callback(new Error(ROLE_ADD_NAME_FORMAT_ERROR_MESSAGE));
+      }
+      // 可用性校验
+      let availability = false;
+      await testRoleNameAvailability(name).then(res => {
+        availability = res.data.data;
+      });
+      if (!availability) {
+        return callback(new Error(ROLE_ADD_NAME_DUPLICATE_ERROR_MESSAGE));
+      }
+      return callback();
+    },
+    // 新增角色表单校验角色名称
+    async addRoleNameCheck(rule, value, callback) {
+      let name = this.addForm.name;
+      // 角色名判空校验
+      if (name === null || name === "") {
+        return callback(new Error(ROLE_ADD_NAME_EMPTY_ERROR_MESSAGE));
+      }
+      // 角色名称正则校验
+      if (!ROLE_ADD_NAME_REGEX.test(name)) {
+        return callback(new Error(ROLE_ADD_NAME_FORMAT_ERROR_MESSAGE));
+      }
+      // 可用性校验
+      let availability = false;
+      await testRoleNameAvailability(name).then(res => {
+        availability = res.data.data;
+      });
+      if (!availability) {
+        return callback(new Error(ROLE_ADD_NAME_DUPLICATE_ERROR_MESSAGE));
+      }
+      return callback();
+    },
+    // 提交新增角色表单
+    commitAddForm(formName) {
+      let that = this;
+      // 先校验表单数据
+      this.$refs[formName].validate(async (valid, error) => {
+        // 校验成功，请求保存角色接口
+        let name = this.addForm.name;
+        let description = this.addForm.description;
+        let menuIdSet = this.addForm.menuIdSet;
+        if (valid) {
+          this.$loading(ELEMENT_PAGE_LOADING_CONFIG);
+          await saveRole({name, description, menuIdSet}).then(res => {
+            this.$message({
+              type: "success",
+              message: "操作成功",
+              duration: 2000
+            });
+            this.$loading().close();
+            that.addFormVisible = false;
+          }).catch(e => {
+            this.$loading().close();
+            that.addFormVisible = false;
+          });
+          await that.search();
+        } else {
+          // 校验失败
+          this.$message({
+            type: "error",
+            message: Object.values(error)[0][0]["message"],
+            duration: 2000
+          });
+        }
+      });
+    },
+    // 删除角色
+    handleDeleteRole(roleId) {
+      deleteRoleBatch([roleId]).then(res => {
+        if (HTTP_RESULT_SUCCESS_CODE === res.data.code) {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        }
+        this.search();
+      })
+    },
     // 搜索角色列表
     search() {
       let param = {
@@ -296,6 +446,7 @@ export default {
   },
   mounted() {
     this.search();
+    // 获取所有可配置的角色菜单树
     findMenuTree().then(res => {
       let data = res.data.data;
       let menuTreeData = data.map(menuTree => {

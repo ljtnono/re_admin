@@ -22,3 +22,6 @@ export const USER_ADD_EMAIL_REGEX = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)
 
 // #################### 管理员编辑用户表单相关正则表达式 #################### //
 export const ADMIN_USER_EDIT_EMAIL_REGEX = USER_ADD_EMAIL_REGEX;
+
+// #################### 新增角色表单相关正则表达式 #################### //
+export const ROLE_ADD_NAME_REGEX = /^[a-zA-Z0-9\u4e00-\u9fa5]{4,30}$/;
