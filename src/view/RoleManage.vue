@@ -37,6 +37,14 @@
           icon="el-icon-plus">
           新增
         </el-button>
+        <!-- 更多操作下拉菜单-->
+        <el-button
+          size="mini"
+          type="danger"
+          :disabled="selectionButtonDisabled"
+          @click="deleteBatch">
+          删除
+        </el-button>
       </div>
       <!-- 表格数据 -->
       <div class="role-table-container">
@@ -182,6 +190,7 @@ import {findMenuTree} from "@/api/menu";
 import { deleteRoleBatch, saveRole, testRoleNameAvailability } from "../api/role";
 import { ROLE_ADD_NAME_DUPLICATE_ERROR_MESSAGE, ROLE_ADD_NAME_EMPTY_ERROR_MESSAGE, ROLE_ADD_NAME_FORMAT_ERROR_MESSAGE } from "../constant/errorMessageConstant";
 import { ROLE_ADD_NAME_REGEX } from "../constant/regexConstant";
+import {deleteUserBatch, updateUserDeleteStatusBatch} from "@/api/user";
 
 export default {
   name: "RoleManage",
@@ -259,6 +268,14 @@ export default {
       this.editForm.name = name;
       this.editForm.description = description;
       this.editForm.menuIdSet = [];
+    },
+    // 批量删除角色
+    async deleteBatch() {
+      let selectedRoleIdList = this.selectedRoleIdList;
+      await deleteRoleBatch(selectedRoleIdList).then(res => {
+        this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+      });
+      this.search();
     },
     // 处理角色菜单树选中状态改变事件
     handleMenuTreeCheck(checkedNode, checkedData) {
@@ -339,6 +356,10 @@ export default {
           });
         }
       });
+    },
+    // 提交编辑角色表单
+    commitEditForm(formName) {
+
     },
     // 删除角色
     handleDeleteRole(roleId) {
