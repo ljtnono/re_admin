@@ -277,7 +277,9 @@ export default {
       this.editForm.menuIdSet = [];
       this.editForm.id = id;
       // 将编辑角色表单中的菜单树进行打勾操作
-      this.$refs.editRoleMenuTree.setCheckedKeys(checkedKeys);
+      this.$nextTick(() => {
+        this.$refs.editRoleMenuTree.setCheckedKeys(checkedKeys);
+      });
     },
     // 批量删除角色
     async deleteBatch() {
