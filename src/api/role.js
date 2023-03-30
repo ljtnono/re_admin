@@ -70,12 +70,41 @@ export const saveRole = ({name, description, menuIdSet}) => {
 };
 
 /**
- * 测试角色名称可用性
+ * 编辑角色
+ *
+ * @param id 角色id
+ * @param name 角色名称
+ * @description 角色描述
+ * @param menuIdSet 角色对应的菜单id集合
+ */
+export const updateRole = ({id, name, description, menuIdSet}) => {
+  return axios.put(BASE_URL + requestMapping, {
+    id,
+    name,
+    description,
+    menuIdSet
+  });
+};
+
+
+/**
+ * 新增角色表单角色名称校验
  *
  * @param roleName 角色名称
  * @returns {Promise<AxiosResponse<any>>}
  */
-export const testRoleNameAvailability = (roleName) => {
-  return axios.get(BASE_URL + requestMapping + "/testRoleNameAvailability?roleName=" + roleName);
+export const addFormRoleNameCheck = (roleName) => {
+  return axios.get(BASE_URL + requestMapping + "/addFormRoleNameCheck?roleName=" + roleName);
 };
+
+/**
+ * 编辑角色表单角色名称校验
+ * 
+ * @param roleId 角色
+ * @param roleName 角色名称
+ * @returns {Promise<AxiosResponse<any>>)}
+ */
+export const editFormRoleNameCheck = (roleId, roleName) => {
+  return axios.get(BASE_URL + requestMapping + "/editFormRoleNameCheck?roleId=" + roleId + "&roleName=" + roleName);
+}
 

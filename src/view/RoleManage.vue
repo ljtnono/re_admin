@@ -6,10 +6,8 @@
         菜单树
       </template>
       <el-tree
-        :data="roleMenuTreeData"
-        default-expand-all
+        :data="showRoleMenuTreeData"
         node-key="id"
-        ref="tree"
         highlight-current>
       </el-tree>
     </el-card>
@@ -117,12 +115,10 @@
             </div>
             <div style="padding: 10px 10px; height: 300px; overflow-y: auto; ">
               <el-tree
-                :data="menuTreeData"
+                :data="allRoleMenuTreeData"
                 show-checkbox
-                default-expand-all
                 node-key="id"
-                ref="tree"
-                @check="handleMenuTreeCheck"
+                @check="handleAddFormMenuTreeCheck"
                 highlight-current>
               </el-tree>
             </div>
@@ -155,11 +151,11 @@
             </div>
             <div style="padding: 10px 10px; height: 300px; overflow-y: auto; ">
               <el-tree
-                :data="menuTreeData"
+                :data="allRoleMenuTreeData"
                 show-checkbox
-                default-expand-all
                 node-key="id"
-                ref="tree"
+                ref="editRoleMenuTree"
+                @check="handleEditFormMenuTreeCheck"
                 highlight-current>
               </el-tree>
             </div>
@@ -187,7 +183,7 @@ import {findRoleMenuTree, findRolePageList} from "@/api/role";
 import {ELEMENT_PAGE_LOADING_CONFIG, ELEMENT_SUCCESS_MESSAGE_CONFIG} from "@/config/commonConfig";
 import S from "string";
 import {findMenuTree} from "@/api/menu";
-import { deleteRoleBatch, saveRole, testRoleNameAvailability } from "../api/role";
+import { addFormRoleNameCheck, deleteRoleBatch, editFormRoleNameCheck, saveRole, updateRole } from "../api/role";
 import { ROLE_ADD_NAME_DUPLICATE_ERROR_MESSAGE, ROLE_ADD_NAME_EMPTY_ERROR_MESSAGE, ROLE_ADD_NAME_FORMAT_ERROR_MESSAGE } from "../constant/errorMessageConstant";
 import { ROLE_ADD_NAME_REGEX } from "../constant/regexConstant";
 import {deleteUserBatch, updateUserDeleteStatusBatch} from "@/api/user";
@@ -218,11 +214,11 @@ export default {
       // 角色列表
       roleList: [],
       // 角色的菜单树
-      roleMenuTreeData: [],
+      showRoleMenuTreeData: [],
       // 全部菜单树
-      menuTreeData: [],
+      allRoleMenuTreeData: [],
       // 显示的菜单树对应的角色id
-      menuTreeRoleId: null,
+      showMenuTreeRoleId: null,
       // 新增角色表单是否显示
       addFormVisible: false,
       // 编辑角色表单是否显示
@@ -244,6 +240,7 @@ export default {
       },
       // 编辑角色表单
       editForm: {
+        id: null,
         name: null,
         description: null,
         menuIdSet: []
@@ -256,7 +253,9 @@ export default {
             trigger: "blur"
           }
         ]
-      }
+      },
+      // 编辑的角色菜单树
+      editRoleMenuTreeData: []
     };
   },
   methods: {
@@ -264,37 +263,52 @@ export default {
     openEditForm(row) {
       let name = row.name;
       let description = row.description;
+      let id = row.id;
+      let checkedKeys = [];
+      for (let menu of row.roleMenuTree.menuTree) {
+        checkedKeys.push(menu.menuId);
+        for (let childMenu of menu.children) {
+          checkedKeys.push(childMenu.menuId);
+        }
+      }
       this.editFormVisible = true;
       this.editForm.name = name;
       this.editForm.description = description;
       this.editForm.menuIdSet = [];
+      this.editForm.id = id;
+      // 将编辑角色表单中的菜单树进行打勾操作
+      this.$refs.editRoleMenuTree.setCheckedKeys(checkedKeys);
     },
     // 批量删除角色
     async deleteBatch() {
       let selectedRoleIdList = this.selectedRoleIdList;
       await deleteRoleBatch(selectedRoleIdList).then(res => {
         this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
-      });
-      this.search();
+        this.search();
+      }).catch(e => {});
     },
     // 处理角色菜单树选中状态改变事件
-    handleMenuTreeCheck(checkedNode, checkedData) {
+    handleAddFormMenuTreeCheck(checkedNode, checkedData) {
       this.addForm.menuIdSet = checkedData.checkedKeys;
+    },
+    handleEditFormMenuTreeCheck(checkedNode, checkedData) {
+      this.editForm.menuIdSet = checkedData.checkedKeys;
     },
     // 编辑角色表单校验角色名称
     async editRoleNameCheck(rule, value, callback) {
-      let name = this.editForm.name;
+      let roleName = this.editForm.name;
+      let roleId = this.editForm.id;
       // 角色名判空校验
-      if (name === null || name === "") {
+      if (roleName === null || roleName === "") {
         return callback(new Error(ROLE_ADD_NAME_EMPTY_ERROR_MESSAGE));
       }
       // 角色名称正则校验
-      if (!ROLE_ADD_NAME_REGEX.test(name)) {
+      if (!ROLE_ADD_NAME_REGEX.test(roleName)) {
         return callback(new Error(ROLE_ADD_NAME_FORMAT_ERROR_MESSAGE));
       }
       // 可用性校验
       let availability = false;
-      await testRoleNameAvailability(name).then(res => {
+      await editFormRoleNameCheck(roleId, roleName).then(res => {
         availability = res.data.data;
       });
       if (!availability) {
@@ -315,7 +329,7 @@ export default {
       }
       // 可用性校验
       let availability = false;
-      await testRoleNameAvailability(name).then(res => {
+      await addFormRoleNameCheck(name).then(res => {
         availability = res.data.data;
       });
       if (!availability) {
@@ -359,7 +373,36 @@ export default {
     },
     // 提交编辑角色表单
     commitEditForm(formName) {
-
+      let that = this;
+      this.$refs[formName].validate(async (valid, error) => {
+        let id = this.editForm.id;
+        let name = this.editForm.name;
+        let description = this.editForm.description;
+        let menuIdSet = this.editForm.menuIdSet;
+        if (valid) {
+          this.$loading(ELEMENT_PAGE_LOADING_CONFIG);
+          await updateRole({id, name, description, menuIdSet}).then(res => {
+            this.$message({
+              type: "success",
+              message: "操作成功",
+              duration: 2000
+            });
+            this.$loading().close();
+            that.editFormVisible = false;
+          }).catch(e => {
+            this.$loading().close();
+            that.editFormVisible = false;
+          });
+          await that.search();
+        } else {
+          // 校验失败
+          this.$message({
+            type: "error",
+            message: Object.values(error)[0][0]["message"],
+            duration: 2000
+          });
+        }
+      });
     },
     // 删除角色
     handleDeleteRole(roleId) {
@@ -368,7 +411,7 @@ export default {
           this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
         }
         this.search();
-      })
+      }).catch(e => {})
     },
     // 搜索角色列表
     search() {
@@ -448,8 +491,8 @@ export default {
     menuTree(roleId) {
       findRoleMenuTree(roleId).then(res => {
         let data = res.data.data;
-        this.menuTreeRoleId = data.roleId;
-        let menuTreeData = data.menuTree.map(menuTree => {
+        this.showMenuTreeRoleId = data.roleId;
+        let showRoleMenuTreeData = data.menuTree.map(menuTree => {
           return {
             id: menuTree.menuId,
             label: menuTree.menuTitle,
@@ -461,7 +504,7 @@ export default {
             })
           }
         });
-        this.roleMenuTreeData = menuTreeData;
+        this.showRoleMenuTreeData = showRoleMenuTreeData;
       });
     },
   },
@@ -470,7 +513,7 @@ export default {
     // 获取所有可配置的角色菜单树
     findMenuTree().then(res => {
       let data = res.data.data;
-      let menuTreeData = data.map(menuTree => {
+      let allRoleMenuTreeData = data.map(menuTree => {
         return {
           id: menuTree.menuId,
           label: menuTree.menuTitle,
@@ -482,7 +525,7 @@ export default {
           })
         }
       });
-      this.menuTreeData = menuTreeData;
+      this.allRoleMenuTreeData = allRoleMenuTreeData;
     });
   }
 };
