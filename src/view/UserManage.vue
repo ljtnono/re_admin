@@ -260,6 +260,8 @@ export default {
       ENTITY_DELETE_STATE_NORMAL,
       // 多选操作按钮点击状态
       selectionButtonDisabled: true,
+      // 是否显示删除警告对话框
+      deleteDialogVisible: false,
       // 被选中的行列表
       selection: [],
       selectedUserIdList: [],
@@ -379,22 +381,43 @@ export default {
       };
       this.editFormVisible = true;
     },
-    async handleSelectionOperation(command) {
+    handleSelectionOperation(command) {
       let userIdList = this.selectedUserIdList;
       if (command === "hidden") {
-        await updateUserDeleteStatusBatch(userIdList, ENTITY_DELETE_STATE_DELETE).then(res => {
-          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        this.$confirm("是否确认隐藏?", "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          updateUserDeleteStatusBatch(userIdList, ENTITY_DELETE_STATE_DELETE).then(res => {
+            this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+            this.search();
+          });
         });
       } else if (command === "show") {
-        await updateUserDeleteStatusBatch(userIdList, ENTITY_DELETE_STATE_NORMAL).then(res => {
-          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        this.$confirm("是否确认显示?", "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          updateUserDeleteStatusBatch(userIdList, ENTITY_DELETE_STATE_NORMAL).then(res => {
+            this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+            this.search();
+          });
         });
       } else if (command === "delete") {
-        await deleteUserBatch(userIdList).then(res => {
-          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        // 提示警告消息
+        this.$confirm("是否确认删除?", "警告", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          deleteUserBatch(userIdList).then(res => {
+            this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+            this.search();
+          });
         });
       }
-      this.search();
     },
     // 当多选栏改变时
     handleSelectionChange(selection) {
@@ -580,20 +603,32 @@ export default {
     handleDeleteIconChange(row) {
       let deleteStatus = getEntityStateContrary(row.deleted);
       row.deleted = deleteStatus;
-      updateUserDeleteStatusBatch([row.id], deleteStatus).then(res => {
-        this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
-      }).catch(e => {
-        row.deleted = getEntityStateContrary(deleteStatus);
+      this.$confirm("是否更改对象显示状态?", "警告", { 
+        confirmButtonText: "确定", 
+        cancelButtonText: "取消", 
+        type: "warning"
+      }).then(() => {
+        updateUserDeleteStatusBatch([row.id], deleteStatus).then(res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+        }).catch(e => {
+          row.deleted = getEntityStateContrary(deleteStatus);
+        });
       });
     },
     // 删除用户
     handleDeleteUser(userId) {
-      deleteUserBatch([userId]).catch(res => {
-        if (HTTP_RESULT_SUCCESS_CODE === res.data.code) {
-          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
-        }
-        this.search();
-      })
+      this.$confirm("是否删除?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        deleteUserBatch([userId]).then(res => {
+          if (HTTP_RESULT_SUCCESS_CODE === res.data.code) {
+            this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+            this.search();
+          }
+        });
+      });
     },
     // 分页查询用户列表
     search() {

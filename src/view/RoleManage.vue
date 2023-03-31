@@ -282,12 +282,18 @@ export default {
       });
     },
     // 批量删除角色
-    async deleteBatch() {
+    deleteBatch() {
       let selectedRoleIdList = this.selectedRoleIdList;
-      await deleteRoleBatch(selectedRoleIdList).then(res => {
-        this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
-        this.search();
-      }).catch(e => {});
+      this.$confirm("是否删除?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        deleteRoleBatch(selectedRoleIdList).then(res => {
+          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+          this.search();
+        });
+      });
     },
     // 处理角色菜单树选中状态改变事件
     handleAddFormMenuTreeCheck(checkedNode, checkedData) {
@@ -408,12 +414,18 @@ export default {
     },
     // 删除角色
     handleDeleteRole(roleId) {
-      deleteRoleBatch([roleId]).then(res => {
-        if (HTTP_RESULT_SUCCESS_CODE === res.data.code) {
-          this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
-        }
-        this.search();
-      }).catch(e => {})
+      this.$confirm("是否删除?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        deleteRoleBatch([roleId]).then(res => {
+          if (HTTP_RESULT_SUCCESS_CODE === res.data.code) {
+            this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+          }
+          this.search();
+        });
+      });
     },
     // 搜索角色列表
     search() {
