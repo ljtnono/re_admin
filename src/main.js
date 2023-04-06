@@ -22,7 +22,6 @@ Vue.use(ElementUI);
 Vue.use(VueAxios, axios);
 Vue.use(mavonEditor);
 Vue.use(Router);
-
 // 全局过滤器
 Vue.filter("dateFormat", function(value, style) {
   return DateUtil.format(value, style);

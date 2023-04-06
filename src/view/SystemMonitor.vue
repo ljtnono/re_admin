@@ -186,8 +186,11 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+import { findK8sNamespaceList, findK8sNodeList } from "../api/systemMonitor";
 import "../mock/system"
 import axios from "axios";
+import SockJS from "sockjs-client";
 
 export default {
   name: "SystemMonitor",
@@ -215,73 +218,12 @@ export default {
       hardStatusList: []
     }
   },
+  computed: {
+    ...mapState({
+      tokenInfo: state => state.user.tokenInfo
+    })
+  },
   methods: {
-    // 获取k8s节点列表
-    async getK8sNodeList() {
-      await axios.get("/api-backend/system/monitor/k8sNodeList").then(res => {
-        let data = res.data.data;
-        let defaultSelect = data[0].hostname + "\t" + data[0].ipAddress;
-        this.k8sNodeList = data;
-        this.cpuMonitorNode = defaultSelect;
-        this.memoryMonitorNode = defaultSelect;
-        this.hardStatusMonitorNode = defaultSelect;
-      });
-    },
-    // 获取cpu监控信息
-    getCPUInfo(node) {
-      let that = this;
-      axios.get("/api-backend/system/monitor/CPUInfo").then(res => {
-        let data = res.data.data;
-        that.cpuMonitorInfo = data;
-        if (node !== null && node !== undefined) {
-          that.cpuMonitorNode = node.hostname + "\t" + node.ipAddress;
-        }
-      });
-    },
-    // 获取内存监控信息
-    getMemoryInfo(node) {
-      let that = this;
-      axios.get("/api-backend/system/monitor/memoryInfo").then(res => {
-        let data = res.data.data;
-        that.memoryMonitorInfo = data;
-        if (node !== null && node !== undefined) {
-          that.memoryMonitorNode = node.hostname + "\t" + node.ipAddress;
-        }
-      });
-    },
-    // 获取k8s名称空间列表
-    async getK8sNamespaceList(namespace) {
-      let that = this;
-      await axios.get("/api-backend/system/monitor/k8sNamespaceList").then(res => {
-        let data = res.data.data;
-        that.k8sNamespaceList = data;
-        if (namespace === null || namespace === undefined) {
-          that.k8sMonitorNamespace = data[1];
-        } else {
-          that.k8sMonitorNamespace = namespace;
-        }
-      });
-    },
-    // 获取指定名称空间的pod状态信息
-    getK8sPodInfoList(namespace) {
-      axios.get("/api-backend/system/monitor/k8sPodInfoList").then(res => {
-        let data = res.data.data;
-        this.k8sPodInfoList = data;
-      });
-    },
-    // 获取指定机器的硬盘状态
-    getHardStatus(node) {
-      let that = this;
-      axios.get("/api-backend/system/monitor/hardStatus").then(res => {
-        let data = res.data.data;
-        that.hardStatusList = data;
-        if (node === null || node === undefined) {
-          that.hardStatusMonitorNode = that.k8sNodeList[0]["hostname"] + "\t" + that.k8sNodeList[0]["ipAddress"];
-        } else {
-          that.hardStatusMonitorNode = node.hostname + "\t" + node.ipAddress;
-        }
-      });
-    },
     changeCPUMonitorIP(node) {
       this.getCPUInfo(node);
     },
@@ -294,20 +236,35 @@ export default {
     changeHardStatusMonitorIP(node) {
       this.getHardStatus(node);
     },
-    // 初始化
-    async init() {
-      let that = this;
-      await this.getK8sNodeList();
-      await this.getK8sNamespaceList(null);
-      this.getCPUInfo();
-      this.getMemoryInfo();
-      this.getK8sPodInfoList(that.k8sMonitorNamespace);
-      this.getHardStatus(null);
-    }
   },
-  mounted() {
-    this.init();
-  }
+  async mounted() {
+    // 获取k8s节点列表和名称空间列表
+    await findK8sNamespaceList().then(res => {
+      this.k8sNamespaceList = res.data.data;
+    });
+    await findK8sNodeList().then(res => {
+      this.k8sNodeList = res.data.data;
+    });
+
+    const url = "ws://127.0.0.1:8152/api-backend/websocket";
+    const token = this.$store.state.user.tokenInfo.access_token;
+    const headers = {
+      "Authorization": `Bearer ${token}`,
+    };
+    let socket = new SockJS(url, null, {
+      headers: headers,
+    });
+    socket.onopen = () => {
+      console.log("Connected to WebSocket");
+    };
+    socket.onmessage = (event) => {
+      console.log(`Received message: ${event.data}`);
+      // 处理从服务器接收到的消息
+    };
+    socket.onclose = (event) => {
+      console.log(`Disconnected from WebSocket: ${event.reason}`);
+    };
+  },
 };
 </script>
 
