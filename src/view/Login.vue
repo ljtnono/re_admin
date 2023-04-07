@@ -12,9 +12,8 @@ import LoginForm from "@c/LoginForm";
 import {ROUT_WORKSPACE_NAME} from "@/constant/commonConstant";
 import router from "@/router";
 import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
-import {refreshVerifyCode, login} from "@/api/auth";
+import {login, refreshVerifyCode} from "@/api/auth";
 import randomUtil from "@/util/randomUtil";
-
 export default {
   name: "Login",
   data() {
