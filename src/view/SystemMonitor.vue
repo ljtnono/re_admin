@@ -273,22 +273,51 @@ export default {
       }
     },
     // 获取监控信息
-    async fetchSystemMonitor(cpuMonitorNode, memoryMonitorNode, hardDiskMonitorNode, k8sPodMonitorNamespace) {
+    async fetchSystemMonitor() {
       // 获取k8s节点列表和名称空间列表
       await findK8sNamespaceList().then(res => {
         this.k8sNamespaceList = res.data.data;
-        this.k8sPodMonitorNamespace = k8sPodMonitorNamespace;
       });
       await findK8sNodeList().then(res => {
         this.k8sNodeList = res.data.data;
-        this.cpuMonitorNode = cpuMonitorNode;
-        this.memoryMonitorNode = memoryMonitorNode;
-        this.hardDiskMonitorNode = hardDiskMonitorNode;
       });
-      this.findK8sPodInfo(k8sPodMonitorNamespace);
-      this.findSystemInfo(cpuMonitorNode, 1);
-      this.findSystemInfo(memoryMonitorNode, 2);
-      this.findSystemInfo(hardDiskMonitorNode, 4);
+      let cpuMonitorNode = this.cpuMonitorNode;
+      let memoryMonitorNode = this.memoryMonitorNode;
+      let hardDiskMonitorNode = this.hardDiskMonitorNode;
+      let k8sPodMonitorNamespace = this.k8sPodMonitorNamespace;
+      if (this.env === "production") {
+        // 生产环境
+        if (cpuMonitorNode !== null) {
+          this.findSystemInfo(cpuMonitorNode, 1);
+        } else {
+          this.findSystemInfo(this.k8sNodeList[0].hostIPAddr, 1);
+        }
+        if (memoryMonitorNode !== null) {
+          this.findSystemInfo(memoryMonitorNode, 2);
+        } else {
+          this.findSystemInfo(this.k8sNodeList[0].hostIPAddr, 2);
+        }
+        if (hardDiskMonitorNode !== null) {
+          this.findSystemInfo(hardDiskMonitorNode, 4);
+        } else {
+          this.findSystemInfo(this.k8sNodeList[0].hostIPAddr, 4);
+        }
+        if (k8sPodMonitorNamespace !== null) {
+          this.findK8sPodInfo(k8sPodMonitorNamespace);
+        } else {
+          this.findK8sPodInfo(this.k8sNamespaceList[0].name);
+        }
+      } else {
+        // 开发环境
+        this.findK8sPodInfo("rootelement");
+        this.cpuMonitorNode = "k8s-master";
+        this.memoryMonitorNode = "k8s-master";
+        this.hardDiskMonitorNode = "k8s-master";
+        this.k8sPodMonitorNamespace = "rootelement";
+        this.findSystemInfo("www.lingjiatong.cn", 1);
+        this.findSystemInfo("www.lingjiatong.cn", 2);
+        this.findSystemInfo("www.lingjiatong.cn", 4);
+      }
     },
   },
   async created() {
@@ -301,17 +330,7 @@ export default {
   },
   mounted() {
     this.initWebSocket();
-    if (this.env === "production") {
-      this.fetchSystemMonitor(this.cpuMonitorNode, this.memoryMonitorNode, this.hardDiskMonitorNode, this.k8sPodMonitorNamespace);
-      this.fetchTimer = setInterval(() => {
-        this.fetchSystemMonitor(this.cpuMonitorNode, this.memoryMonitorNode, this.hardDiskMonitorNode, this.k8sPodMonitorNamespace);
-      }, 5000);
-    } else {
-      this.fetchSystemMonitor("www.lingjiatong.cn", "www.lingjiatong.cn", "www.lingjiatong.cn", "rootelement");
-      this.fetchTimer = setInterval(() => {
-        this.fetchSystemMonitor("www.lingjiatong.cn", "www.lingjiatong.cn", "www.lingjiatong.cn", "rootelement");
-      }, 5000);
-    }
+    this.fetchSystemMonitor();
   }
 };
 </script>
