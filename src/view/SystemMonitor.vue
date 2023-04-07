@@ -290,17 +290,17 @@ export default {
         if (cpuMonitorNode !== null) {
           this.findSystemInfo(cpuMonitorNode, 1);
         } else {
-          this.findSystemInfo(this.k8sNodeList[0].hostIPAddr, 1);
+          this.findSystemInfo(this.k8sNodeList[0].nodeIPAddr, 1);
         }
         if (memoryMonitorNode !== null) {
           this.findSystemInfo(memoryMonitorNode, 2);
         } else {
-          this.findSystemInfo(this.k8sNodeList[0].hostIPAddr, 2);
+          this.findSystemInfo(this.k8sNodeList[0].nodeIPAddr, 2);
         }
         if (hardDiskMonitorNode !== null) {
           this.findSystemInfo(hardDiskMonitorNode, 4);
         } else {
-          this.findSystemInfo(this.k8sNodeList[0].hostIPAddr, 4);
+          this.findSystemInfo(this.k8sNodeList[0].nodeIPAddr, 4);
         }
         if (k8sPodMonitorNamespace !== null) {
           this.findK8sPodInfo(k8sPodMonitorNamespace);
