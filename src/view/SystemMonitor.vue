@@ -345,7 +345,7 @@ export default {
   },
   mounted() {
     this.initWebSocket();
-    this.fetchSystemMonitor();
+    this.fetchTimer = setInterval(this.fetchSystemMonitor, 5000);
   }
 };
 </script>
