@@ -288,23 +288,34 @@ export default {
       if (this.env === "production") {
         // 生产环境
         if (cpuMonitorNode !== null) {
-          this.findSystemInfo(cpuMonitorNode, 1);
+          this.cpuMonitorNode = cpuMonitorNode;
+          let ipAddr = this.k8sNodeList.filter(node => cpuMonitorNode === node.nodeHostname)[0].nodeIPAddr;
+          this.findSystemInfo(ipAddr, 1);
         } else {
+          this.cpuMonitorNode = this.k8sNodeList[0].nodeHostname;
           this.findSystemInfo(this.k8sNodeList[0].nodeIPAddr, 1);
         }
         if (memoryMonitorNode !== null) {
-          this.findSystemInfo(memoryMonitorNode, 2);
+          this.memoryMonitorNode = memoryMonitorNode;
+          let ipAddr = this.k8sNodeList.filter(node => memoryMonitorNode === node.nodeHostname)[0].nodeIPAddr;
+          this.findSystemInfo(ipAddr, 2);
         } else {
+          this.memoryMonitorNode = this.k8sNodeList[0].nodeHostname;
           this.findSystemInfo(this.k8sNodeList[0].nodeIPAddr, 2);
         }
         if (hardDiskMonitorNode !== null) {
-          this.findSystemInfo(hardDiskMonitorNode, 4);
+          this.hardDiskMonitorNode = hardDiskMonitorNode;
+          let ipAddr = this.k8sNodeList.filter(node => hardDiskMonitorNode === node.nodeHostname)[0].nodeIPAddr;
+          this.findSystemInfo(ipAddr, 4);
         } else {
+          this.hardDiskMonitorNode = this.k8sNodeList[0].nodeHostname;
           this.findSystemInfo(this.k8sNodeList[0].nodeIPAddr, 4);
         }
         if (k8sPodMonitorNamespace !== null) {
+          this.k8sPodMonitorNamespace = k8sPodMonitorNamespace;
           this.findK8sPodInfo(k8sPodMonitorNamespace);
         } else {
+          this.k8sPodMonitorNamespace = this.k8sNamespaceList[0].name;
           this.findK8sPodInfo(this.k8sNamespaceList[0].name);
         }
       } else {
