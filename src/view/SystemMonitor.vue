@@ -213,7 +213,7 @@ export default {
     },
     // 更改当前监控的k8s pod的名称空间
     changeK8sPodMonitorNamespace(namespace) {
-      this.k8sPodMonitorNamespace = namespace;
+      this.k8sPodMonitorNamespace = namespace.name;
       this.findK8sPodInfo(namespace.name);
     },
     // 更改当前监控的硬盘节点
