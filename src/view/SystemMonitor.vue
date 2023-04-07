@@ -203,19 +203,23 @@ export default {
   methods: {
     // 更改当前监控的CPU节点
     changeCpuMonitorNode(node) {
-      this.findSystemInfo(node.hostIPAddr, 1);
+      this.cpuMonitorNode = node.nodeHostname;
+      this.findSystemInfo(node.nodeIPAddr, 1);
     },
     // 更改当前监控的内存节点
     changeMemoryMonitorNode(node) {
-      this.findSystemInfo(node.hostIPAddr, 2);
+      this.memoryMonitorNode = node.nodeHostname;
+      this.findSystemInfo(node.nodeIPAddr, 2);
     },
     // 更改当前监控的k8s pod的名称空间
     changeK8sPodMonitorNamespace(namespace) {
+      this.k8sPodMonitorNamespace = namespace;
       this.findK8sPodInfo(namespace.name);
     },
     // 更改当前监控的硬盘节点
     changeHardDiskMonitorNode(node) {
-      this.findSystemInfo(node.hostIPAddr, 4);
+      this.hardDiskMonitorNode = node.nodeHostname;
+      this.findSystemInfo(node.nodeIPAddr, 4);
     },
     // 获取CPU、内存，硬盘信息
     findSystemInfo(ipAddr, type) {
