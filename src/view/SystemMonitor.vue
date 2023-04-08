@@ -151,6 +151,7 @@ import {
   HTTP_TOKEN_HEADER_PREFIX,
   WEBSOCKET_BASE_URL
 } from "@/constant/commonConstant";
+import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
 
 export default {
   name: "SystemMonitor",
@@ -343,8 +344,12 @@ export default {
     this.websocket.close();
     clearInterval(this.fetchTimer);
   },
-  mounted() {
+  async mounted() {
     this.initWebSocket();
+    // 这里第一次先获取一下数据，否则会导致第一次进入页面需要等待5s的时间
+    this.$loading(ELEMENT_PAGE_LOADING_CONFIG);
+    await this.fetchSystemMonitor();
+    this.$loading().close();
     this.fetchTimer = setInterval(this.fetchSystemMonitor, 5000);
   }
 };
