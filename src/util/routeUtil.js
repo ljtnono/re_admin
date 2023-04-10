@@ -24,6 +24,8 @@ class RouteUtil {
       return ["系统管理", "用户管理"]
     } else if (routeName === "SystemRole") {
       return ["系统管理", "角色管理"]
+    } else if (routeName === "SystemMenu") {
+      return ["系统管理", "菜单管理"]
     } else if (routeName === "SystemWebsiteConfig") {
       return ["系统管理", "网站配置"]
     } else if (routeName === "SystemMonitor") {

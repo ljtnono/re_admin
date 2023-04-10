@@ -109,6 +109,15 @@ export default [
         component: () => import("@v/RoleManage.vue")
       },
       {
+        path: "/system/menu",
+        name: "SystemMenu",
+        meta: {
+          title: "菜单管理",
+          hideInMenu: true,
+        },
+        component: () => import("@v/MenuManage.vue")
+      },
+      {
         path: "/system/websiteConfig",
         name: "SystemWebsiteConfig",
         meta: {

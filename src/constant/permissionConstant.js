@@ -29,6 +29,10 @@ const permissionMap = {
   "system:role": 10211,
   "system:role:read": 10212,
   "system:role:write": 10213,
+  // 系统管理-菜单管理
+  "system:menu": 10241,
+  "system:menu:read": 10242,
+  "system:menu:write": 10243,
   // 系统管理-网站配置
   "system:websiteConfig": 10221,
   "system:websiteConfig:read": 10222,
@@ -39,7 +43,7 @@ const permissionMap = {
 
 /**
  * 判断是否含有指定表达式的权限
- * 
+ *
  * @param expression 权限表达式
  * @returns 有该权限返回true，没有则返回false
  */

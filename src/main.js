@@ -27,6 +27,9 @@ Vue.filter("dateFormat", function(value, style) {
   return DateUtil.format(value, style);
 });
 
+
+
+
 new Vue({
   render: (h) => h(App),
   router,
