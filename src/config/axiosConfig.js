@@ -14,7 +14,8 @@ const INSTANCE = axios.create();
 // 不需要携带token的请求路径集合
 const PASS_TOKEN_URL = [
   BASE_URL + "/re-auth/user/login",
-  BASE_URL + "/re-auth/user/refreshVerifyCode"
+  BASE_URL + "/re-auth/user/refreshVerifyCode",
+  BASE_URL + "/api-backend/route/list"
 ];
 
 // 添加请求拦截器
