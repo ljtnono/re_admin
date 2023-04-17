@@ -30,18 +30,19 @@ Vue.filter("dateFormat", function(value, style) {
 
 axios.get(BASE_URL + "/api-backend/route/list").then(res => {
   let data = res.data.data;
+  // 生成组件列表
   data.forEach(route => {
-    let childrenStr = route.children;
+    let childrenSource = route.children;
     let children = [];
-    if (childrenStr) {
-      children = JSON.parse(childrenStr).children.map(child => {
+    if (childrenSource !== [] && childrenSource.length !== 0) {
+      children = childrenSource.map(child => {
         let componentPath = child.component.substring(child.component.lastIndexOf("/") + 1);
         return {
           name: child.name,
           path: child.path,
           redirect: child.redirect ? JSON.parse(child.redirect) : null,
           props: child.props,
-          meta: child.meta,
+          meta: JSON.parse(child.meta),
           component: () => import("@v/" + componentPath)
         }
       });
