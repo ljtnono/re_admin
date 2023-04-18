@@ -9,7 +9,7 @@ import error404 from "@a/images/error-page/error-404.svg";
 import errorContent from "./error-content.vue";
 
 export default {
-  name: "404",
+  name: "NotFound",
   components: {
     errorContent,
   },

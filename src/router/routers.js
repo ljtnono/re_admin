@@ -17,12 +17,12 @@ export default [
   },
   {
     path: "*",
-    name: "404",
+    name: "NotFound",
     meta: {
       title: "404",
       name: "找不到页面",
       hideInMenu: true
     },
-    component: () => import("@v/error/404")
+    component: () => import("@v/error/NotFound.vue")
   }
 ];

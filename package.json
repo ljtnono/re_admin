@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@riophae/vue-treeselect": "^0.4.0",
     "axios": "^0.19.2",
     "core-js": "^3.8.3",
     "countup.js": "^2.3.2",
@@ -27,8 +28,7 @@
     "vue-socket.io": "^3.0.10",
     "vue-totop": "^1.0.3",
     "vuex": "^3.6.2",
-    "vuex-persistedstate": "^4.1.0",
-    "ws": "^8.13.0"
+    "vuex-persistedstate": "^4.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
