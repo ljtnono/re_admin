@@ -285,7 +285,6 @@ export default {
       this.editForm.description = description;
       this.editForm.menuIdSet = [];
       this.editForm.id = id;
-      console.log(checkedKeys)
       // 将编辑角色表单中的菜单树进行打勾操作
       this.$nextTick(() => {
         this.$refs.editRoleMenuTree.setCheckedKeys(checkedKeys);
@@ -511,23 +510,27 @@ export default {
       this.pageNum = val;
       this.search();
     },
+    // 处理角色菜单树
+    parseMenuData(menuData) {
+      let treeData = [];
+      for (let i = 0; i < menuData.length; i++) {
+        let node = {
+          id: menuData[i].menuId,
+          label: menuData[i].menuTitle
+        };
+        if (menuData[i].children && menuData[i].children.length > 0) {
+          node.children = this.parseMenuData(menuData[i].children);
+        }
+        treeData.push(node);
+      }
+      return treeData;
+    },
     // 获取并设置角色的菜单树
     menuTree(roleId) {
       findRoleMenuTree(roleId).then(res => {
         let data = res.data.data;
         this.showMenuTreeRoleId = data.roleId;
-        let showRoleMenuTreeData = data.menuTree.map(menuTree => {
-          return {
-            id: menuTree.menuId,
-            label: menuTree.menuTitle,
-            children: menuTree.children.map(child => {
-              return {
-                id: child.menuId,
-                label: child.menuTitle
-              }
-            })
-          }
-        });
+        let showRoleMenuTreeData = this.parseMenuData(data.menuTree);
         this.showRoleMenuTreeData = showRoleMenuTreeData;
       });
     },
@@ -537,18 +540,7 @@ export default {
     // 获取所有可配置的角色菜单树
     findMenuTree().then(res => {
       let data = res.data.data;
-      let allRoleMenuTreeData = data.map(menuTree => {
-        return {
-          id: menuTree.menuId,
-          label: menuTree.menuTitle,
-          children: menuTree.children.map(child => {
-            return {
-              id: child.menuId,
-              label: child.menuTitle
-            }
-          })
-        }
-      });
+      let allRoleMenuTreeData = this.parseMenuData(data);
       this.allRoleMenuTreeData = allRoleMenuTreeData;
     });
   }
