@@ -259,23 +259,33 @@ export default {
     };
   },
   methods: {
+    // 深度优先遍历角色菜单树
+    dfsRoleMenuTree(menuTree, cb) {
+      for (let menu of menuTree) {
+        cb(menu);
+        if (menu.children != null && menu.children.length !== 0) {
+          this.dfsRoleMenuTree(menu.children, cb);
+        }
+      }
+    },
     // 打开编辑角色弹窗
     openEditForm(row) {
       let name = row.name;
       let description = row.description;
       let id = row.id;
       let checkedKeys = [];
-      for (let menu of row.roleMenuTree.menuTree) {
-        checkedKeys.push(menu.menuId);
-        for (let childMenu of menu.children) {
-          checkedKeys.push(childMenu.menuId);
+      this.dfsRoleMenuTree(row.roleMenuTree.menuTree, menu => {
+        if (menu.children === null || menu.children.length === 0) {
+          // 这里只加入子节点的id,加入父节点id会导致全勾选
+          checkedKeys.push(menu.menuId);
         }
-      }
+      });
       this.editFormVisible = true;
       this.editForm.name = name;
       this.editForm.description = description;
       this.editForm.menuIdSet = [];
       this.editForm.id = id;
+      console.log(checkedKeys)
       // 将编辑角色表单中的菜单树进行打勾操作
       this.$nextTick(() => {
         this.$refs.editRoleMenuTree.setCheckedKeys(checkedKeys);
