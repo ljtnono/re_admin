@@ -144,7 +144,6 @@
 <script>
 import { mapState } from "vuex";
 import { findK8sNamespaceList, findK8sNodeList } from "@/api/systemMonitor";
-import "../mock/system"
 import {
   HTTP_RESULT_SUCCESS_CODE,
   HTTP_RESULT_SUCCESS_MESSAGE,

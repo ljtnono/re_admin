@@ -74,10 +74,10 @@
                   <el-form-item label="父级菜单：" prop="parentId" class="is-required" >
                     <tree-select v-model="addForm.parentId" :options="menuTreeData" style="width: 182px;"/>
                   </el-form-item>
-                  <el-form-item label="组件名称：" prop="componentName">
+                  <el-form-item label="组件名称：" prop="componentName" class="is-required">
                     <el-input v-model="addForm.componentName" size="small" clearable placeholder="请输入组件名称" />
                   </el-form-item>
-                  <el-form-item label="组件路径：" prop="componentPath">
+                  <el-form-item label="组件路径：" prop="componentPath" class="is-required">
                     <el-input v-model="addForm.componentPath" size="small" clearable placeholder="请输入组件路径" />
                   </el-form-item>
                   <el-form-item label="菜单图标：" prop="icon">

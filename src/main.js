@@ -35,7 +35,7 @@ Vue.filter("dateFormat", function(value, style) {
  * @returns {{redirect: (any|null), path, component: (function(): Promise<*>), meta: any, name, props}}
  */
 function dfsRouteList(route) {
-  let componentPath = route.component.substring(route.component.lastIndexOf("/") + 1);
+  let componentPath = route.component.substring("src/view/".length);
   let routeConfig = {
     name: route.name,
     path: route.path,
