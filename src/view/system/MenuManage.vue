@@ -61,15 +61,18 @@
             <el-form ref="addForm" :model="addForm" :rules="addFormRule" label-width="100px" inline>
               <el-tabs activeName="menuConfig">
                 <!-- 菜单配置 -->
-                <el-tab-pane label="菜单配置" name="menuConfig">
-                  <el-form-item label="菜单标题：" prop="title" class="is-required" >
+                <el-tab-pane label="菜单配置" name="menuConfig" >
+                  <el-form-item label="菜单标题：" prop="title" class="is-required">
                     <el-input v-model="addForm.title" size="small" clearable placeholder="请输入菜单标题" />
                   </el-form-item>
                   <el-form-item label="路由路径：" prop="routePath" class="is-required">
                     <el-input v-model="addForm.routePath" size="small" type="password" clearable placeholder="请输入路由路径" />
                   </el-form-item>
-                  <el-form-item label="父级菜单：" prop="parentId" class="is-required" >
-                    <tree-select v-model="addForm.parentId" :options="menuTreeData" style="width: 182px;"/>
+                  <el-form-item label="父级菜单：" prop="parentId" class="is-required">
+                    <vue-treeselect
+                      v-model="addForm.parentId"
+                      :options="menuTreeData"
+                      style="width: 182px;" />
                   </el-form-item>
                   <el-form-item label="路由名称：" prop="routeName" class="is-required">
                     <el-input v-model="addForm.routeName" size="small" clearable placeholder="请输入路由名称" />
@@ -115,13 +118,13 @@
 import {ENTITY_DELETE_STATE_DELETE, ENTITY_DELETE_STATE_NORMAL} from "@/constant/commonConstant";
 import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
 import {findMenuList, findMenuTree} from "@/api/menu";
-import TreeSelect from "@riophae/vue-treeselect";
+import VueTreeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 
 export default {
   name: "MenuManage",
   components: {
-    TreeSelect
+    VueTreeselect
   },
   data() {
     return {
@@ -219,6 +222,11 @@ export default {
 </script>
 
 <style scoped lang="scss">
+
+::v-deep .el-tabs__content {
+  overflow: visible;
+}
+
 ::v-deep .el-form-item__content {
   line-height: normal;
 }
