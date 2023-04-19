@@ -8,51 +8,31 @@
       :collapse="collapseStatus">
       <!-- 导航栏上面的logo -->
       <div class="nav-logo-container mb10">
-        <img class="nav-logo-max" v-show="!collapseStatus" src="@a/images/logo.png"/>
-        <img class="nav-logo-min" v-show="collapseStatus" src="@a/images/logo-min.png"/>
+        <img class="nav-logo-max" v-show="!collapseStatus" src="@a/images/logo.png" alt="logo"/>
+        <img class="nav-logo-min" v-show="collapseStatus" src="@a/images/logo-min.png" alt="logo-mini"/>
       </div>
       <!-- 工作台 -->
       <el-menu-item style="text-align: center; cursor: pointer" @click="$router.push({ name: 'Workspace' })">
-        <a href="javascript:;" v-show="!collapseStatus" style="width: 100%; height: 100%; display: inline-block">
+        <a href="javascript:" v-show="!collapseStatus" style="width: 100%; height: 100%; display: inline-block">
           工作台
         </a>
         <div v-show="collapseStatus">
-          <a href="javascript:;" style="width: 100%; height: 100%; display: inline-block">
+          <a href="javascript:" style="width: 100%; height: 100%; display: inline-block">
             <i class="el-icon-location" style="display: inline-block !important"/>
           </a>
         </div>
       </el-menu-item>
-      <!-- 循环渲染菜单 -->
-      <div v-for="(m1, i1) in menus" :key="m1.name">
-        <!-- 包含子菜单 -->
-        <div v-if="m1.children !== null && m1.children !== undefined">
-          <el-submenu :index="i1 + ''">
-            <div slot="title">
-              <i :class="'iconfont' + ' ' + m1.icon"/>
-              <span style="margin-left: 15px" v-show="!collapseStatus">
-                {{ m1.title }}
-              </span>
-            </div>
-            <div v-for="m2 in m1.children" :key="m2.name">
-              <el-menu-item @click="$router.push({ path: m2.path })">
-                <a class="ml30" href="javascript:;" style="width: 100%; height: 100%; display: inline-block">
-                  {{ m2.title }}
-                </a>
-              </el-menu-item>
-            </div>
-          </el-submenu>
-        </div>
-        <!-- 不包含子菜单 -->
-        <el-menu-item v-if="m1.children === null || m1.children === undefined" :index="i1"
-                      @click="$router.push({ path: m1.path })">
-          <a href="javascript:;"> {{ m1.name }} </a>
-        </el-menu-item>
-      </div>
+      <!-- 递归嵌套设置子菜单 -->
+      <template v-for="item in menus">
+        <menu-item :item="item" :key="item.name" />
+      </template>
     </el-menu>
   </div>
 </template>
 
 <script>
+import MenuItem from "@c/MenuItem.vue";
+
 export default {
   name: "Navigation",
   data() {
@@ -66,7 +46,9 @@ export default {
       type: Array,
     },
   },
-  components: {},
+  components: {
+    MenuItem
+  },
   methods: {},
   mounted() {
 
