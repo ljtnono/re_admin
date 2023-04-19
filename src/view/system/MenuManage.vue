@@ -37,8 +37,8 @@
               <i :class="'iconfont ' + row.icon" />
             </template>
           </el-table-column>
-          <el-table-column prop="path" label="路由路径" />
-          <el-table-column prop="componentName" label="菜单组件名称" />
+          <el-table-column prop="routePath" label="路由路径" />
+          <el-table-column prop="routeName" label="路由名称" />
           <el-table-column prop="componentPath" label="菜单组件路径" />
           <el-table-column fixed="right" label="操作" align="center">
             <template #default="{ row, column, $index }">
@@ -65,17 +65,14 @@
                   <el-form-item label="菜单标题：" prop="title" class="is-required" >
                     <el-input v-model="addForm.title" size="small" clearable placeholder="请输入菜单标题" />
                   </el-form-item>
-                  <el-form-item label="菜单名称：" prop="name" class="is-required" >
-                    <el-input v-model="addForm.name" size="small" clearable placeholder="请输入菜单名称" />
-                  </el-form-item>
-                  <el-form-item label="路由路径：" prop="path" class="is-required">
-                    <el-input v-model="addForm.path" size="small" type="password" clearable placeholder="请输入路由路径" />
+                  <el-form-item label="路由路径：" prop="routePath" class="is-required">
+                    <el-input v-model="addForm.routePath" size="small" type="password" clearable placeholder="请输入路由路径" />
                   </el-form-item>
                   <el-form-item label="父级菜单：" prop="parentId" class="is-required" >
                     <tree-select v-model="addForm.parentId" :options="menuTreeData" style="width: 182px;"/>
                   </el-form-item>
-                  <el-form-item label="组件名称：" prop="componentName" class="is-required">
-                    <el-input v-model="addForm.componentName" size="small" clearable placeholder="请输入组件名称" />
+                  <el-form-item label="路由名称：" prop="routeName" class="is-required">
+                    <el-input v-model="addForm.routeName" size="small" clearable placeholder="请输入路由名称" />
                   </el-form-item>
                   <el-form-item label="组件路径：" prop="componentPath" class="is-required">
                     <el-input v-model="addForm.componentPath" size="small" clearable placeholder="请输入组件路径" />
@@ -141,11 +138,10 @@ export default {
       // 新增菜单表单数据
       addForm: {
         title: null,
-        name: null,
         icon: null,
-        path: null,
         parentId: null,
-        componentName: null,
+        routePath: null,
+        routeName: null,
         componentPath: null,
         permissionList: [{
           name: null,

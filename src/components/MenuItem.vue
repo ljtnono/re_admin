@@ -1,6 +1,6 @@
 <template>
   <!-- 如果存在子菜单 -->
-  <el-submenu v-if="item.children" :index="item.name">
+  <el-submenu v-if="item.children" :index="item.title">
     <template #title>
       <i :class="'iconfont ' + item.icon" />
       <span style="margin-left: 10px">
@@ -8,11 +8,11 @@
       </span>
     </template>
     <template v-for="child in item.children">
-      <menu-item :item="child" :key="child.name" />
+      <menu-item :item="child" :key="child.title" />
     </template>
   </el-submenu>
   <!-- 如果不存在子菜单 -->
-  <el-menu-item v-else :index="item.name" @click="$router.push({ path: item.path })">
+  <el-menu-item v-else :index="item.title" @click="$router.push({ path: item.routePath })">
     <i :class="'iconfont ' + item.icon" />
     <span style="margin-left: 15px">
       {{ item.title }}
