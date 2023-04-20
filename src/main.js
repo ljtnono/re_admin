@@ -13,7 +13,7 @@ import axios from "@/config/axiosConfig";
 import store from "@/store"
 import * as echarts from "echarts";
 import DateUtil from "@/util/dateUtil";
-import commonUtil from "@/util/commonUtil";
+import routeUtil from "@/util/routeUtil";
 
 Vue.prototype.$echarts = echarts;
 Vue.config.productionTip = false;
@@ -35,7 +35,7 @@ let existRouteNameList = router.getRoutes().map(vueRoute => {
 if (routeList !== [] || routeList.length !== 0) {
   routeList.forEach(route => {
     if (!existRouteNameList.includes(route.name)) {
-      router.addRoute(commonUtil.dfsRouteList(route));
+      router.addRoute(routeUtil.dfsRouteList(route));
     }
   });
 }

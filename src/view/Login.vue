@@ -15,7 +15,7 @@ import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
 import {login, refreshVerifyCode} from "@/api/auth";
 import randomUtil from "@/util/randomUtil";
 import {findRouteList} from "@/api/route";
-import commonUtil from "@/util/commonUtil";
+import routeUtil from "@/util/routeUtil";
 export default {
   name: "Login",
   data() {
@@ -66,12 +66,11 @@ export default {
           let existRouteNameList = router.getRoutes().map(vueRoute => {
             return vueRoute.name;
           });
-          console.log(existRouteNameList)
           // 生成组件列表
           data.forEach(route => {
             routeList.push(route);
             if (!existRouteNameList.includes(route.name)) {
-              router.addRoute(commonUtil.dfsRouteList(route));
+              router.addRoute(routeUtil.dfsRouteList(route));
             }
           });
           this.$store.commit("systemSetting/changeRouteList", routeList);

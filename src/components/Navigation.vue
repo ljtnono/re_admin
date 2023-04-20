@@ -3,8 +3,9 @@
     <el-menu
       background-color="#001529"
       text-color="#ffffff"
-      active-text-color="rgba(255, 255, 255, 0.7);"
+      active-text-color="#409EFF"
       :collapse-transition="collapseTransition"
+      unique-opened
       :collapse="collapseStatus">
       <!-- 导航栏上面的logo -->
       <div class="nav-logo-container mb10">
