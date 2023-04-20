@@ -13,7 +13,7 @@ import axios from "@/config/axiosConfig";
 import store from "@/store"
 import * as echarts from "echarts";
 import DateUtil from "@/util/dateUtil";
-import {BASE_URL} from "@/constant/commonConstant";
+import commonUtil from "@/util/commonUtil";
 
 Vue.prototype.$echarts = echarts;
 Vue.config.productionTip = false;
@@ -28,38 +28,17 @@ Vue.filter("dateFormat", function(value, style) {
   return DateUtil.format(value, style);
 });
 
-/**
- * 深度优先算法处理路由列表
- *
- * @param route 菜单路由对象
- * @returns {{redirect: (any|null), path, component: (function(): Promise<*>), meta: any, name, props}}
- */
-function dfsRouteList(route) {
-  let componentPath = route.component.substring("src/view/".length);
-  let routeConfig = {
-    name: route.name,
-    path: route.path,
-    redirect: route.redirect ? JSON.parse(route.redirect) : null,
-    props: route.props,
-    meta: JSON.parse(route.meta),
-    component: () => import("@v/" + componentPath)
-  };
-  let childrenSource = route.children;
-  if (childrenSource === null || childrenSource === []) {
-    routeConfig.children = [];
-    return routeConfig;
-  }
-  routeConfig.children = childrenSource.map(child => {
-    return dfsRouteList(child);
-  });
-  return routeConfig;
-}
-
-axios.get(BASE_URL + "/api-backend/route/list").then(res => {
-  let data = res.data.data;
-  // 生成组件列表
-  data.forEach(route => {router.addRoute(dfsRouteList(route))});
+let routeList = store.state.systemSetting.routeList;
+let existRouteNameList = router.getRoutes().map(vueRoute => {
+  return vueRoute.name;
 });
+if (routeList !== [] || routeList.length !== 0) {
+  routeList.forEach(route => {
+    if (!existRouteNameList.includes(route.name)) {
+      router.addRoute(commonUtil.dfsRouteList(route));
+    }
+  });
+}
 
 new Vue({
   render: (h) => h(App),

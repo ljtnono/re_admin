@@ -14,6 +14,8 @@ import router from "@/router";
 import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
 import {login, refreshVerifyCode} from "@/api/auth";
 import randomUtil from "@/util/randomUtil";
+import {findRouteList} from "@/api/route";
+import commonUtil from "@/util/commonUtil";
 export default {
   name: "Login",
   data() {
@@ -36,12 +38,13 @@ export default {
         that.verifyCodeImageUrl = "data:image/jpeg;base64," + data;
       });
     },
+
     // 用户登录
     async submit(username, password, verifyCode) {
       // 调用之前显示加载中
       let that = this;
       that.$loading(ELEMENT_PAGE_LOADING_CONFIG);
-      await login(username, password, that.verifyCodeKey, verifyCode).then((res) => {
+      await login(username, password, that.verifyCodeKey, verifyCode).then(async (res) => {
         let outerData = res.data;
         let innerData = outerData.data;
         let userInfo = innerData.userInfo;
@@ -55,7 +58,25 @@ export default {
           duration: 2000,
           center: false,
         });
-        router.push({
+
+        // 获取路由
+        await findRouteList().then(res => {
+          let data = res.data.data;
+          let routeList = [];
+          let existRouteNameList = router.getRoutes().map(vueRoute => {
+            return vueRoute.name;
+          });
+          console.log(existRouteNameList)
+          // 生成组件列表
+          data.forEach(route => {
+            routeList.push(route);
+            if (!existRouteNameList.includes(route.name)) {
+              router.addRoute(commonUtil.dfsRouteList(route));
+            }
+          });
+          this.$store.commit("systemSetting/changeRouteList", routeList);
+        });
+        await router.push({
           name: ROUT_WORKSPACE_NAME
         });
         that.$loading(ELEMENT_PAGE_LOADING_CONFIG).close();
