@@ -2,9 +2,9 @@ const systemSetting = {
   namespaced: true,
   state: () => ({
     // 面包屑列表
-    breadcrumbList: null,
+    breadcrumbList: [],
     // 当前面包屑导航列表
-    currentBreadcrumbList: null,
+    currentBreadcrumbList: [],
     routeList: []
   }),
   getters:{

@@ -23,7 +23,7 @@ router.beforeEach((to, from, next) => {
   let toPath = to.path;
   let toName = to.name;
   let currentBreadcrumbList = store.state.systemSetting.breadcrumbList.filter(breadcrumb => breadcrumb.routeName === toName);
-  if (currentBreadcrumbList !== null && currentBreadcrumbList.length !== 0) {
+  if (currentBreadcrumbList.length !== 0) {
     store.commit("systemSetting/changeCurrentBreadcrumbList", currentBreadcrumbList[0]["breadcrumbList"]);
   }
 
