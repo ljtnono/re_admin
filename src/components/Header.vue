@@ -12,7 +12,7 @@
     <!-- 面包屑导航 -->
     <div class="bread-crumb-container flex">
       <el-breadcrumb separator-class="el-icon-arrow-right">
-        <el-breadcrumb-item v-for="breadcrumb in breadcrumbList" :key="breadcrumb">{{ breadcrumb }}</el-breadcrumb-item>
+        <el-breadcrumb-item v-for="breadcrumb in currentBreadcrumbList" :key="breadcrumb">{{ breadcrumb }}</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <!-- 用户头像和信息 -->
@@ -53,7 +53,7 @@ export default {
   },
   computed: {
     ...mapState({
-      breadcrumbList: state => state.systemSetting.breadcrumbList,
+      currentBreadcrumbList: state => state.systemSetting.currentBreadcrumbList,
       userInfo: state => state.user.userInfo
     })
   },

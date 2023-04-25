@@ -16,7 +16,6 @@ export const findMenuTree = () => {
   return axios.get(BASE_URL + requestMapping + "/tree");
 };
 
-
 /**
  * 获取菜单列表
  *
@@ -26,3 +25,12 @@ export const findMenuTree = () => {
 export const findMenuList = (searchCondition) => {
   return axios.get(BASE_URL + requestMapping + "/list?searchCondition=" + searchCondition);
 };
+
+/**
+ * 获取面包屑导航
+ *
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const findBreadcrumbList = () => {
+  return axios.get(BASE_URL + requestMapping + "/breadcrumbList");
+}

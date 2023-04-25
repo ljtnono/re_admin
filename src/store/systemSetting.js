@@ -3,21 +3,26 @@ const systemSetting = {
   state: () => ({
     // 面包屑列表
     breadcrumbList: null,
+    // 当前面包屑导航列表
+    currentBreadcrumbList: null,
     routeList: []
   }),
-  getters:{},
+  getters:{
+  },
   actions:{
 
   },
   mutations:{
-    // 修改面包屑列表
     changeBreadcrumbList(state, breadcrumbList) {
       state.breadcrumbList = breadcrumbList;
     },
-    // 修改路由列表
     changeRouteList(state, routeList) {
       state.routeList = routeList;
-    }
+    },
+    // 修改面包屑列表
+    changeCurrentBreadcrumbList(state, currentBreadcrumbList) {
+      state.currentBreadcrumbList = currentBreadcrumbList;
+    },
   }
 };
 

@@ -16,6 +16,7 @@ import {login, refreshVerifyCode} from "@/api/auth";
 import randomUtil from "@/util/randomUtil";
 import {findRouteList} from "@/api/route";
 import routeUtil from "@/util/routeUtil";
+import {findBreadcrumbList} from "@/api/menu";
 export default {
   name: "Login",
   data() {
@@ -75,6 +76,13 @@ export default {
           });
           this.$store.commit("systemSetting/changeRouteList", routeList);
         });
+
+        // 获取面包屑导航
+        await findBreadcrumbList().then(res => {
+          let data = res.data.data;
+          this.$store.commit("systemSetting/changeBreadcrumbList", data);
+        });
+
         await router.push({
           name: ROUT_WORKSPACE_NAME
         });
