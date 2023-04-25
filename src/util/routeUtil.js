@@ -1,5 +1,12 @@
 class RouteUtil {
 
+  static VIEW_ROUTE_PATH_PREFIX = "src/view/"
+
+  static BREADCRUMB_MAP = {
+    "Workspace": ["工作台"],
+    "UpdatePassword": [""]
+  }
+
   /**
    * 根据路由名称获取面包屑导航
    *
@@ -14,30 +21,35 @@ class RouteUtil {
       return ["写文章"]
     } else if (routeName === "Personal") {
       return ["个人中心"]
-    } else if (routeName === "BlogArticle") {
-      return ["博客管理", "文章管理"]
-    } else if (routeName === "BlogCategory") {
-      return ["博客管理", "分类管理"]
-    } else if (routeName === "BlogComment") {
-      return ["博客管理", "评论管理"]
-    } else if (routeName === "SystemUser") {
-      return ["系统管理", "用户管理"]
-    } else if (routeName === "SystemRole") {
-      return ["系统管理", "角色管理"]
-    } else if (routeName === "SystemMenu") {
-      return ["系统管理", "菜单管理"]
-    } else if (routeName === "SystemWebsiteConfig") {
-      return ["系统管理", "网站配置"]
-    } else if (routeName === "SystemMonitor") {
-      return ["系统管理", "系统监控"]
     } else {
-      return [];
+
+      return []
     }
+
+  // else if (routeName === "BlogArticle") {
+  //     return ["博客管理", "文章管理"]
+  //   } else if (routeName === "BlogCategory") {
+  //     return ["博客管理", "分类管理"]
+  //   } else if (routeName === "BlogComment") {
+  //     return ["博客管理", "评论管理"]
+  //   } else if (routeName === "SystemUser") {
+  //     return ["系统管理", "用户管理"]
+  //   } else if (routeName === "SystemRole") {
+  //     return ["系统管理", "角色管理"]
+  //   } else if (routeName === "SystemMenu") {
+  //     return ["系统管理", "菜单管理"]
+  //   } else if (routeName === "SystemWebsiteConfig") {
+  //     return ["系统管理", "网站配置"]
+  //   } else if (routeName === "SystemMonitor") {
+  //     return ["系统管理", "系统监控"]
+  //   } else {
+  //     return [];
+  //   }
   }
 
   // 深度优先算法处理路由列表
   static dfsRouteList(route) {
-    let componentPath = route.component.substring("src/view/".length);
+    let componentPath = route.component.substring(RouteUtil.VIEW_ROUTE_PATH_PREFIX.length);
     let routeConfig = {
       name: route.name,
       path: route.path,
