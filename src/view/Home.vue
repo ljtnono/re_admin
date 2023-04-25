@@ -25,8 +25,6 @@ export default {
   data() {
     return {
       collapseStatus: false,
-      clientWidth: document.body.clientWidth,
-      clientHeight: document.body.clientHeight,
       toggleIconClass: "nav-toggle-a"
     };
   },
@@ -38,11 +36,6 @@ export default {
   components: {
     Header,
     Navigation
-  },
-  watch: {
-    clientWidth(newVal) {
-      this.collapseStatus = newVal < 2000;
-    },
   },
   methods: {
     navToggleClass() {
@@ -58,19 +51,8 @@ export default {
       this.collapseStatus = !this.collapseStatus;
       this.navToggleClass();
     },
-    // 监听窗口大小改变
-    windowOnResize() {
-      let that = this;
-      window.onresize = () => {
-        window.clientWidth = document.body.clientWidth;
-        window.clientHeight = document.body.clientHeight;
-        that.clientWidth = window.clientWidth;
-        that.clientHeight = window.clientHeight;
-      };
-    }
   },
   mounted() {
-    this.windowOnResize();
     // 获取文章分类列表
     findCategoryList().then(res => {
       this.$store.commit("common/changeCategoryList", res.data.data);
