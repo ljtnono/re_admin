@@ -28,7 +28,7 @@
       <div class="menu-table-container">
         <el-table :data="menuList"
                   header-row-class-name="table-header"
-                  row-key="id"
+                  row-key="hash"
                   max-height="650">
           <el-table-column fixed="left" prop="title" label="菜单标题"  />
           <el-table-column prop="projectName" label="所属项目" />
