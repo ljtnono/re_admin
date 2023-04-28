@@ -114,11 +114,12 @@
 </template>
 
 <script>
-import {ENTITY_DELETE_STATE_DELETE, ENTITY_DELETE_STATE_NORMAL} from "@/constant/commonConstant";
-import {ELEMENT_PAGE_LOADING_CONFIG} from "@/config/commonConfig";
+import {ENTITY_DELETE_STATE_DELETE, ENTITY_DELETE_STATE_NORMAL, HTTP_RESULT_SUCCESS_CODE} from "@/constant/commonConstant";
+import {ELEMENT_PAGE_LOADING_CONFIG, ELEMENT_SUCCESS_MESSAGE_CONFIG} from "@/config/commonConfig";
 import {findMenuList, findMenuTree} from "@/api/menu";
 import VueTreeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
+import { deleteMenu } from "@/api/menu";
 
 export default {
   name: "MenuManage",
@@ -200,7 +201,18 @@ export default {
     },
     // 处理删除菜单
     handleDeleteMenu(menuId) {
-
+      this.$confirm("是否删除?", "警告", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        deleteMenu(menuId).then(res => {
+          if (HTTP_RESULT_SUCCESS_CODE === res.data.code) {
+            this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
+            this.search();
+          }
+        });
+      });
     }
   },
   mounted() {

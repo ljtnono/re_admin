@@ -34,3 +34,13 @@ export const findMenuList = (searchCondition) => {
 export const findBreadcrumbList = () => {
   return axios.get(BASE_URL + requestMapping + "/breadcrumbList");
 }
+
+/**
+ * 删除菜单
+ * 
+ * @param {Number} menuId 菜单id
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const deleteMenu = (menuId) => {
+  return axios.delete(BASE_URL + requestMapping + "/" + menuId);
+}
