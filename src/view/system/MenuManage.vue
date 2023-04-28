@@ -31,7 +31,6 @@
                   row-key="hash"
                   max-height="650">
           <el-table-column fixed="left" prop="title" label="菜单标题"  />
-          <el-table-column prop="projectName" label="所属项目" />
           <el-table-column prop="icon" label="图标" >
             <template #default="{ row, column, $index }">
               <i :class="'iconfont ' + row.icon" />

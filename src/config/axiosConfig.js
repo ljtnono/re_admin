@@ -1,14 +1,14 @@
 import axios from "axios";
+import ElementUI from "element-ui";
+import urlUtil from "@/util/urlUtil";
+import router from "@/router";
+import store from "@/store";
+import { TOKEN_ERROR_CODE_ARRAY } from "@/constant/errorConstant";
 import {
   HTTP_RESULT_SUCCESS_CODE,
   HTTP_RESULT_SUCCESS_MESSAGE,
   BASE_URL
 } from "@/constant/commonConstant";
-import ElementUI from "element-ui";
-import urlUtil from "@/util/urlUtil";
-import {TOKEN_ERROR_CODE_ARRAY} from "@/constant/errorConstant";
-import router from "../router";
-import store from "@/store";
 
 const INSTANCE = axios.create();
 // 不需要携带token的请求路径集合
