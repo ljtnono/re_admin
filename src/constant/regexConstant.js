@@ -25,3 +25,12 @@ export const ADMIN_USER_EDIT_EMAIL_REGEX = USER_ADD_EMAIL_REGEX;
 
 // #################### 新增角色表单相关正则表达式 #################### //
 export const ROLE_ADD_NAME_REGEX = /^[a-zA-Z0-9\u4e00-\u9fa5]{4,30}$/;
+
+
+// #################### 新增菜单表单相关正则表达式 #################### //
+export const MENU_ADD_TITLE_REGEX = /^[\u4E00-\u9FA5A-Za-z0-9]{2,20}$/;
+export const MENU_ADD_ROUTE_PATH_REGEX = /^(?!.*?\/\/)(?!.*?\.\.\/)((\/?[a-zA-Z_][\w-]*)+\/?)*/;
+export const MENU_ADD_ROUTE_NAME_REGEX = /^[a-zA-Z]{2,20}$/;
+export const MENU_ADD_COMPONENT_PATH_REGEX = /^(?!.*\.\.\/\.\.\/)[\w/]+\.vue$/
+export const MENU_ADD_PERMISSION_NAME_REGEX = /^[\u4E00-\u9FA5A-Za-z0-9]{2,50}$/;
+export const MENU_ADD_PERMISSION_EXPRESSION_REGEX = /^[A-Za-z:]{2,100}$/;

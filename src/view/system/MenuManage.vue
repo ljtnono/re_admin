@@ -120,6 +120,16 @@ import {findMenuList, findMenuTree} from "@/api/menu";
 import VueTreeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import { deleteMenu } from "@/api/menu";
+import {
+  MENU_ADD_TITLE_EMPTY_ERROR_MESSAGE,
+  MENU_ADD_TITLE_FORMAT_ERROR_MESSAGE,
+  MENU_ADD_ROUTE_NAME_EMPTY_ERROR_MESSAGE,
+  MENU_ADD_ROUTE_NAME_FORMAT_ERROR_MESSAGE
+} from "@/constant/errorMessageConstant";
+import {
+  MENU_ADD_TITLE_REGEX,
+  MENU_ADD_ROUTE_NAME_REGEX
+} from "@/constant/regexConstant";
 
 export default {
   name: "MenuManage",
@@ -153,6 +163,25 @@ export default {
       },
       // 新增菜单表单校验
       addFormRule: {
+        title: [
+          {
+            required: true,
+            message: MENU_ADD_TITLE_EMPTY_ERROR_MESSAGE,
+            trigger: "blur"
+          },
+          {
+            message: MENU_ADD_TITLE_FORMAT_ERROR_MESSAGE,
+            pattern: MENU_ADD_TITLE_REGEX,
+            trigger: "blur" 
+          }
+        ],
+        routeName: [
+          {
+            required: true,
+            validator: this.addRouteNameCheck,
+            trigger: "blur"
+          }
+        ],
       }
     }
   },
@@ -178,19 +207,23 @@ export default {
         this.$loading().close();
       });
     },
+    // 处理新增菜单路由名称校验
+    async addRouteNameCheck(rule, value, callback) {
+      let routeName = this.addForm.routeName;
+      // 菜单路由名称判空校验
+      if (routeName === null || routeName === "") {
+        return callback(new Error(MENU_ADD_ROUTE_NAME_EMPTY_ERROR_MESSAGE));
+      }
+      // 菜单路由名称正则校验
+      if (!MENU_ADD_ROUTE_NAME_REGEX.test(routeName)) {
+        return callback(new Error(MENU_ADD_ROUTE_NAME_FORMAT_ERROR_MESSAGE));
+      }
+      // 可用性校验
+      return callback();
+    },
     // 提交新增菜单表单
     commitAddForm(formName) {
-
-    },
-    // 处理每页条数变化
-    handleSizeChange(val) {
-      this.pageSize = val;
-      this.search();
-    },
-    // 处理当前页数变化
-    handleCurrentChange(val) {
-      this.pageNum = val;
-      this.search();
+      
     },
     mapMenuData(data) {
       return data.map(item => ({
