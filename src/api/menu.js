@@ -33,7 +33,7 @@ export const findMenuList = (searchCondition) => {
  */
 export const findBreadcrumbList = () => {
   return axios.get(BASE_URL + requestMapping + "/breadcrumbList");
-}
+};
 
 /**
  * 删除菜单
@@ -43,4 +43,41 @@ export const findBreadcrumbList = () => {
  */
 export const deleteMenu = (menuId) => {
   return axios.delete(BASE_URL + requestMapping + "/" + menuId);
-}
+};
+
+/**
+ * 新增菜单
+ * 
+ * @param {String} title 
+ * @param {String} routePath 
+ * @param {Number} parentId 
+ * @param {String} routeName 
+ * @param {String} componentPath 
+ * @param {String} icon 
+ * @param {Array} permissionList 
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const saveMenu = ({title, routePath, parentId, routeName, componentPath, icon, permissionList}) => {
+  return axios.post(BASE_URL + requestMapping, {title, routePath, parentId, routeName, componentPath, icon, permissionList});
+};
+
+/**
+ * 校验菜单路由名称是否重复
+ * 
+ * @param {String} routeName 
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const checkMenuRouteNameDuplicate = (routeName) => {
+  return axios.get(BASE_URL + requestMapping + "/checkRouteNameDuplicate?routeName=" + routeName);
+};
+
+
+/**
+ * 校验菜单路由路径是否重复
+ * 
+ * @param {String} routeName 
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const checkMenuRoutePathDuplicate = (routePath) => {
+  return axios.get(BASE_URL + requestMapping + "/checkRoutePathDuplicate?routePath=" + routePath);
+};

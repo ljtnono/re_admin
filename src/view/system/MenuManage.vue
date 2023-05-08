@@ -65,7 +65,7 @@
                     <el-input v-model="addForm.title" size="small" clearable placeholder="请输入菜单标题" />
                   </el-form-item>
                   <el-form-item label="路由路径：" prop="routePath" class="is-required">
-                    <el-input v-model="addForm.routePath" size="small" type="password" clearable placeholder="请输入路由路径" />
+                    <el-input v-model="addForm.routePath" size="small" clearable placeholder="请输入路由路径" />
                   </el-form-item>
                   <el-form-item label="父级菜单：" prop="parentId" class="is-required">
                     <vue-treeselect
@@ -124,12 +124,22 @@ import {
   MENU_ADD_TITLE_EMPTY_ERROR_MESSAGE,
   MENU_ADD_TITLE_FORMAT_ERROR_MESSAGE,
   MENU_ADD_ROUTE_NAME_EMPTY_ERROR_MESSAGE,
-  MENU_ADD_ROUTE_NAME_FORMAT_ERROR_MESSAGE
+  MENU_ADD_ROUTE_NAME_FORMAT_ERROR_MESSAGE,
+  MENU_ADD_ROUTE_NAME_DUPLICATE_ERROR_MESSAGE,
+  MENU_ADD_ROUTE_PATH_EMPTY_ERROR_MESSAGE,
+  MENU_ADD_ROUTE_PATH_FORMAT_ERROR_MESSAGE,
+  MENU_ADD_ROUTE_PATH_DUPLICATE_ERROR_MESSAGE,
+  MENU_ADD_COMPONENT_PATH_EMPTY_ERROR_MESSAGE,
+  MENU_ADD_COMPONENT_PATH_FORMAT_ERROR_MESSAGE,
+  MENU_ADD_PARENT_ID_EMPTY_ERROR_MESSAGE
 } from "@/constant/errorMessageConstant";
 import {
   MENU_ADD_TITLE_REGEX,
-  MENU_ADD_ROUTE_NAME_REGEX
+  MENU_ADD_ROUTE_NAME_REGEX,
+  MENU_ADD_ROUTE_PATH_REGEX,
+  MENU_ADD_COMPONENT_PATH_REGEX
 } from "@/constant/regexConstant";
+import { checkMenuRouteNameDuplicate, checkMenuRoutePathDuplicate, saveMenu } from "@/api/menu";
 
 export default {
   name: "MenuManage",
@@ -182,6 +192,32 @@ export default {
             trigger: "blur"
           }
         ],
+        routePath: [
+          {
+            required: true,
+            validator: this.addRoutePathCheck,
+            trigger: "blur"
+          }
+        ],
+        componentPath: [
+          {
+            required: true,
+            message: MENU_ADD_COMPONENT_PATH_EMPTY_ERROR_MESSAGE,
+            trigger: "blur"
+          },
+          {
+            message: MENU_ADD_COMPONENT_PATH_FORMAT_ERROR_MESSAGE,
+            pattern: MENU_ADD_COMPONENT_PATH_REGEX,
+            trigger: "blur" 
+          }
+        ],
+        parentId: [
+          {
+            required: true,
+            message: MENU_ADD_PARENT_ID_EMPTY_ERROR_MESSAGE,
+            trigger: "blur"
+          }
+        ]
       }
     }
   },
@@ -218,12 +254,84 @@ export default {
       if (!MENU_ADD_ROUTE_NAME_REGEX.test(routeName)) {
         return callback(new Error(MENU_ADD_ROUTE_NAME_FORMAT_ERROR_MESSAGE));
       }
-      // 可用性校验
+      // 校验菜单路由名称是否重复
+      let duplicate = false;
+      await checkMenuRouteNameDuplicate(routeName).then(res => {
+        duplicate = res.data.data;
+      });
+      if (duplicate) {
+        return callback(new Error(MENU_ADD_ROUTE_NAME_DUPLICATE_ERROR_MESSAGE));
+      }
+      return callback();
+    },
+    // 处理新增菜单路由名称校验
+    async addRoutePathCheck(rule, value, callback) {
+      let routePath = this.addForm.routePath;
+      // 是否为空校验
+      if (routePath === null || routePath === "") {
+        return callback(new Error(MENU_ADD_ROUTE_PATH_EMPTY_ERROR_MESSAGE));
+      }
+      // 菜单路由路径正则校验
+      if (!MENU_ADD_ROUTE_PATH_REGEX.test(routePath)) {
+        return callback(new Error(MENU_ADD_ROUTE_PATH_FORMAT_ERROR_MESSAGE));
+      }
+      let duplicate = false;
+      await checkMenuRoutePathDuplicate(routePath).then(res => {
+        duplicate = res.data.data;
+      });
+      if (duplicate) {
+        return callback(new Error(MENU_ADD_ROUTE_PATH_DUPLICATE_ERROR_MESSAGE));
+      }
       return callback();
     },
     // 提交新增菜单表单
     commitAddForm(formName) {
-      
+      let that = this;
+      // 先校验表单数据
+      this.$refs[formName].validate(async (valid, error) => {
+        // 校验成功，请求保存菜单接口
+        let data = {
+          title: this.addForm.title,
+          routeName: this.addForm.routeName,
+          parentId: this.addForm.parentId,
+          routePath: this.addForm.routePath,
+          componentPath: this.addForm.componentPath,
+          icon: this.addForm.icon
+        }
+        if (valid) {
+          this.$loading(ELEMENT_PAGE_LOADING_CONFIG);
+          await saveMenu({...data}).then(res => {
+            this.$message({
+              type: "success",
+              message: "操作成功",
+              duration: 2000
+            });
+            this.$loading().close();
+            that.addFormVisible = false;
+          }).catch(e => {
+            this.$loading().close();
+            that.addFormVisible = false;
+          });
+          await findMenuTree().then(res => {
+            let data = res.data.data;
+            let allRoleMenuTreeData = [{
+              id: -1,
+              label: "顶层菜单"
+            }];
+            let mapData = this.mapMenuData(data);
+            mapData.forEach(d => allRoleMenuTreeData.push(d));
+            this.menuTreeData = allRoleMenuTreeData;
+          });
+          await that.search();
+        } else {
+          // 校验失败
+          this.$message({
+            type: "error",
+            message: Object.values(error)[0][0]["message"],
+            duration: 2000
+          });
+        }
+      });
     },
     mapMenuData(data) {
       return data.map(item => ({
