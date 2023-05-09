@@ -186,7 +186,6 @@ import {findMenuTree} from "@/api/menu";
 import { addFormRoleNameCheck, deleteRoleBatch, editFormRoleNameCheck, saveRole, updateRole } from "@/api/role";
 import { ROLE_ADD_NAME_DUPLICATE_ERROR_MESSAGE, ROLE_ADD_NAME_EMPTY_ERROR_MESSAGE, ROLE_ADD_NAME_FORMAT_ERROR_MESSAGE } from "@/constant/errorMessageConstant";
 import { ROLE_ADD_NAME_REGEX } from "@/constant/regexConstant";
-import {deleteUserBatch, updateUserDeleteStatusBatch} from "@/api/user";
 
 export default {
   name: "RoleManage",

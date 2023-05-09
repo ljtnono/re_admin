@@ -62,6 +62,47 @@ export const saveMenu = ({title, routePath, parentId, routeName, componentPath, 
 };
 
 /**
+ * 编辑菜单
+ * 
+ * @param {String} id
+ * @param {String} title 
+ * @param {String} routePath 
+ * @param {Number} parentId 
+ * @param {String} routeName 
+ * @param {String} componentPath 
+ * @param {String} icon 
+ * @param {Array} permissionList 
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const editMenu = ({id, title, routePath, parentId, routeName, componentPath, icon, permissionList}) => {
+  return axios.put(BASE_URL + requestMapping + "/editMenu", {id, title, routePath, parentId, routeName, componentPath, icon, permissionList});
+};
+
+
+/**
+ * 校验菜单路由名称在编辑时是否可用
+ * 
+ * @param {String} menuId 菜单id
+ * @param {String} routeName 路由名称
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const checkMenuRouteNameAvailableEdit = (menuId, routeName) => {
+  return axios.get(BASE_URL + requestMapping + "/checkRoutNameAvailableEdit?menuId=" + menuId + "&routeName=" + routeName);
+};
+
+
+/**
+ * 校验菜单路由路径在编辑时是否可用
+ * 
+ * @param {String} menuId 菜单id
+ * @param {String} rouetPath 路由名称
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const checkMenuRoutePathAvailableEdit = (menuId, routePath) => {
+  return axios.get(BASE_URL + requestMapping + "/checkRoutPathAvailableEdit?menuId=" + menuId + "&routePath=" + routePath);
+};
+
+/**
  * 校验菜单路由名称是否重复
  * 
  * @param {String} routeName 
