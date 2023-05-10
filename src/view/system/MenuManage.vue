@@ -544,7 +544,7 @@ export default {
       await checkMenuRouteNameAvailableEdit(menuId, routeName).then(res => {
         available = res.data.data;
       });
-      if (available) {
+      if (!available) {
         return callback(new Error(MENU_EDIT_ROUTE_NAME_DUPLICATE_ERROR_MESSAGE));
       }
       return callback();
@@ -562,15 +562,15 @@ export default {
         return callback(new Error(MENU_EDIT_ROUTE_PATH_FORMAT_ERROR_MESSAGE));
       }
       let available = false;
-      await checkMenuRoutePathAvailableEdit(routePath).then(res => {
+      await checkMenuRoutePathAvailableEdit(menuId, routePath).then(res => {
         available = res.data.data;
       });
-      if (available) {
+      console.log(available);
+      if (!available) {
         return callback(new Error(MENU_EDIT_ROUTE_PATH_DUPLICATE_ERROR_MESSAGE));
       }
       return callback();
     },
-
     // 提交编辑菜单表单
     commitEditForm(formName) {
       let that = this;

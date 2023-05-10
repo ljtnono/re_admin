@@ -99,7 +99,7 @@ export const checkMenuRouteNameAvailableEdit = (menuId, routeName) => {
  * @returns {Promise<AxiosResponse<any>>}
  */
 export const checkMenuRoutePathAvailableEdit = (menuId, routePath) => {
-  return axios.get(BASE_URL + requestMapping + "/checkRoutPathAvailableEdit?menuId=" + menuId + "&routePath=" + routePath);
+  return axios.get(BASE_URL + requestMapping + "/checkRoutePathAvailableEdit?menuId=" + menuId + "&routePath=" + routePath);
 };
 
 /**
