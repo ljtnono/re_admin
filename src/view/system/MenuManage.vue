@@ -3,35 +3,21 @@
     <el-card style="width: 100%">
       <!-- 查询表单 -->
       <div class="search-container flex flex-direction-row flex-justify-content-start mb20">
-        <el-input
-          class="mr20"
-          v-model="searchCondition"
-          placeholder="请输入菜单名称、标题"
-          clearable @keyup.enter.native="search" />
-        <el-button
-          size="mini"
-          type="primary"
-          @click="search"
-          icon="el-icon-search">
+        <el-input class="mr20" v-model="searchCondition" placeholder="请输入菜单名称、标题" clearable
+          @keyup.enter.native="search" />
+        <el-button size="mini" type="primary" @click="search" icon="el-icon-search">
           搜索
         </el-button>
         <!-- 新增用户接口 -->
-        <el-button
-          size="mini"
-          type="success"
-          @click="addFormVisible = true"
-          icon="el-icon-plus">
+        <el-button size="mini" type="success" @click="addFormVisible = true" icon="el-icon-plus">
           新增
         </el-button>
       </div>
       <!-- 表格数据 -->
       <div class="menu-table-container">
-        <el-table :data="menuList"
-                  header-row-class-name="table-header"
-                  row-key="hash"
-                  max-height="650">
-          <el-table-column fixed="left" prop="title" label="菜单标题"  />
-          <el-table-column prop="icon" label="图标" >
+        <el-table :data="menuList" header-row-class-name="table-header" row-key="hash" max-height="650">
+          <el-table-column fixed="left" prop="title" label="菜单标题" />
+          <el-table-column prop="icon" label="图标">
             <template #default="{ row, column, $index }">
               <i :class="'iconfont ' + row.icon" />
             </template>
@@ -53,17 +39,13 @@
       </div>
       <!-- 新增菜单模态弹窗 -->
       <div class="add-form-container">
-        <el-dialog title="新增菜单"
-                   top="4vh"
-                   width="800px"
-                   center
-                   :visible.sync="addFormVisible">
+        <el-dialog title="新增菜单" top="4vh" width="800px" center :visible.sync="addFormVisible">
           <template slot="default">
             <!-- 新增菜单表单 -->
             <el-form ref="addForm" :model="addForm" :rules="addFormRule" label-width="100px" inline>
               <el-tabs activeName="menuConfig">
                 <!-- 菜单配置 -->
-                <el-tab-pane label="菜单配置" name="menuConfig" >
+                <el-tab-pane label="菜单配置" name="menuConfig">
                   <el-form-item label="菜单标题：" prop="title" class="is-required">
                     <el-input v-model="addForm.title" size="small" clearable placeholder="请输入菜单标题" />
                   </el-form-item>
@@ -71,10 +53,7 @@
                     <el-input v-model="addForm.routePath" size="small" clearable placeholder="请输入路由路径" />
                   </el-form-item>
                   <el-form-item label="父级菜单：" prop="parentId" class="is-required">
-                    <vue-treeselect
-                      v-model="addForm.parentId"
-                      :options="menuTreeData"
-                      style="width: 182px;" />
+                    <vue-treeselect v-model="addForm.parentId" :options="menuTreeData" style="width: 182px;" />
                   </el-form-item>
                   <el-form-item label="路由名称：" prop="routeName" class="is-required">
                     <el-input v-model="addForm.routeName" size="small" clearable placeholder="请输入路由名称" />
@@ -88,7 +67,8 @@
                 </el-tab-pane>
                 <!-- 菜单权限配置 -->
                 <el-tab-pane label="权限配置" name="permissionConfig">
-                  <el-button icon="el-icon-plus" @click="addMenuPermission('addForm')" class="mb20" size="mini" type="success">新增菜单权限</el-button>
+                  <el-button icon="el-icon-plus" @click="addMenuPermission('addForm')" class="mb20" size="mini"
+                    type="success">新增菜单权限</el-button>
                   <ul class="menu-permission-list-container">
                     <li v-for="(item, index) in addForm.permissionList" :key="index">
                       <el-form-item label="权限名称" class="is-required">
@@ -97,7 +77,8 @@
                       <el-form-item label="权限表达式" class="is-required">
                         <el-input size="small" v-model="item.expression" clearable placeholder="请输入权限表达式" />
                       </el-form-item>
-                      <el-button icon="el-icon-sub" @click="removeMenuPermission('addForm', index)" class="mb20" size="mini" type="danger">删除</el-button>
+                      <el-button icon="el-icon-sub" @click="removeMenuPermission('addForm', index)" class="mb20"
+                        size="mini" type="danger">删除</el-button>
                     </li>
                   </ul>
                 </el-tab-pane>
@@ -114,17 +95,13 @@
       </div>
       <!-- 编辑菜单模态弹窗 -->
       <div class="edit-form-container">
-        <el-dialog title="编辑菜单"
-                   top="4vh"
-                   width="800px"
-                   center
-                   :visible.sync="editFormVisible">
+        <el-dialog title="编辑菜单" top="4vh" width="800px" center :visible.sync="editFormVisible">
           <template slot="default">
             <!-- 编辑菜单表单 -->
             <el-form ref="editForm" :model="editForm" :rules="editFormRule" label-width="100px" inline>
               <el-tabs activeName="menuConfig">
                 <!-- 菜单配置 -->
-                <el-tab-pane label="菜单配置" name="menuConfig" >
+                <el-tab-pane label="菜单配置" name="menuConfig">
                   <el-form-item label="菜单标题：" prop="title" class="is-required">
                     <el-input v-model="editForm.title" size="small" clearable placeholder="请输入菜单标题" />
                   </el-form-item>
@@ -132,10 +109,7 @@
                     <el-input v-model="editForm.routePath" size="small" clearable placeholder="请输入路由路径" />
                   </el-form-item>
                   <el-form-item label="父级菜单：" prop="parentId" class="is-required">
-                    <vue-treeselect
-                      v-model="editForm.parentId"
-                      :options="menuTreeData"
-                      style="width: 182px;" />
+                    <vue-treeselect v-model="editForm.parentId" :options="menuTreeData" style="width: 182px;" />
                   </el-form-item>
                   <el-form-item label="路由名称：" prop="routeName" class="is-required">
                     <el-input v-model="editForm.routeName" size="small" clearable placeholder="请输入路由名称" />
@@ -149,7 +123,8 @@
                 </el-tab-pane>
                 <!-- 菜单权限配置 -->
                 <el-tab-pane label="权限配置" name="permissionConfig">
-                  <el-button icon="el-icon-plus" @click="addMenuPermission('editForm')" class="mb20" size="mini" type="success">新增菜单权限</el-button>
+                  <el-button icon="el-icon-plus" @click="addMenuPermission('editForm')" class="mb20" size="mini"
+                    type="success">新增菜单权限</el-button>
                   <ul class="menu-permission-list-container">
                     <li v-for="(item, index) in editForm.permissionList" :key="index">
                       <el-form-item label="权限名称" class="is-required">
@@ -158,7 +133,8 @@
                       <el-form-item label="权限表达式" class="is-required">
                         <el-input size="small" v-model="item.expression" clearable placeholder="请输入权限表达式" />
                       </el-form-item>
-                      <el-button icon="el-icon-sub" @click="removeMenuPermission('editForm', index)" class="mb20" size="mini" type="danger">删除</el-button>
+                      <el-button icon="el-icon-sub" @click="removeMenuPermission('editForm', index)" class="mb20"
+                        size="mini" type="danger">删除</el-button>
                     </li>
                   </ul>
                 </el-tab-pane>
@@ -178,9 +154,9 @@
 </template>
 
 <script>
-import {ENTITY_DELETE_STATE_DELETE, ENTITY_DELETE_STATE_NORMAL, HTTP_RESULT_SUCCESS_CODE} from "@/constant/commonConstant";
-import {ELEMENT_PAGE_LOADING_CONFIG, ELEMENT_SUCCESS_MESSAGE_CONFIG} from "@/config/commonConfig";
-import {findMenuList, findMenuTree} from "@/api/menu";
+import { ENTITY_DELETE_STATE_DELETE, ENTITY_DELETE_STATE_NORMAL, HTTP_RESULT_SUCCESS_CODE } from "@/constant/commonConstant";
+import { ELEMENT_PAGE_LOADING_CONFIG, ELEMENT_SUCCESS_MESSAGE_CONFIG } from "@/config/commonConfig";
+import { findMenuList, findMenuTree } from "@/api/menu";
 import VueTreeselect from "@riophae/vue-treeselect";
 import "@riophae/vue-treeselect/dist/vue-treeselect.css";
 import { deleteMenu } from "@/api/menu";
@@ -218,13 +194,13 @@ import {
   MENU_ADD_COMPONENT_PATH_REGEX,
   MENU_EDIT_COMPONENT_PATH_REGEX
 } from "@/constant/regexConstant";
-import { 
-  checkMenuRouteNameDuplicate, 
+import {
+  checkMenuRouteNameDuplicate,
   checkMenuRoutePathDuplicate,
   checkMenuRouteNameAvailableEdit,
   checkMenuRoutePathAvailableEdit,
-  saveMenu, 
-  editMenu 
+  saveMenu,
+  editMenu
 } from "@/api/menu";
 
 export default {
@@ -267,7 +243,7 @@ export default {
           {
             message: MENU_ADD_TITLE_FORMAT_ERROR_MESSAGE,
             pattern: MENU_ADD_TITLE_REGEX,
-            trigger: "blur" 
+            trigger: "blur"
           }
         ],
         routeName: [
@@ -293,7 +269,7 @@ export default {
           {
             message: MENU_ADD_COMPONENT_PATH_FORMAT_ERROR_MESSAGE,
             pattern: MENU_ADD_COMPONENT_PATH_REGEX,
-            trigger: "blur" 
+            trigger: "blur"
           }
         ],
         parentId: [
@@ -327,8 +303,8 @@ export default {
           {
             message: MENU_EDIT_TITLE_FORMAT_ERROR_MESSAGE,
             pattern: MENU_EDIT_TITLE_REGEX,
-            trigger: "blur" 
-          } 
+            trigger: "blur"
+          }
         ],
         routeName: [
           {
@@ -353,7 +329,7 @@ export default {
           {
             message: MENU_EDIT_COMPONENT_PATH_FORMAT_ERROR_MESSAGE,
             pattern: MENU_EDIT_COMPONENT_PATH_REGEX,
-            trigger: "blur" 
+            trigger: "blur"
           }
         ],
         parentId: [
@@ -457,7 +433,7 @@ export default {
         }
         if (valid) {
           this.$loading(ELEMENT_PAGE_LOADING_CONFIG);
-          await saveMenu({...data}).then(res => {
+          await saveMenu({ ...data }).then(res => {
             this.$message({
               type: "success",
               message: "操作成功",
@@ -589,7 +565,7 @@ export default {
         }
         if (valid) {
           this.$loading(ELEMENT_PAGE_LOADING_CONFIG);
-          await editMenu({...data}).then(res => {
+          await editMenu({ ...data }).then(res => {
             this.$message({
               type: "success",
               message: "操作成功",
@@ -610,7 +586,7 @@ export default {
             duration: 2000
           });
         }
-      }); 
+      });
     },
     // 刷新新增和编辑表单中的选择父级菜单的数据
     refreshMenuTree() {
@@ -634,7 +610,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-
 ::v-deep .el-tabs__content {
   overflow: visible;
 }
@@ -687,5 +662,4 @@ export default {
     }
   }
 }
-
 </style>

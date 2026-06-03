@@ -300,7 +300,7 @@ export default {
         deleteRoleBatch(selectedRoleIdList).then(res => {
           this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
           this.search();
-        });
+        }).catch(() => {});
       });
     },
     // 处理角色菜单树选中状态改变事件
@@ -432,7 +432,7 @@ export default {
             this.$message.success(ELEMENT_SUCCESS_MESSAGE_CONFIG);
           }
           this.search();
-        });
+        }).catch(() => {});
       });
     },
     // 搜索角色列表
