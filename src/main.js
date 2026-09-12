@@ -24,7 +24,7 @@ Vue.use(VueAxios, axios);
 Vue.use(mavonEditor);
 Vue.use(Router);
 // 全局过滤器
-Vue.filter("dateFormat", function(value, style) {
+Vue.filter("dateFormat", function (value, style) {
   return DateUtil.format(value, style);
 });
 
@@ -32,7 +32,7 @@ let routeList = store.state.systemSetting.routeList;
 let existRouteNameList = router.getRoutes().map(vueRoute => {
   return vueRoute.name;
 });
-if (routeList !== [] || routeList.length !== 0) {
+if (routeList && routeList.length > 0) {
   routeList.forEach(route => {
     if (!existRouteNameList.includes(route.name)) {
       router.addRoute(routeUtil.dfsRouteList(route));
