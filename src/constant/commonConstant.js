@@ -4,7 +4,6 @@
 // export const BASE_URL = "http://api.lingjiatong.cn:30152";
 // export const BASE_URL = "http://127.0.0.1:8152";
 export const BASE_URL = process.env.NODE_ENV === "production" ? "http://api.lingjiatong.cn:30152" : "http://127.0.0.1:9100";
-export const WEBSOCKET_BASE_URL = process.env.NODE_ENV === "production" ? "ws://api.lingjiatong.cn:30152/api-backend/websocket" : "ws://127.0.0.1:8152/api-backend/websocket";
 // 请求成功code值
 export const HTTP_RESULT_SUCCESS_CODE = 0;
 // 请求成功message值

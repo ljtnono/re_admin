@@ -1,18 +1,7 @@
 <template>
   <div class="role-manage-container p20 flex flex1 flex-direction-row">
-    <!-- 角色菜单树卡片 -->
-    <el-card class="menu-tree-container mr20" style="flex: 1 1">
-      <template slot="header">
-        菜单树
-      </template>
-      <el-tree
-        :data="showRoleMenuTreeData"
-        node-key="id"
-        highlight-current>
-      </el-tree>
-    </el-card>
     <!-- 角色表格卡片 -->
-    <el-card class="role-table-container" style="flex: 4 4">
+    <el-card class="role-table-container" style="width: 100%">
       <!-- 查询表单 -->
       <div class="search-container flex flex-direction-row flex-justify-content-start mb20">
         <el-input
@@ -54,6 +43,7 @@
           <el-table-column type="selection" align="center"/>
           <el-table-column fixed="left" prop="name" label="名称" />
           <el-table-column prop="description" label="角色描述" />
+          <el-table-column prop="remark" label="备注" show-overflow-tooltip />
           <el-table-column prop="createTime" label="创建时间" align="center" sortable="custom">
             <template #default="{ row, column, $index }">
               <span class="cell-time">
@@ -111,6 +101,9 @@
                 <el-form-item label="角色描述：" prop="description">
                   <el-input type="textarea" :autosize="{ minRows: 4, maxRows: 4}" maxlength="200" show-word-limit v-model="addForm.description" size="small" clearable placeholder="请输入角色描述" />
                 </el-form-item>
+                <el-form-item label="备注：" prop="remark">
+                  <el-input type="textarea" :autosize="{ minRows: 4, maxRows: 4}" v-model="addForm.remark" size="small" clearable placeholder="请输入备注" />
+                </el-form-item>
               </el-form>
             </div>
             <div style="padding: 10px 10px; height: 300px; overflow-y: auto; ">
@@ -147,6 +140,9 @@
                 <el-form-item label="角色描述：" prop="description">
                   <el-input type="textarea" :autosize="{ minRows: 4, maxRows: 4}" maxlength="200" show-word-limit v-model="editForm.description" size="small" clearable placeholder="请输入角色描述" />
                 </el-form-item>
+                <el-form-item label="备注：" prop="remark">
+                  <el-input type="textarea" :autosize="{ minRows: 4, maxRows: 4}" v-model="editForm.remark" size="small" clearable placeholder="请输入备注" />
+                </el-form-item>
               </el-form>
             </div>
             <div style="padding: 10px 10px; height: 300px; overflow-y: auto; ">
@@ -179,7 +175,7 @@ import {
   ORDER_BY_DESC,
   HTTP_RESULT_SUCCESS_CODE
 } from "@/constant/commonConstant";
-import {findRoleMenuTree, findRolePageList} from "@/api/role";
+import {findRolePageList} from "@/api/role";
 import {ELEMENT_PAGE_LOADING_CONFIG, ELEMENT_SUCCESS_MESSAGE_CONFIG} from "@/config/commonConfig";
 import S from "string";
 import {findMenuTree} from "@/api/menu";
@@ -212,12 +208,8 @@ export default {
       orderFlagList: [],
       // 角色列表
       roleList: [],
-      // 角色的菜单树
-      showRoleMenuTreeData: [],
       // 全部菜单树
       allRoleMenuTreeData: [],
-      // 显示的菜单树对应的角色id
-      showMenuTreeRoleId: null,
       // 新增角色表单是否显示
       addFormVisible: false,
       // 编辑角色表单是否显示
@@ -226,6 +218,7 @@ export default {
       addForm: {
         name: null,
         description: null,
+        remark: null,
         menuIdSet: []
       },
       addFormRule: {
@@ -242,6 +235,7 @@ export default {
         id: null,
         name: null,
         description: null,
+        remark: null,
         menuIdSet: []
       },
       editFormRule: {
@@ -271,6 +265,7 @@ export default {
     openEditForm(row) {
       let name = row.name;
       let description = row.description;
+      let remark = row.remark;
       let id = row.id;
       let checkedKeys = [];
       this.dfsRoleMenuTree(row.roleMenuTree.menuTree, menu => {
@@ -282,6 +277,7 @@ export default {
       this.editFormVisible = true;
       this.editForm.name = name;
       this.editForm.description = description;
+      this.editForm.remark = remark;
       this.editForm.menuIdSet = [];
       this.editForm.id = id;
       // 将编辑角色表单中的菜单树进行打勾操作
@@ -361,10 +357,11 @@ export default {
         // 校验成功，请求保存角色接口
         let name = this.addForm.name;
         let description = this.addForm.description;
+        let remark = this.addForm.remark;
         let menuIdSet = this.addForm.menuIdSet;
         if (valid) {
           this.$loading(ELEMENT_PAGE_LOADING_CONFIG);
-          await saveRole({name, description, menuIdSet}).then(res => {
+          await saveRole({name, description, remark, menuIdSet}).then(res => {
             this.$message({
               type: "success",
               message: "操作成功",
@@ -394,10 +391,11 @@ export default {
         let id = this.editForm.id;
         let name = this.editForm.name;
         let description = this.editForm.description;
+        let remark = this.editForm.remark;
         let menuIdSet = this.editForm.menuIdSet;
         if (valid) {
           this.$loading(ELEMENT_PAGE_LOADING_CONFIG);
-          await updateRole({id, name, description, menuIdSet}).then(res => {
+          await updateRole({id, name, description, remark, menuIdSet}).then(res => {
             this.$message({
               type: "success",
               message: "操作成功",
@@ -451,7 +449,6 @@ export default {
         this.total = data.total;
         this.pageNum = data.current;
         this.pageSize = data.size;
-        await this.menuTree(data.records[0].id);
         this.$loading().close();
       }).catch(e => {
         this.$loading().close();
@@ -523,15 +520,6 @@ export default {
         treeData.push(node);
       }
       return treeData;
-    },
-    // 获取并设置角色的菜单树
-    menuTree(roleId) {
-      findRoleMenuTree(roleId).then(res => {
-        let data = res.data.data;
-        this.showMenuTreeRoleId = data.roleId;
-        let showRoleMenuTreeData = this.parseMenuData(data.menuTree);
-        this.showRoleMenuTreeData = showRoleMenuTreeData;
-      });
     },
   },
   mounted() {

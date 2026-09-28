@@ -31,16 +31,6 @@ export const findRoleList = () => {
 }
 
 /**
- * 获取角色菜单树
- *
- * @param roleId 角色id
- * @returns {Promise<AxiosResponse<any>>}
- */
-export const findRoleMenuTree = (roleId) => {
-  return axios.get(BASE_URL + requestMapping + "/menuTree/" + roleId);
-};
-
-/**
  * 批量删除角色
  *
  * @param roleIdSet 角色id集合

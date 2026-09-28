@@ -1,28 +1,45 @@
 import axios from "@/config/axiosConfig";
 
 import { BASE_URL } from "@/constant/commonConstant";
-import qs from "qs";
 
-// #################### 角色相关接口 #################### //
+// #################### 系统监控相关接口 #################### //
 
 // url通用前缀
 const requestMapping = "/api-backend/systemMonitor";
 
 
 /**
- * 获取k8s集群节点列表
+ * 获取本机cpu信息
  *
  * @returns {Promise<AxiosResponse<any>>}
  */
-export const findK8sNodeList = () => {
-  return axios.get(BASE_URL + requestMapping + "/k8sNodeList");
+export const findCPUInfo = () => {
+  return axios.get(BASE_URL + requestMapping + "/cpuInfo");
 };
 
 /**
- * 获取k8s集群名称空间列表
+ * 获取本机内存信息
  *
  * @returns {Promise<AxiosResponse<any>>}
  */
-export const findK8sNamespaceList = () => {
-  return axios.get(BASE_URL + requestMapping + "/k8sNamespaceList");
+export const findMemoryInfo = () => {
+  return axios.get(BASE_URL + requestMapping + "/memoryInfo");
+};
+
+/**
+ * 获取本机硬盘信息
+ *
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const findHardDiskInfo = () => {
+  return axios.get(BASE_URL + requestMapping + "/hardDiskInfo");
+};
+
+/**
+ * 获取本机磁盘、网络IO速率
+ *
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const findIOInfo = () => {
+  return axios.get(BASE_URL + requestMapping + "/ioInfo");
 };
