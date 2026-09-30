@@ -33,8 +33,8 @@ INSTANCE.interceptors.request.use(config => {
 INSTANCE.interceptors.response.use((response) => {
   // 2xx 范围内的状态码都会触发该函数。
   // 对响应数据做点什么
-  let contentType = response.headers["content-type"];
-  if (contentType.indexOf("application/json") !== -1) {
+  let contentType = response.headers && response.headers["content-type"];
+  if (contentType && contentType.indexOf("application/json") !== -1) {
     let code = response.data.code;
     let message = response.data.message;
     if (HTTP_RESULT_SUCCESS_CODE === code && HTTP_RESULT_SUCCESS_MESSAGE === message) {

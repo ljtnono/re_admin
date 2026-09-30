@@ -57,7 +57,7 @@
               <i class="iconfont icon-view mr5" style="color: #19be6b;"/>
               <CountUp
                 style="color: #19be6b;"
-                :endVal="row.view"
+                :endVal="row.view || 0"
                 :options="countUpOptions">
               </CountUp>
             </template>
@@ -67,7 +67,7 @@
               <i class="iconfont icon-favorite mr5" style="color: #ffaad0"/>
               <CountUp
                 style="color: #ffaad0"
-                :endVal="row.favorite"
+                :endVal="row.favorite || 0"
                 :options="countUpOptions">
               </CountUp>
             </template>
@@ -118,7 +118,7 @@
           </el-table-column>
           <el-table-column fixed="right" label="操作" align="center">
             <template #default="{ row, column, $index }">
-              <el-button type="text" size="mini" style="margin-right: 10px; color: #909399">
+              <el-button type="text" size="mini" style="margin-right: 10px; color: #909399" @click="handleEdit(row)">
                 编辑
               </el-button>
               <el-dropdown trigger="click" @command="handleOperation">
@@ -250,6 +250,10 @@ export default {
     })
   },
   methods: {
+    // 跳转到写文章页面编辑该文章
+    handleEdit(row) {
+      this.$router.push({name: "WriteArticle", query: {articleId: row.id}});
+    },
     // 处理多选栏操作
     async handleSelectionOperation(command) {
       let articleIdList = this.selectedArticleIdList;

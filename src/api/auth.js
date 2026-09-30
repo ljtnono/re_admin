@@ -50,3 +50,12 @@ export const login = (username, password, verifyCodeKey, verifyCode) => {
 export const logout = () => {
   return axios.post(BASE_URL + requestMapping + "/user/logout");
 };
+
+/**
+ * 获取当前登录用户信息
+ *
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const getCurrentUser = () => {
+  return axios.get(BASE_URL + requestMapping + "/user/currentUser");
+};

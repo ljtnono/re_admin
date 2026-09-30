@@ -50,13 +50,19 @@
           @click="commit('loginForm')">
           登录
         </el-button>
+        <div class="forget-password">
+          <span class="forget-password__link" @click="forgetPasswordVisible = true">忘记密码？</span>
+        </div>
       </el-form-item>
     </el-form>
+    <!-- 忘记密码弹窗 -->
+    <ForgetPasswordDialog :visible.sync="forgetPasswordVisible"/>
   </el-card>
 </template>
 
 <script>
 import {LOGIN_PASSWORD_REGEX, LOGIN_USERNAME_REGEX} from "@/constant/regexConstant";
+import ForgetPasswordDialog from "@c/ForgetPasswordDialog";
 import {
   LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE,
   LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE,
@@ -67,8 +73,13 @@ import {
 
 export default {
   name: "LoginForm",
+  components: {
+    ForgetPasswordDialog
+  },
   data() {
     return {
+      // 忘记密码弹窗是否显示
+      forgetPasswordVisible: false,
       loginForm: {
         username: "",
         password: "",
@@ -162,6 +173,21 @@ export default {
     .btn-submit {
       width: 100%;
       height: 40px;
+    }
+
+    .forget-password {
+      margin-top: 10px;
+      text-align: right;
+
+      &__link {
+        font-size: 13px;
+        color: #409eff;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
     }
   }
 }

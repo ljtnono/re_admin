@@ -1,343 +1,330 @@
 <template>
-  <div class="update-password-container">
-    <div class="content-container">
-      <header>
-        <span>修改用户密码</span>
-      </header>
-      <!-- 步骤条 -->
-      <div class="step-container mt50">
-        <el-steps :active="stepActive" process-status="process" align-center>
-          <el-step title="验证身份"></el-step>
-          <el-step title="修改密码"></el-step>
-          <el-step title="修改成功"></el-step>
-        </el-steps>
+  <div class="update-password">
+    <div class="update-card">
+      <header class="update-card__header">修改密码</header>
+      <el-steps class="update-card__steps" :active="stepActive" finish-status="success" align-center>
+        <el-step title="验证身份"/>
+        <el-step title="设置新密码"/>
+        <el-step title="修改成功"/>
+      </el-steps>
+
+      <!-- 未绑定邮箱提示：修改密码依赖邮箱验证 -->
+      <div v-if="!emailBound" class="no-email">
+        <i class="el-icon-warning-outline no-email__icon"/>
+        <p class="no-email__text">修改密码需要先绑定邮箱，用于接收验证验证码</p>
+        <el-button type="primary" round @click="$router.push({name: 'Personal'})">去绑定邮箱</el-button>
       </div>
-      <!-- 表单 -->
-      <div class="form-container">
-        <div class="form-validate-container mt50">
-          <!-- 验证身份表单 -->
-          <el-form
-            class="validate-form"
-            :rules="validateFormRules"
-            :model="validateForm"
-            ref="validateForm"
-            label-width="140px">
-            <!-- 密码 -->
-            <el-form-item prop="password" label="请输入当前密码：">
+
+      <template v-else>
+        <!-- 第一步：验证身份 -->
+        <div v-show="stepActive === 0" class="form-area">
+          <el-form ref="validateForm" :model="validateForm" :rules="validateFormRules" label-width="110px">
+            <el-form-item label="当前密码" prop="oldPassword">
               <el-input
-                class="fl"
-                v-model="validateForm.password"
-                style="width: 400px"
+                v-model="validateForm.oldPassword"
+                style="width: 340px"
                 show-password
-                clearable/>
+                clearable
+                placeholder="请输入当前密码"/>
             </el-form-item>
-            <!-- 验证码 -->
-            <el-form-item prop="verifyCode" label="请输入验证码：">
-              <el-input
-                class="fl mr20"
-                v-model="validateForm.verifyCode"
-                style="width: 200px"/>
-              <img
-                class="verify-code-img fl"
-                :src="verifyCodeImageUrl"
-                @click="refresh()"/>
-              <a href="javascript:;" class="ml20" @click="refresh()">
-                看不清？换一张
-              </a>
+            <el-form-item label="邮箱验证码" prop="emailCode">
+              <div class="code-row">
+                <el-input
+                  v-model="validateForm.emailCode"
+                  maxlength="6"
+                  placeholder="6位数字验证码"/>
+                <el-button
+                  class="code-row__send-btn"
+                  :disabled="sendCountdown > 0"
+                  @click="sendCode">
+                  {{ sendCountdown > 0 ? sendCountdown + "s后重发" : "发送验证码" }}
+                </el-button>
+              </div>
+              <p class="form-tip">验证码将发送至已绑定邮箱 {{ maskedEmail }}</p>
             </el-form-item>
-            <!-- 验证身份 -->
             <el-form-item>
-              <el-button
-                type="primary"
-                @click="commitValidateForm('validateForm')">
-                提交
-              </el-button>
-              <el-button
-                type="primary">
-                返回上一步
-              </el-button>
-              <a class="ml20" href="javascript:;">忘记密码?</a>
+              <el-button type="primary" @click="goNext">下一步</el-button>
             </el-form-item>
           </el-form>
         </div>
-        <div class="form-update-container mt50 none">
-          <!-- 修改密码表单 -->
-          <el-form
-            class="update-password-form"
-            :model="updatePasswordForm"
-            ref="updatePasswordForm"
-            :rules="updatePasswordFormRules"
-            label-width="140px">
-            <el-form-item prop="password" class="mb30" label="请输入新密码">
+
+        <!-- 第二步：设置新密码 -->
+        <div v-show="stepActive === 1" class="form-area">
+          <el-form ref="passwordForm" :model="passwordForm" :rules="passwordFormRules" label-width="110px">
+            <el-form-item label="新密码" prop="password">
               <el-input
-                class="input-password fl"
-                v-model="updatePasswordForm.password"
-                style="width: 400px"
+                v-model="passwordForm.password"
+                style="width: 340px"
                 show-password
-                clearable/>
+                clearable
+                placeholder="6-20位，须包含大小写字母和数字"/>
             </el-form-item>
-            <el-form-item prop="rePassword" class="mb30" label="重新输入密码">
+            <el-form-item label="确认新密码" prop="rePassword">
               <el-input
-                class="input-password fl"
-                v-model="updatePasswordForm.rePassword"
-                style="width: 400px"
+                v-model="passwordForm.rePassword"
+                style="width: 340px"
                 show-password
-                clearable/>
+                clearable
+                placeholder="请再次输入新密码"/>
             </el-form-item>
-            <!-- 验证身份 -->
             <el-form-item>
-              <el-button
-                class="btn-submit"
-                type="primary"
-                @click="commitUpdatePasswordForm('updatePasswordForm')">
-                确认修改
-              </el-button>
-              <el-button
-                type="primary">
-                返回上一步
-              </el-button>
+              <el-button @click="stepActive = 0">上一步</el-button>
+              <el-button type="primary" :loading="submitting" @click="submitUpdate">确认修改</el-button>
             </el-form-item>
           </el-form>
         </div>
-        <!-- 修改成功 -->
-        <div class="success-container mt50 none">
-          <svg
-            t="1668155349480"
-            class="icon"
-            viewBox="0 0 1024 1024"
-            version="1.1"
-            xmlns="http://www.w3.org/2000/svg"
-            p-id="7238"
-            width="200"
-            height="200">
-            <path
-              d="M512 512m-448 0a448 448 0 1 0 896 0 448 448 0 1 0-896 0Z"
-              fill="#07C160"
-              p-id="7239">
-            </path>
-            <path
-              d="M466.7 679.8c-8.5 0-16.6-3.4-22.6-9.4l-181-181.1c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l158.4 158.5 249-249c12.5-12.5 32.8-12.5 45.3 0s12.5 32.8 0 45.3L489.3 670.4c-6 6-14.1 9.4-22.6 9.4z"
-              fill="#FFFFFF"
-              p-id="7240">
-            </path>
-          </svg>
-          <p class="mt20">修改成功</p>
+
+        <!-- 第三步：修改成功 -->
+        <div v-show="stepActive === 2" class="success-area">
+          <i class="el-icon-circle-check success-area__icon"/>
+          <p class="success-area__text">密码修改成功，当前登录状态已失效</p>
+          <el-button type="primary" round @click="backToLogin">重新登录</el-button>
         </div>
-      </div>
-      <!-- 密码建议 -->
+      </template>
     </div>
   </div>
 </template>
 
 <script>
-import Header from "@c/Header";
-import "../mock/login";
+import {mapState} from "vuex";
+import {sendUpdatePasswordEmailCode, updatePassword} from "@/api/user";
+import {LOGIN_PASSWORD_REGEX} from "@/constant/regexConstant";
 import {
   LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE,
-  LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE,
-  LOGIN_VERIFY_CODE_EMPTY_ERROR_MESSAGE,
-  RE_PASSWORD_NOT_EQUALS_PASSWORD_ERROR_MESSAGE,
+  LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE
 } from "@/constant/errorMessageConstant";
-import {LOGIN_PASSWORD_REGEX} from "@/constant/regexConstant";
-import axios from "axios";
 
 export default {
   name: "UpdatePassword",
-  components: {Header},
   data() {
     return {
-      stepActive: 1,
-      verifyCodeImageUrl: "",
+      // 当前步骤
+      stepActive: 0,
+      // 第一步表单
       validateForm: {
-        password: "",
-        verifyCode: "",
+        oldPassword: "",
+        emailCode: ""
       },
+      // 第一步表单校验规则
       validateFormRules: {
-        password: [
-          {
-            required: true,
-            message: LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE,
-            trigger: "blur",
-          },
-          {
-            pattern: LOGIN_PASSWORD_REGEX,
-            message: LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE,
-            trigger: "blur",
-          },
+        oldPassword: [
+          {required: true, message: LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE, trigger: "blur"},
+          {pattern: LOGIN_PASSWORD_REGEX, message: LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE, trigger: "blur"}
         ],
-        verifyCode: [
-          {
-            required: true,
-            message: LOGIN_VERIFY_CODE_EMPTY_ERROR_MESSAGE,
-            trigger: "blur",
-          },
-        ],
+        emailCode: [
+          {required: true, message: "请输入邮箱验证码", trigger: "blur"},
+          {pattern: /^\d{6}$/, message: "验证码为6位数字", trigger: "blur"}
+        ]
       },
-      updatePasswordForm: {
+      // 第二步表单
+      passwordForm: {
         password: "",
-        rePassword: "",
+        rePassword: ""
       },
-      updatePasswordFormRules: {
+      // 第二步表单校验规则
+      passwordFormRules: {
         password: [
-          {
-            required: true,
-            message: LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE,
-            trigger: "blur",
-          },
-          {
-            pattern: LOGIN_PASSWORD_REGEX,
-            message: LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE,
-            trigger: "blur",
-          },
+          {required: true, message: LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE, trigger: "blur"},
+          {pattern: LOGIN_PASSWORD_REGEX, message: LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE, trigger: "blur"}
         ],
         rePassword: [
+          {required: true, message: "请再次输入新密码", trigger: "blur"},
           {
             validator: (rule, value, callback) => {
-              if (this.updatePasswordForm.password !== this.updatePasswordForm.rePassword) {
-                return callback(new Error(RE_PASSWORD_NOT_EQUALS_PASSWORD_ERROR_MESSAGE));
-              } else {
-                return callback();
+              if (value !== this.passwordForm.password) {
+                return callback(new Error("两次输入的密码不一致"));
               }
+              return callback();
             },
-            trigger: "blur",
-          },
-        ],
+            trigger: "blur"
+          }
+        ]
       },
+      // 发送验证码倒计时（秒）
+      sendCountdown: 0,
+      // 倒计时定时器
+      countdownTimer: null,
+      // 提交中
+      submitting: false
     };
   },
+  computed: {
+    ...mapState({
+      userInfo: state => state.user.userInfo
+    }),
+    // 是否已绑定邮箱
+    emailBound() {
+      return !!(this.userInfo && this.userInfo.email);
+    },
+    // 脱敏后的邮箱
+    maskedEmail() {
+      let email = this.userInfo && this.userInfo.email;
+      if (!email) {
+        return "";
+      }
+      let atIndex = email.indexOf("@");
+      if (atIndex <= 1) {
+        return email;
+      }
+      return email.charAt(0) + "***" + email.substring(atIndex);
+    }
+  },
   methods: {
-    // 刷新验证码图片
-    refresh() {
-      axios.get("/api-backend/refreshVerifyCode").then((res) => {
-        let outerData = res.data;
-        let innerData = outerData.data;
-        this.verifyCodeImageUrl = innerData;
+    // 密码修改成功后当前会话已被服务端强制下线，清理本地登录态并返回登录页
+    backToLogin() {
+      this.$store.commit("logout");
+      this.$router.push({name: "Login"});
+    },
+    // 发送修改密码邮箱验证码
+    sendCode() {
+      let that = this;
+      sendUpdatePasswordEmailCode().then(() => {
+        that.$message.success("验证码已发送，请查收邮件");
+        that.sendCountdown = 60;
+        that.countdownTimer = setInterval(() => {
+          that.sendCountdown--;
+          if (that.sendCountdown <= 0) {
+            clearInterval(that.countdownTimer);
+            that.countdownTimer = null;
+          }
+        }, 1000);
+      }).catch(() => {
+        // 错误消息已由axios响应拦截器统一弹出，这里仅需吞掉异常，防止出现未处理的Promise拒绝
       });
     },
-    commitValidateForm(formName) {
+    // 第一步校验通过后进入设置新密码
+    goNext() {
+      this.$refs.validateForm.validate((valid) => {
+        if (valid) {
+          this.stepActive = 1;
+        }
+      });
     },
-    commitUpdatePasswordForm(formName) {
-    },
+    // 提交修改密码
+    submitUpdate() {
+      let that = this;
+      that.$refs.passwordForm.validate((valid) => {
+        if (!valid) {
+          return;
+        }
+        that.submitting = true;
+        updatePassword({
+          oldPassword: that.validateForm.oldPassword,
+          newPassword: that.passwordForm.password,
+          emailCode: that.validateForm.emailCode
+        }).then(() => {
+          that.$message.success("密码修改成功");
+          that.stepActive = 2;
+        }).catch(() => {
+          // 错误消息已由axios响应拦截器统一弹出，这里仅需吞掉异常，防止出现未处理的Promise拒绝
+        }).finally(() => {
+          that.submitting = false;
+        });
+      });
+    }
   },
-  mounted() {
-    this.refresh();
-  },
+  beforeDestroy() {
+    if (this.countdownTimer) {
+      clearInterval(this.countdownTimer);
+      this.countdownTimer = null;
+    }
+  }
 };
 </script>
 
 <style lang="scss" scoped>
-.update-password-container {
-  height: calc(100% - 60px);
-  margin: 20px auto;
-  width: 1100px;
+$primary: #409eff;
+$text-primary: #303133;
+$text-regular: #606266;
+$text-secondary: #909399;
+$border-light: #f2f6fc;
+$page-bg: #f1f1f1;
 
-  .content-container {
-    background: #ffffff;
-    width: 100%;
-    height: 600px;
-    transition: 0.3s;
-    border-radius: 4px;
+.update-password {
+  padding: 20px;
+  background: $page-bg;
+  box-sizing: border-box;
+}
 
-    &:hover {
-      box-shadow: 0 2px 12px 0 rgb(0 0 0 / 10%);
+.update-card {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 24px 32px 40px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-sizing: border-box;
+
+  &__header {
+    font-size: 16px;
+    font-weight: 600;
+    color: $text-primary;
+    padding-bottom: 16px;
+    border-bottom: 1px solid $border-light;
+  }
+
+  &__steps {
+    margin: 32px auto 8px;
+    max-width: 560px;
+  }
+}
+
+.form-area {
+  max-width: 480px;
+  margin: 40px auto 0;
+
+  .code-row {
+    display: flex;
+    gap: 10px;
+    width: 340px;
+
+    .el-input {
+      flex: 1;
     }
 
-    header {
-      width: 100%;
-      text-align: left;
-      height: 40px;
-      line-height: 40px;
-      padding: 5px 20px;
-
-      span {
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-      }
+    &__send-btn {
+      flex-shrink: 0;
     }
+  }
 
-    .step-container {
-      height: 60px;
+  .form-tip {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: $text-secondary;
+    line-height: 1.4;
+  }
+}
 
-      .el-steps {
-        height: 60px;
+.no-email {
+  margin: 48px auto 24px;
+  text-align: center;
 
-        ::v-deep .el-step__line {
-          background: #349ad9;
-        }
-      }
-    }
+  &__icon {
+    font-size: 48px;
+    color: #e6a23c;
+  }
 
-    .form-container {
-      width: 800px;
-      height: 300px;
-      margin: 0 auto;
+  &__text {
+    margin: 16px 0 20px;
+    font-size: 14px;
+    color: $text-regular;
+  }
+}
 
-      .validate-form {
-        width: 100%;
-        height: 100%;
+.success-area {
+  margin: 48px auto 24px;
+  text-align: center;
 
-        .el-form-item {
-          margin-bottom: 30px;
+  &__icon {
+    font-size: 64px;
+    color: #67c23a;
+  }
 
-          ::v-deep .el-form-item__label::before {
-            content: "*";
-            color: #f56c6c;
-          }
-
-          a {
-            color: #4a4a4a;
-
-            &:hover {
-              text-decoration: underline;
-              color: #5c6b77;
-            }
-          }
-        }
-
-        .verify-code-img {
-          display: block;
-          width: 100px;
-          height: 40px;
-          line-height: 40px;
-          cursor: pointer;
-        }
-      }
-
-      .update-password-form {
-        width: 100%;
-        height: 100%;
-
-        .el-form-item {
-          margin-bottom: 30px;
-
-          ::v-deep .el-form-item__label::before {
-            content: "*";
-            color: #f56c6c;
-          }
-
-          a {
-            color: #4a4a4a;
-
-            &:hover {
-              text-decoration: underline;
-              color: #5c6b77;
-            }
-          }
-        }
-      }
-
-      .success-container {
-        width: 100%;
-        height: 100%;
-        text-align: center;
-
-        p {
-          font-size: 24px;
-          color: #5cb85c;
-        }
-      }
-    }
+  &__text {
+    margin: 16px 0 24px;
+    font-size: 18px;
+    font-weight: 600;
+    color: $text-primary;
   }
 }
 </style>

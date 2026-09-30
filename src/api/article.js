@@ -45,6 +45,53 @@ export const deleteDraft = (draftId) => {
 };
 
 
+/**
+ * 获取文章详情（用于编辑已发布文章）
+ *
+ * @param articleId 文章id
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const findArticleDetail = (articleId) => {
+  return axios.get(BASE_URL + requestMapping + "/detail/" + articleId);
+};
+
+/**
+ * 更新已发布文章
+ *
+ * @param articleId 文章id
+ * @param title 文章标题
+ * @param summary 文章简介
+ * @param markdownContent markdown文章内容
+ * @param htmlContent html文章内容
+ * @param categoryId 文章分类id
+ * @param tagList 文章标签列表
+ * @param recommend 是否推荐
+ * @param top 是否置顶
+ * @param creationType 创作类型
+ * @param coverUrl 文章封面
+ * @param transportInfo 转载说明
+ * @param quoteInfo 文章引用信息
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updateArticle = ({articleId, title, summary, markdownContent, htmlContent, categoryId, tagList, recommend, top, creationType, coverUrl, transportInfo, quoteInfo}) => {
+  return axios.put(BASE_URL + requestMapping + "/update", {
+    articleId,
+    title,
+    summary,
+    markdownContent,
+    htmlContent,
+    categoryId,
+    tagList,
+    recommend,
+    top,
+    creationType,
+    coverUrl,
+    transportInfo,
+    quoteInfo
+  });
+};
+
+
 // #################### 文章相关接口 #################### //
 
 /**

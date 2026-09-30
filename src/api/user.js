@@ -116,3 +116,78 @@ export const adminEditUser = (userId, password, email, roleId) => {
     roleId
   });
 };
+
+/**
+ * 发送绑定邮箱验证码
+ *
+ * @param email 邮箱
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const sendBindEmailCode = (email) => {
+  return axios.post(BASE_URL + requestMapping + "/bindEmail/sendCode", {email});
+};
+
+/**
+ * 确认绑定邮箱
+ *
+ * @param email 邮箱
+ * @param code 验证码
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const bindEmail = ({email, code}) => {
+  return axios.post(BASE_URL + requestMapping + "/bindEmail/confirm", {email, code});
+};
+
+/**
+ * 发送修改密码邮箱验证码（发送到已绑定邮箱）
+ *
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const sendUpdatePasswordEmailCode = () => {
+  return axios.post(BASE_URL + requestMapping + "/updatePassword/sendCode");
+};
+
+/**
+ * 个人修改密码
+ *
+ * @param oldPassword 当前密码
+ * @param newPassword 新密码
+ * @param emailCode 邮箱验证码
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updatePassword = ({oldPassword, newPassword, emailCode}) => {
+  return axios.put(BASE_URL + requestMapping + "/updatePassword", {oldPassword, newPassword, emailCode});
+};
+
+/**
+ * 发送忘记密码邮箱验证码
+ *
+ * @param username 用户名
+ * @param email 已绑定邮箱
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const sendForgetPasswordEmailCode = ({username, email}) => {
+  return axios.post(BASE_URL + requestMapping + "/forgetPassword/sendCode", {username, email});
+};
+
+/**
+ * 忘记密码重置密码
+ *
+ * @param username 用户名
+ * @param code 邮箱验证码
+ * @param newPassword 新密码
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const resetPasswordByEmailCode = ({username, code, newPassword}) => {
+  return axios.post(BASE_URL + requestMapping + "/forgetPassword/reset", {username, code, newPassword});
+};
+
+/**
+ * 更新当前用户头像
+ *
+ * @param avatarUrl 头像文件地址
+ * @returns {Promise<AxiosResponse<any>>}
+ */
+export const updateAvatar = ({avatarUrl}) => {
+  return axios.put(BASE_URL + requestMapping + "/avatar", {avatarUrl});
+};
