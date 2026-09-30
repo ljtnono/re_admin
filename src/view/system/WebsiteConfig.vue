@@ -4,18 +4,8 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: "WebsiteConfig",
-  data() {
-    return {
-
-    }
-  },
-  methods: {
-
-  }
-};
+<script setup>
+defineOptions({ name: "WebsiteConfig" });
 </script>
 
 <style lang="scss" scoped>

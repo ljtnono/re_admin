@@ -1,28 +1,39 @@
-.DS_Store
-node_modules
-/dist
+# 依赖
+node_modules/
+.pnp
+.pnp.*
 
-package-lock.json
+# 构建产物
+dist/
+dist-ssr/
+*.local
 
-/tests/e2e/videos/
-/tests/e2e/screenshots/
-
-# local env files
+# 环境变量：本地私有配置不提交，模板与按环境的默认配置提交
+.env
 .env.local
 .env.*.local
 
-# Log files
+# 日志
+logs/
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# Editor directories and files
-.idea
-.vscode
+# 编辑器 / IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
-*.sw*
+*.sw?
 
-build/env.js
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# 其他
+*.tsbuildinfo

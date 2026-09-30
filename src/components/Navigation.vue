@@ -13,48 +13,39 @@
         <img class="nav-logo-min" v-show="collapseStatus" src="@a/images/logo-min.png" alt="logo-mini"/>
       </div>
       <!-- 工作台 -->
-      <el-menu-item style="text-align: center; cursor: pointer" @click="$router.push({ name: 'Workspace' })">
+      <el-menu-item index="/workspace" style="text-align: center; cursor: pointer" @click="$router.push({ name: 'Workspace' })">
         <a href="javascript:" v-show="!collapseStatus" style="width: 100%; height: 100%; display: inline-block">
           工作台
         </a>
         <div v-show="collapseStatus">
           <a href="javascript:" style="width: 100%; height: 100%; display: inline-block">
-            <i class="el-icon-location" style="display: inline-block !important"/>
+            <el-icon><Location /></el-icon>
           </a>
         </div>
       </el-menu-item>
       <!-- 递归嵌套设置子菜单 -->
-      <template v-for="item in menus">
-        <menu-item :item="item" :key="item.name" />
+      <template v-for="item in menus" :key="item.name">
+        <menu-item :item="item" />
       </template>
     </el-menu>
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref } from "vue";
+import { Location } from "@element-plus/icons-vue";
 import MenuItem from "@c/MenuItem.vue";
 
-export default {
-  name: "Navigation",
-  data() {
-    return {
-      collapseTransition: true
-    };
-  },
-  props: {
-    collapseStatus: Boolean,
-    menus: {
-      type: Array,
-    },
-  },
-  components: {
-    MenuItem
-  },
-  methods: {},
-  mounted() {
+defineOptions({ name: "Navigation" });
 
-  },
-};
+defineProps({
+  collapseStatus: Boolean,
+  menus: {
+    type: Array
+  }
+});
+
+const collapseTransition = ref(true);
 </script>
 
 <style lang="scss" scoped>
@@ -64,15 +55,7 @@ export default {
   height: 100%;
   position: relative;
 
-  .el-submenu {
-    .el-submenu__title {
-      float: left;
-    }
-
-    .el-submenu__icon-arrow {
-      display: inline-block !important;
-    }
-
+  :deep(.el-sub-menu) {
     .el-menu-item {
       min-width: 180px;
     }
@@ -83,11 +66,11 @@ export default {
 .el-menu--collapse {
   width: 64px;
 
-  ::v-deep .el-submenu__title {
+  :deep(.el-sub-menu__title) {
     text-align: center;
   }
 
-  ::v-deep .el-submenu__icon-arrow {
+  :deep(.el-sub-menu__icon-arrow) {
     display: none !important;
   }
 

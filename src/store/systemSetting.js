@@ -1,29 +1,26 @@
-const systemSetting = {
-  namespaced: true,
+import { defineStore } from "pinia";
+
+export const useSystemSettingStore = defineStore("systemSetting", {
   state: () => ({
     // 面包屑列表
     breadcrumbList: [],
     // 当前面包屑导航列表
     currentBreadcrumbList: [],
+    // 后端下发的路由列表
     routeList: []
   }),
-  getters:{
+  actions: {
+    changeBreadcrumbList(breadcrumbList) {
+      this.breadcrumbList = breadcrumbList;
+    },
+    changeRouteList(routeList) {
+      this.routeList = routeList;
+    },
+    changeCurrentBreadcrumbList(currentBreadcrumbList) {
+      this.currentBreadcrumbList = currentBreadcrumbList;
+    }
   },
-  actions:{
-
-  },
-  mutations:{
-    changeBreadcrumbList(state, breadcrumbList) {
-      state.breadcrumbList = breadcrumbList;
-    },
-    changeRouteList(state, routeList) {
-      state.routeList = routeList;
-    },
-    // 修改面包屑列表
-    changeCurrentBreadcrumbList(state, currentBreadcrumbList) {
-      state.currentBreadcrumbList = currentBreadcrumbList;
-    },
+  persist: {
+    storage: sessionStorage
   }
-};
-
-export default systemSetting;
+});

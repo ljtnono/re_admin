@@ -1,8 +1,9 @@
 import axios from "axios";
-import ElementUI from "element-ui";
+import { ElMessage } from "element-plus";
 import urlUtil from "@/util/urlUtil";
 import router from "@/router";
-import store from "@/store";
+import { useUserStore } from "@/store/user";
+import globalLogout from "@/util/storeUtil";
 import { TOKEN_ERROR_CODE_ARRAY } from "@/constant/errorConstant";
 import {
   HTTP_RESULT_SUCCESS_CODE,
@@ -18,10 +19,10 @@ const PASS_TOKEN_URL = [
 ];
 
 // 添加请求拦截器
-INSTANCE.interceptors.request.use(config => {
-  let urlWithoutParameter = urlUtil.removeParameter(config.url);
+INSTANCE.interceptors.request.use((config) => {
+  const urlWithoutParameter = urlUtil.removeParameter(config.url);
   if (!PASS_TOKEN_URL.includes(urlWithoutParameter)) {
-    let token = store.state.user.tokenInfo;
+    const token = useUserStore().tokenInfo;
     if (token) {
       config.headers["Authorization"] = "Bearer " + token["access_token"];
     }
@@ -32,25 +33,22 @@ INSTANCE.interceptors.request.use(config => {
 // 添加响应拦截器
 INSTANCE.interceptors.response.use((response) => {
   // 2xx 范围内的状态码都会触发该函数。
-  // 对响应数据做点什么
-  let contentType = response.headers && response.headers["content-type"];
+  const contentType = response.headers && response.headers["content-type"];
   if (contentType && contentType.indexOf("application/json") !== -1) {
-    let code = response.data.code;
-    let message = response.data.message;
+    const code = response.data.code;
+    const message = response.data.message;
     if (HTTP_RESULT_SUCCESS_CODE === code && HTTP_RESULT_SUCCESS_MESSAGE === message) {
       return response;
     } else {
-      // 在这里处理自定义异常，这里处理完之后，如果调用axios时有自定义的catch也会进行处理
-      // 弹出错误消息
-      ElementUI.Message.error({
+      // 弹出错误消息（调用处的自定义catch仍会执行）
+      ElMessage.error({
         message: message,
         duration: 2000,
         center: false
       });
       // 如果token异常，需要清除缓存，并跳转到登录页面
       if (TOKEN_ERROR_CODE_ARRAY.includes(code)) {
-        // 删除当前token信息,并返回到登录界面
-        store.commit("logout");
+        globalLogout();
         router.push({
           name: "Login"
         });
@@ -59,29 +57,29 @@ INSTANCE.interceptors.response.use((response) => {
     }
   }
   return response;
-}, error => {
-  let message = error.message;
+}, (error) => {
+  const message = error.message || "";
   if (message.indexOf("status code 503") !== -1) {
-    // 这里处理HTTP非200的情况，这里处理完之后，如果axios有自定义的catch也会进行处理
-    ElementUI.Message.error({
+    ElMessage.error({
       message: "后台服务异常，请联系管理员！",
       duration: 2000,
       center: false
     });
   } else if (message.indexOf("Network Error") !== -1) {
-    ElementUI.Message.error({
+    ElMessage.error({
       message: "操作失败！请检查网络",
       duration: 2000,
       center: false
     });
   } else {
     console.log(error);
-    ElementUI.Message.error({
+    ElMessage.error({
       message: "未知异常",
       duration: 2000,
       center: false
     });
   }
+  return Promise.reject(error);
 });
 
 export default INSTANCE;

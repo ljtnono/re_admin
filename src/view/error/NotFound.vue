@@ -4,19 +4,11 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import error404 from "@a/images/error-page/error-404.svg";
-import errorContent from "./error-content.vue";
+import ErrorContent from "./error-content.vue";
 
-export default {
-  name: "NotFound",
-  components: {
-    errorContent,
-  },
-  data() {
-    return {
-      src: error404,
-    };
-  },
-};
+defineOptions({ name: "NotFound" });
+
+const src = error404;
 </script>

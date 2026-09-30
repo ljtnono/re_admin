@@ -6,25 +6,21 @@
         <h4>{{ code }}</h4>
         <h5>{{ desc }}</h5>
       </div>
-      <back-btn-group class="back-btn-group"></back-btn-group>
+      <back-btn-group class="back-btn-group" />
     </div>
   </div>
 </template>
 
-<script>
-import backBtnGroup from "./back-btn-group.vue";
+<script setup>
+import BackBtnGroup from "./back-btn-group.vue";
 
-export default {
-  name: "error_content",
-  components: {
-    backBtnGroup,
-  },
-  props: {
-    code: String,
-    desc: String,
-    src: String,
-  },
-};
+defineOptions({ name: "ErrorContent" });
+
+defineProps({
+  code: String,
+  desc: String,
+  src: String
+});
 </script>
 
 <style lang="scss" scoped>

@@ -6,10 +6,7 @@
 
 <script>
 export default {
-  name: "App",
-  methods: {
-
-  }
+  name: "App"
 };
 </script>
 
@@ -21,13 +18,4 @@ export default {
   margin: 0;
   padding: 0;
 }
-
-body,
-html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
-}
-
 </style>

@@ -1,21 +1,23 @@
 <template>
-  <el-card id="login-card" class="box-card m20" @keyup.enter.native="commit('loginForm')">
+  <el-card id="login-card" class="box-card m20" @keyup.enter="commit">
     <!-- 登录提示头 -->
-    <div slot="header" class="clearfix">
-      <span>欢迎登录</span>
-    </div>
+    <template #header>
+      <div class="clearfix">
+        <span>欢迎登录</span>
+      </div>
+    </template>
     <!--登录表单-->
     <el-form
       class="login-form"
       :model="loginForm"
       :rules="rules"
-      ref="loginForm">
+      ref="loginFormRef">
       <!-- 用户名 -->
       <el-form-item prop="username">
         <el-input
           class="fr"
           v-model="loginForm.username"
-          prefix-icon="el-icon-user-solid"
+          :prefix-icon="User"
           placeholder="请输入用户名"
           clearable
           maxlength="50"/>
@@ -24,7 +26,7 @@
       <el-form-item prop="password">
         <el-input
           class="fr"
-          prefix-icon="el-icon-lock"
+          :prefix-icon="Lock"
           v-model="loginForm.password"
           placeholder="请输入密码"
           show-password
@@ -47,7 +49,7 @@
         <el-button
           class="btn-submit"
           type="primary"
-          @click="commit('loginForm')">
+          @click="commit">
           登录
         </el-button>
         <div class="forget-password">
@@ -56,91 +58,86 @@
       </el-form-item>
     </el-form>
     <!-- 忘记密码弹窗 -->
-    <ForgetPasswordDialog :visible.sync="forgetPasswordVisible"/>
+    <ForgetPasswordDialog v-model="forgetPasswordVisible"/>
   </el-card>
 </template>
 
-<script>
-import {LOGIN_PASSWORD_REGEX, LOGIN_USERNAME_REGEX} from "@/constant/regexConstant";
-import ForgetPasswordDialog from "@c/ForgetPasswordDialog";
+<script setup>
+import { ref, reactive } from "vue";
+import { User, Lock } from "@element-plus/icons-vue";
+import { LOGIN_PASSWORD_REGEX, LOGIN_USERNAME_REGEX } from "@/constant/regexConstant";
+import ForgetPasswordDialog from "@c/ForgetPasswordDialog.vue";
 import {
   LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE,
   LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE,
   LOGIN_USERNAME_EMPTY_ERROR_MESSAGE,
   LOGIN_USERNAME_FORMAT_ERROR_MESSAGE,
-  LOGIN_VERIFY_CODE_EMPTY_ERROR_MESSAGE,
+  LOGIN_VERIFY_CODE_EMPTY_ERROR_MESSAGE
 } from "@/constant/errorMessageConstant";
 
-export default {
-  name: "LoginForm",
-  components: {
-    ForgetPasswordDialog
-  },
-  data() {
-    return {
-      // 忘记密码弹窗是否显示
-      forgetPasswordVisible: false,
-      loginForm: {
-        username: "",
-        password: "",
-        verifyCode: "",
-      },
-      rules: {
-        username: [
-          {
-            required: true,
-            message: LOGIN_USERNAME_EMPTY_ERROR_MESSAGE,
-            trigger: "blur",
-          },
-          {
-            pattern: LOGIN_USERNAME_REGEX,
-            message: LOGIN_USERNAME_FORMAT_ERROR_MESSAGE,
-            trigger: "blur",
-          },
-        ],
-        password: [
-          {
-            required: true,
-            message: LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE,
-            trigger: "blur",
-          },
-          {
-            pattern: LOGIN_PASSWORD_REGEX,
-            message: LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE,
-            trigger: "blur",
-          },
-        ],
-        verifyCode: [
-          {
-            required: true,
-            message: LOGIN_VERIFY_CODE_EMPTY_ERROR_MESSAGE,
-            trigger: "blur",
-          },
-        ],
-      },
-    };
-  },
-  props: {
-    verifyCodeImageUrl: String,
-  },
-  computed: {},
-  methods: {
-    refresh() {
-      this.$emit("refreshVerifyCode");
+defineOptions({ name: "LoginForm" });
+
+defineProps({
+  verifyCodeImageUrl: String
+});
+
+const emit = defineEmits(["submit", "refreshVerifyCode"]);
+
+// 忘记密码弹窗是否显示
+const forgetPasswordVisible = ref(false);
+const loginFormRef = ref(null);
+
+const loginForm = reactive({
+  username: "",
+  password: "",
+  verifyCode: ""
+});
+
+const rules = {
+  username: [
+    {
+      required: true,
+      message: LOGIN_USERNAME_EMPTY_ERROR_MESSAGE,
+      trigger: "blur"
     },
-    commit(formName) {
-      let that = this;
-      this.$refs[formName].validate((valid) => {
-        // 校验成功，请求登录接口
-        if (valid) {
-          this.$emit("submit", that.loginForm.username, that.loginForm.password, that.loginForm.verifyCode);
-          return true;
-        } else {
-          return false;
-        }
-      });
+    {
+      pattern: LOGIN_USERNAME_REGEX,
+      message: LOGIN_USERNAME_FORMAT_ERROR_MESSAGE,
+      trigger: "blur"
+    }
+  ],
+  password: [
+    {
+      required: true,
+      message: LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE,
+      trigger: "blur"
     },
-  },
+    {
+      pattern: LOGIN_PASSWORD_REGEX,
+      message: LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE,
+      trigger: "blur"
+    }
+  ],
+  verifyCode: [
+    {
+      required: true,
+      message: LOGIN_VERIFY_CODE_EMPTY_ERROR_MESSAGE,
+      trigger: "blur"
+    }
+  ]
+};
+
+const refresh = () => {
+  emit("refreshVerifyCode");
+};
+
+const commit = () => {
+  loginFormRef.value.validate((valid) => {
+    // 校验成功，请求登录接口
+    if (valid) {
+      emit("submit", loginForm.username, loginForm.password, loginForm.verifyCode);
+    }
+  });
 };
 </script>
 
@@ -156,10 +153,8 @@ export default {
     width: 100%;
     height: 100%;
 
-    .el-form-item {
-      &:nth-child(2) {
-        margin-bottom: 30px;
-      }
+    :deep(.el-form-item:nth-child(2)) {
+      margin-bottom: 30px;
     }
 
     .verify-code-img {

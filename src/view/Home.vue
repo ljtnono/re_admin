@@ -11,63 +11,48 @@
   </div>
 </template>
 
-<script>
-
+<script setup>
+import { ref, computed, onMounted } from "vue";
 import Header from "@c/Header.vue";
 import Navigation from "@c/Navigation.vue";
-import {findCategoryList} from "@/api/category";
-import {findTagList} from "@/api/tag";
-import {mapState} from "vuex";
-import {findRoleList} from "@/api/role";
+import { findCategoryList } from "@/api/category";
+import { findTagList } from "@/api/tag";
+import { findRoleList } from "@/api/role";
+import { useUserStore } from "@/store/user";
+import { useCommonStore } from "@/store/common";
 
-export default {
-  name: "Home",
-  data() {
-    return {
-      collapseStatus: false,
-      toggleIconClass: "nav-toggle-a"
-    };
-  },
-  computed: {
-    ...mapState({
-      menus: state => state.user.menus
-    })
-  },
-  components: {
-    Header,
-    Navigation
-  },
-  methods: {
-    navToggleClass() {
-      let collapseStatus = this.collapseStatus;
-      if (collapseStatus) {
-        this.toggleIconClass = "nav-toggle-a-collapse";
-      } else {
-        this.toggleIconClass = "nav-toggle-a";
-      }
-    },
-    // 切换导航菜单的折叠状态
-    toggleNav() {
-      this.collapseStatus = !this.collapseStatus;
-      this.navToggleClass();
-    },
-  },
-  mounted() {
-    // 获取文章分类列表
-    findCategoryList().then(res => {
-      this.$store.commit("common/changeCategoryList", res.data.data);
-    });
-    // 获取文章标签列表
-    findTagList().then(res => {
-      this.$store.commit("common/changeTagList", res.data.data);
-    });
-    // 获取角色列表
-    findRoleList().then(res => {
-      this.$store.commit("common/changeRoleList", res.data.data);
-    });
-  },
+defineOptions({ name: "Home" });
+
+const collapseStatus = ref(false);
+const toggleIconClass = ref("nav-toggle-a");
+
+const menus = computed(() => useUserStore().menus);
+
+const navToggleClass = () => {
+  toggleIconClass.value = collapseStatus.value ? "nav-toggle-a-collapse" : "nav-toggle-a";
 };
 
+// 切换导航菜单的折叠状态
+const toggleNav = () => {
+  collapseStatus.value = !collapseStatus.value;
+  navToggleClass();
+};
+
+onMounted(() => {
+  const commonStore = useCommonStore();
+  // 获取文章分类列表
+  findCategoryList().then((res) => {
+    commonStore.changeCategoryList(res.data.data);
+  }).catch(() => {});
+  // 获取文章标签列表
+  findTagList().then((res) => {
+    commonStore.changeTagList(res.data.data);
+  }).catch(() => {});
+  // 获取角色列表
+  findRoleList().then((res) => {
+    commonStore.changeRoleList(res.data.data);
+  }).catch(() => {});
+});
 </script>
 
 <style lang="scss" scoped>

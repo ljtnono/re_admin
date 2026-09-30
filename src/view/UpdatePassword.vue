@@ -10,7 +10,7 @@
 
       <!-- 未绑定邮箱提示：修改密码依赖邮箱验证 -->
       <div v-if="!emailBound" class="no-email">
-        <i class="el-icon-warning-outline no-email__icon"/>
+        <el-icon class="no-email__icon"><Warning /></el-icon>
         <p class="no-email__text">修改密码需要先绑定邮箱，用于接收验证验证码</p>
         <el-button type="primary" round @click="$router.push({name: 'Personal'})">去绑定邮箱</el-button>
       </div>
@@ -18,7 +18,7 @@
       <template v-else>
         <!-- 第一步：验证身份 -->
         <div v-show="stepActive === 0" class="form-area">
-          <el-form ref="validateForm" :model="validateForm" :rules="validateFormRules" label-width="110px">
+          <el-form ref="validateFormRef" :model="validateForm" :rules="validateFormRules" label-width="110px">
             <el-form-item label="当前密码" prop="oldPassword">
               <el-input
                 v-model="validateForm.oldPassword"
@@ -50,7 +50,7 @@
 
         <!-- 第二步：设置新密码 -->
         <div v-show="stepActive === 1" class="form-area">
-          <el-form ref="passwordForm" :model="passwordForm" :rules="passwordFormRules" label-width="110px">
+          <el-form ref="passwordFormRef" :model="passwordForm" :rules="passwordFormRules" label-width="110px">
             <el-form-item label="新密码" prop="password">
               <el-input
                 v-model="passwordForm.password"
@@ -76,7 +76,7 @@
 
         <!-- 第三步：修改成功 -->
         <div v-show="stepActive === 2" class="success-area">
-          <i class="el-icon-circle-check success-area__icon"/>
+          <el-icon class="success-area__icon"><CircleCheckFilled /></el-icon>
           <p class="success-area__text">密码修改成功，当前登录状态已失效</p>
           <el-button type="primary" round @click="backToLogin">重新登录</el-button>
         </div>
@@ -85,151 +85,158 @@
   </div>
 </template>
 
-<script>
-import {mapState} from "vuex";
-import {sendUpdatePasswordEmailCode, updatePassword} from "@/api/user";
-import {LOGIN_PASSWORD_REGEX} from "@/constant/regexConstant";
+<script setup>
+import { ref, reactive, computed, onBeforeUnmount } from "vue";
+import { ElMessage } from "element-plus";
+import { Warning, CircleCheckFilled } from "@element-plus/icons-vue";
+import { useRouter } from "vue-router";
+import { sendUpdatePasswordEmailCode, updatePassword } from "@/api/user";
+import { LOGIN_PASSWORD_REGEX } from "@/constant/regexConstant";
 import {
   LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE,
   LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE
 } from "@/constant/errorMessageConstant";
+import { useUserStore } from "@/store/user";
+import globalLogout from "@/util/storeUtil";
 
-export default {
-  name: "UpdatePassword",
-  data() {
-    return {
-      // 当前步骤
-      stepActive: 0,
-      // 第一步表单
-      validateForm: {
-        oldPassword: "",
-        emailCode: ""
-      },
-      // 第一步表单校验规则
-      validateFormRules: {
-        oldPassword: [
-          {required: true, message: LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE, trigger: "blur"},
-          {pattern: LOGIN_PASSWORD_REGEX, message: LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE, trigger: "blur"}
-        ],
-        emailCode: [
-          {required: true, message: "请输入邮箱验证码", trigger: "blur"},
-          {pattern: /^\d{6}$/, message: "验证码为6位数字", trigger: "blur"}
-        ]
-      },
-      // 第二步表单
-      passwordForm: {
-        password: "",
-        rePassword: ""
-      },
-      // 第二步表单校验规则
-      passwordFormRules: {
-        password: [
-          {required: true, message: LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE, trigger: "blur"},
-          {pattern: LOGIN_PASSWORD_REGEX, message: LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE, trigger: "blur"}
-        ],
-        rePassword: [
-          {required: true, message: "请再次输入新密码", trigger: "blur"},
-          {
-            validator: (rule, value, callback) => {
-              if (value !== this.passwordForm.password) {
-                return callback(new Error("两次输入的密码不一致"));
-              }
-              return callback();
-            },
-            trigger: "blur"
-          }
-        ]
-      },
-      // 发送验证码倒计时（秒）
-      sendCountdown: 0,
-      // 倒计时定时器
-      countdownTimer: null,
-      // 提交中
-      submitting: false
-    };
-  },
-  computed: {
-    ...mapState({
-      userInfo: state => state.user.userInfo
-    }),
-    // 是否已绑定邮箱
-    emailBound() {
-      return !!(this.userInfo && this.userInfo.email);
-    },
-    // 脱敏后的邮箱
-    maskedEmail() {
-      let email = this.userInfo && this.userInfo.email;
-      if (!email) {
-        return "";
-      }
-      let atIndex = email.indexOf("@");
-      if (atIndex <= 1) {
-        return email;
-      }
-      return email.charAt(0) + "***" + email.substring(atIndex);
-    }
-  },
-  methods: {
-    // 密码修改成功后当前会话已被服务端强制下线，清理本地登录态并返回登录页
-    backToLogin() {
-      this.$store.commit("logout");
-      this.$router.push({name: "Login"});
-    },
-    // 发送修改密码邮箱验证码
-    sendCode() {
-      let that = this;
-      sendUpdatePasswordEmailCode().then(() => {
-        that.$message.success("验证码已发送，请查收邮件");
-        that.sendCountdown = 60;
-        that.countdownTimer = setInterval(() => {
-          that.sendCountdown--;
-          if (that.sendCountdown <= 0) {
-            clearInterval(that.countdownTimer);
-            that.countdownTimer = null;
-          }
-        }, 1000);
-      }).catch(() => {
-        // 错误消息已由axios响应拦截器统一弹出，这里仅需吞掉异常，防止出现未处理的Promise拒绝
-      });
-    },
-    // 第一步校验通过后进入设置新密码
-    goNext() {
-      this.$refs.validateForm.validate((valid) => {
-        if (valid) {
-          this.stepActive = 1;
-        }
-      });
-    },
-    // 提交修改密码
-    submitUpdate() {
-      let that = this;
-      that.$refs.passwordForm.validate((valid) => {
-        if (!valid) {
-          return;
-        }
-        that.submitting = true;
-        updatePassword({
-          oldPassword: that.validateForm.oldPassword,
-          newPassword: that.passwordForm.password,
-          emailCode: that.validateForm.emailCode
-        }).then(() => {
-          that.$message.success("密码修改成功");
-          that.stepActive = 2;
-        }).catch(() => {
-          // 错误消息已由axios响应拦截器统一弹出，这里仅需吞掉异常，防止出现未处理的Promise拒绝
-        }).finally(() => {
-          that.submitting = false;
-        });
-      });
-    }
-  },
-  beforeDestroy() {
-    if (this.countdownTimer) {
-      clearInterval(this.countdownTimer);
-      this.countdownTimer = null;
-    }
-  }
+defineOptions({ name: "UpdatePassword" });
+
+const router = useRouter();
+const userStore = useUserStore();
+
+const validateFormRef = ref(null);
+const passwordFormRef = ref(null);
+
+// 当前步骤
+const stepActive = ref(0);
+
+// 第一步表单
+const validateForm = reactive({
+  oldPassword: "",
+  emailCode: ""
+});
+
+// 第一步表单校验规则
+const validateFormRules = {
+  oldPassword: [
+    {required: true, message: LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE, trigger: "blur"},
+    {pattern: LOGIN_PASSWORD_REGEX, message: LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE, trigger: "blur"}
+  ],
+  emailCode: [
+    {required: true, message: "请输入邮箱验证码", trigger: "blur"},
+    {pattern: /^\d{6}$/, message: "验证码为6位数字", trigger: "blur"}
+  ]
 };
+
+// 第二步表单
+const passwordForm = reactive({
+  password: "",
+  rePassword: ""
+});
+
+// 第二步表单校验规则
+const passwordFormRules = {
+  password: [
+    {required: true, message: LOGIN_PASSWORD_EMPTY_ERROR_MESSAGE, trigger: "blur"},
+    {pattern: LOGIN_PASSWORD_REGEX, message: LOGIN_PASSWORD_FORMAT_ERROR_MESSAGE, trigger: "blur"}
+  ],
+  rePassword: [
+    {required: true, message: "请再次输入新密码", trigger: "blur"},
+    {
+      validator: (rule, value, callback) => {
+        if (value !== passwordForm.password) {
+          return callback(new Error("两次输入的密码不一致"));
+        }
+        return callback();
+      },
+      trigger: "blur"
+    }
+  ]
+};
+
+// 发送验证码倒计时（秒）
+const sendCountdown = ref(0);
+// 倒计时定时器
+let countdownTimer = null;
+// 提交中
+const submitting = ref(false);
+
+// 是否已绑定邮箱
+const emailBound = computed(() => !!(userStore.userInfo && userStore.userInfo.email));
+
+// 脱敏后的邮箱
+const maskedEmail = computed(() => {
+  const email = userStore.userInfo && userStore.userInfo.email;
+  if (!email) {
+    return "";
+  }
+  const atIndex = email.indexOf("@");
+  if (atIndex <= 1) {
+    return email;
+  }
+  return email.charAt(0) + "***" + email.substring(atIndex);
+});
+
+// 密码修改成功后当前会话已被服务端强制下线，清理本地登录态并返回登录页
+const backToLogin = () => {
+  globalLogout();
+  router.push({name: "Login"});
+};
+
+// 发送修改密码邮箱验证码
+const sendCode = () => {
+  sendUpdatePasswordEmailCode().then(() => {
+    ElMessage.success("验证码已发送，请查收邮件");
+    sendCountdown.value = 60;
+    countdownTimer = setInterval(() => {
+      sendCountdown.value--;
+      if (sendCountdown.value <= 0) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
+    }, 1000);
+  }).catch(() => {
+    // 错误消息已由axios响应拦截器统一弹出，这里仅需吞掉异常，防止出现未处理的Promise拒绝
+  });
+};
+
+// 第一步校验通过后进入设置新密码
+const goNext = () => {
+  validateFormRef.value.validate((valid) => {
+    if (valid) {
+      stepActive.value = 1;
+    }
+  });
+};
+
+// 提交修改密码
+const submitUpdate = () => {
+  passwordFormRef.value.validate((valid) => {
+    if (!valid) {
+      return;
+    }
+    submitting.value = true;
+    updatePassword({
+      oldPassword: validateForm.oldPassword,
+      newPassword: passwordForm.password,
+      emailCode: validateForm.emailCode
+    }).then(() => {
+      ElMessage.success("密码修改成功");
+      stepActive.value = 2;
+    }).catch(() => {
+      // 错误消息已由axios响应拦截器统一弹出，这里仅需吞掉异常，防止出现未处理的Promise拒绝
+    }).finally(() => {
+      submitting.value = false;
+    });
+  });
+};
+
+onBeforeUnmount(() => {
+  if (countdownTimer) {
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
+});
 </script>
 
 <style lang="scss" scoped>

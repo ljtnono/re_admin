@@ -1,0 +1,108 @@
+@charset "UTF-8";
+
+/**
+  @description 后台表格页面统一样式
+ */
+
+// ========== 表格整体 ==========
+.el-table {
+  // 表头设计
+  --el-table-header-bg-color: #f7f8fa;
+  --el-table-header-text-color: #303133;
+  --el-table-row-hover-bg-color: #f5f7fa;
+
+  // 覆盖全局 reset 中 table 的 border-spacing，避免表头错位
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  th.el-table__cell {
+    height: 48px;
+    padding: 8px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--el-table-header-text-color);
+  }
+
+  td.el-table__cell {
+    padding: 12px 0;
+    font-size: 14px;
+    color: #606266;
+  }
+
+  // 时间列：图标与文字垂直居中对齐
+  .cell-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: #606266;
+
+    .el-icon {
+      color: #c0c4cc;
+    }
+  }
+}
+
+// ========== 操作列按钮组 ==========
+.table-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+
+  .el-button.is-link {
+    height: 28px;
+    padding: 0 2px;
+    font-size: 13px;
+
+    .el-icon {
+      font-size: 14px;
+      margin-right: 2px;
+    }
+  }
+}
+
+// ========== 查询工具栏 ==========
+// 输入框与按钮垂直居中对齐，保持同一高度
+.search-container {
+  align-items: center;
+  flex-wrap: wrap;
+  row-gap: 12px;
+}
+
+// ========== 表格内特殊单元格 ==========
+// 时间列不换行
+.el-table .cell-time {
+  white-space: nowrap;
+}
+
+// 数字统计列（浏览量/喜欢数）：图标与数字水平居中
+.cell-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+
+  &.count-view {
+    color: #19be6b;
+  }
+
+  &.count-favorite {
+    color: #ffaad0;
+  }
+
+  .iconfont {
+    font-size: 15px;
+  }
+}
+
+// 标签列：水平排列自动换行
+.el-table .cell-tag {
+  margin-right: 4px;
+
+  &:last-child {
+    margin-right: 0;
+  }
+}

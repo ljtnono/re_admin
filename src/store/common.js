@@ -1,5 +1,6 @@
-const common = {
-  namespaced: true,
+import { defineStore } from "pinia";
+
+export const useCommonStore = defineStore("common", {
   state: () => ({
     // 文章分类列表
     categoryList: [],
@@ -8,33 +9,26 @@ const common = {
     // 角色列表
     roleList: []
   }),
-  getters:{
+  getters: {
     categoryFilters(state) {
-      return state.categoryList.map(category => {
-        return {
-          text: category.name,
-          value: category.name
-        }
-      });
+      return state.categoryList.map((category) => ({
+        text: category.name,
+        value: category.name
+      }));
     }
   },
-  actions:{
-
-  },
-  mutations:{
-    // 修改文章分类列表
-    changeCategoryList(state, categoryList) {
-      state.categoryList = categoryList;
+  actions: {
+    changeCategoryList(categoryList) {
+      this.categoryList = categoryList;
     },
-    // 修改文章标签列表
-    changeTagList(state, tagList) {
-      state.tagList = tagList;
+    changeTagList(tagList) {
+      this.tagList = tagList;
     },
-    // 修改角色列表
-    changeRoleList(state, roleList) {
-      state.roleList = roleList;
+    changeRoleList(roleList) {
+      this.roleList = roleList;
     }
+  },
+  persist: {
+    storage: sessionStorage
   }
-};
-
-export default common;
+});

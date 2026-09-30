@@ -10,16 +10,15 @@
           :before-upload="beforeAvatarUpload"
           :http-request="uploadAvatar">
           <div class="avatar-upload__wrap" v-loading="avatarUploading">
-            <img v-if="avatarUrl" class="profile-card__avatar" :src="avatarUrl" alt="用户头像"/>
-            <div v-else class="profile-card__avatar profile-card__avatar--fallback">{{ username.charAt(0).toUpperCase() }}</div>
-            <span class="avatar-upload__mask"><i class="el-icon-camera"/></span>
+            <UserAvatar class="profile-card__avatar" :src="avatarUrl" :name="username" :size="100"/>
+            <span class="avatar-upload__mask"><el-icon><Camera /></el-icon></span>
           </div>
         </el-upload>
         <div class="profile-card__meta">
           <h2 class="profile-card__name">{{ username }}</h2>
           <p class="profile-card__sub">ID：{{ userId }}</p>
           <div class="profile-card__tags">
-            <span class="profile-card__tag"><i class="el-icon-key"/>已开通权限 {{ permissionCount }} 项</span>
+            <span class="profile-card__tag"><el-icon><Key /></el-icon>已开通权限 {{ permissionCount }} 项</span>
           </div>
         </div>
       </div>
@@ -29,12 +28,12 @@
       <!-- 账号信息 -->
       <section class="panel">
         <div class="panel__header">
-          <span class="panel__title"><i class="el-icon-postcard"/> 账号信息</span>
+          <span class="panel__title"><el-icon><Postcard /></el-icon> 账号信息</span>
         </div>
         <div class="info-list">
           <div class="info-item">
             <div class="info-item__left">
-              <i class="el-icon-user info-item__icon info-item__icon--blue"/>
+              <el-icon class="info-item__icon info-item__icon--blue"><User /></el-icon>
               <span class="info-item__label">用户名</span>
             </div>
             <div class="info-item__right">
@@ -44,29 +43,29 @@
           </div>
           <div class="info-item">
             <div class="info-item__left">
-              <i class="el-icon-postcard info-item__icon info-item__icon--purple"/>
+              <el-icon class="info-item__icon info-item__icon--purple"><Postcard /></el-icon>
               <span class="info-item__label">用户 ID</span>
             </div>
             <div class="info-item__right">
               <span class="info-item__value">{{ userId }}</span>
               <button class="info-item__copy" type="button" @click="copy(userId)">
-                <i class="el-icon-copy-document"/>复制
+                <el-icon><CopyDocument /></el-icon>复制
               </button>
             </div>
           </div>
           <div class="info-item">
             <div class="info-item__left">
-              <i class="el-icon-message info-item__icon info-item__icon--green"/>
+              <el-icon class="info-item__icon info-item__icon--green"><Message /></el-icon>
               <span class="info-item__label">邮箱</span>
             </div>
             <div class="info-item__right">
               <span v-if="email" class="info-item__value">{{ email }}</span>
               <span v-else class="info-item__value info-item__value--empty">未绑定</span>
               <button v-if="email" class="info-item__copy" type="button" @click="copy(email)">
-                <i class="el-icon-copy-document"/>复制
+                <el-icon><CopyDocument /></el-icon>复制
               </button>
               <button class="info-item__bind" type="button" @click="openBindDialog">
-                <i class="el-icon-message"/>{{ email ? "换绑" : "绑定" }}
+                <el-icon><Message /></el-icon>{{ email ? "换绑" : "绑定" }}
               </button>
             </div>
           </div>
@@ -76,12 +75,12 @@
       <!-- 安全设置 -->
       <section class="panel">
         <div class="panel__header">
-          <span class="panel__title"><i class="el-icon-lock"/> 安全设置</span>
+          <span class="panel__title"><el-icon><Lock /></el-icon> 安全设置</span>
         </div>
         <div class="security-list">
           <div class="security-item">
             <div class="security-item__left">
-              <i class="el-icon-key security-item__icon security-item__icon--blue"/>
+              <el-icon class="security-item__icon security-item__icon--blue"><Key /></el-icon>
               <div class="security-item__meta">
                 <p class="security-item__title">登录密码</p>
                 <p class="security-item__desc">定期修改密码可以有效保护账号安全</p>
@@ -91,7 +90,7 @@
           </div>
           <div class="security-item">
             <div class="security-item__left">
-              <i class="el-icon-user security-item__icon security-item__icon--green"/>
+              <el-icon class="security-item__icon security-item__icon--green"><User /></el-icon>
               <div class="security-item__meta">
                 <p class="security-item__title">账号权限</p>
                 <p class="security-item__desc">当前账号共开通 {{ permissionCount }} 项操作权限</p>
@@ -106,12 +105,12 @@
     <!-- 绑定邮箱弹窗 -->
     <el-dialog
       :title="email ? '换绑邮箱' : '绑定邮箱'"
-      :visible.sync="bindDialogVisible"
+      v-model="bindDialogVisible"
       width="440px"
       :close-on-click-modal="false"
-      custom-class="bind-email-dialog"
+      class="bind-email-dialog"
       @closed="resetBindDialog">
-      <el-form ref="bindForm" :model="bindForm" :rules="bindFormRules" label-width="80px">
+      <el-form ref="bindFormRef" :model="bindForm" :rules="bindFormRules" label-width="80px">
         <el-form-item label="邮箱" prop="email">
           <el-input v-model="bindForm.email" placeholder="请输入要绑定的邮箱" clearable/>
         </el-form-item>
@@ -127,226 +126,220 @@
           </div>
         </el-form-item>
       </el-form>
-      <div slot="footer">
+      <template #footer>
+        <div>
         <el-button @click="bindDialogVisible = false">取 消</el-button>
         <el-button type="primary" :loading="bindSubmitting" @click="confirmBind">确 定</el-button>
-      </div>
+        </div>
+      </template>
     </el-dialog>
   </div>
 </template>
 
-<script>
-import {mapState} from "vuex";
-import {sendBindEmailCode, bindEmail} from "@/api/user";
-import {getCurrentUser} from "@/api/auth";
-import {updateAvatar} from "@/api/user";
-import {uploadFile} from "@/api/common";
-import {ARTICLE_COVER_SIZE_LIMIT} from "@/constant/commonConstant";
-import {USER_ADD_EMAIL_REGEX} from "@/constant/regexConstant";
+<script setup>
+import UserAvatar from "@/components/UserAvatar.vue";
+import { ref, reactive, computed, onMounted, onBeforeUnmount } from "vue";
+import { ElMessage } from "element-plus";
+import { Camera, Key, Postcard, User, CopyDocument, Message, Lock } from "@element-plus/icons-vue";
+import { sendBindEmailCode, bindEmail } from "@/api/user";
+import { getCurrentUser } from "@/api/auth";
+import { updateAvatar } from "@/api/user";
+import { uploadFile } from "@/api/common";
+import { ARTICLE_COVER_SIZE_LIMIT } from "@/constant/commonConstant";
+import { USER_ADD_EMAIL_REGEX } from "@/constant/regexConstant";
+import { useUserStore } from "@/store/user";
 
-export default {
-  name: "Personal",
-  data() {
-    return {
-      // 绑定邮箱弹窗可见性
-      bindDialogVisible: false,
-      // 绑定邮箱表单
-      bindForm: {
-        email: "",
-        code: ""
-      },
-      // 绑定表单校验规则
-      bindFormRules: {
-        email: [
-          {required: true, message: "请输入邮箱", trigger: "blur"},
-          {pattern: USER_ADD_EMAIL_REGEX, message: "邮箱格式不正确", trigger: "blur"}
-        ],
-        code: [
-          {required: true, message: "请输入验证码", trigger: "blur"},
-          {pattern: /^\d{6}$/, message: "验证码为6位数字", trigger: "blur"}
-        ]
-      },
-      // 发送验证码倒计时（秒）
-      sendCountdown: 0,
-      // 倒计时定时器
-      countdownTimer: null,
-      // 绑定提交中
-      bindSubmitting: false,
-      // 头像上传中
-      avatarUploading: false
-    };
-  },
-  computed: {
-    ...mapState({
-      userInfo: state => state.user.userInfo
-    }),
-    // 用户名
-    username() {
-      return (this.userInfo && this.userInfo.username) || "-";
-    },
-    // 用户id
-    userId() {
-      return (this.userInfo && this.userInfo.id) || "-";
-    },
-    // 邮箱
-    email() {
-      return (this.userInfo && this.userInfo.email) || null;
-    },
-    // 头像地址
-    avatarUrl() {
-      return (this.userInfo && this.userInfo.avatarUrl) || null;
-    },
-    // 权限数量
-    permissionCount() {
-      let list = this.userInfo && this.userInfo.permissionIdList;
-      return list ? list.length : 0;
+defineOptions({ name: "Personal" });
+
+const userStore = useUserStore();
+
+const bindFormRef = ref(null);
+
+// 绑定邮箱弹窗可见性
+const bindDialogVisible = ref(false);
+// 绑定邮箱表单
+const bindForm = reactive({
+  email: "",
+  code: ""
+});
+// 绑定表单校验规则
+const bindFormRules = {
+  email: [
+    {required: true, message: "请输入邮箱", trigger: "blur"},
+    {pattern: USER_ADD_EMAIL_REGEX, message: "邮箱格式不正确", trigger: "blur"}
+  ],
+  code: [
+    {required: true, message: "请输入验证码", trigger: "blur"},
+    {pattern: /^\d{6}$/, message: "验证码为6位数字", trigger: "blur"}
+  ]
+};
+// 发送验证码倒计时（秒）
+const sendCountdown = ref(0);
+// 倒计时定时器
+let countdownTimer = null;
+// 绑定提交中
+const bindSubmitting = ref(false);
+// 头像上传中
+const avatarUploading = ref(false);
+
+// 用户名
+const username = computed(() => (userStore.userInfo && userStore.userInfo.username) || "-");
+// 用户id
+const userId = computed(() => (userStore.userInfo && userStore.userInfo.id) || "-");
+// 邮箱
+const email = computed(() => (userStore.userInfo && userStore.userInfo.email) || null);
+// 头像地址
+const avatarUrl = computed(() => (userStore.userInfo && userStore.userInfo.avatarUrl) || null);
+// 权限数量
+const permissionCount = computed(() => {
+  const list = userStore.userInfo && userStore.userInfo.permissionIdList;
+  return list ? list.length : 0;
+});
+
+onMounted(() => {
+  // 进入个人中心时拉取最新用户信息，同步到store
+  getCurrentUser().then((res) => {
+    const userInfo = res.data.data;
+    if (userInfo) {
+      userStore.changeUserInfo({...userStore.userInfo, ...userInfo});
     }
-  },
-  mounted() {
-    // 进入个人中心时拉取最新用户信息，同步到store
-    let that = this;
-    getCurrentUser().then((res) => {
-      let userInfo = res.data.data;
-      if (userInfo) {
-        that.$store.commit("user/changeUserInfo", {...that.userInfo, ...userInfo});
-      }
+  }).catch(() => {
+    // 错误消息已由axios响应拦截器统一弹出，这里仅需吞掉异常，防止出现未处理的Promise拒绝
+  });
+});
+
+// 头像上传前校验：仅支持jpeg/png/gif，大小不超过2M
+const beforeAvatarUpload = (file) => {
+  const typeOk = ["image/jpeg", "image/png", "image/gif"].includes(file.type);
+  if (!typeOk) {
+    ElMessage.error("头像格式仅支持jpeg/png/gif");
+    return false;
+  }
+  if (file.size > ARTICLE_COVER_SIZE_LIMIT) {
+    ElMessage.error("头像大小不能超过2M");
+    return false;
+  }
+  return true;
+};
+
+// 上传头像：先上传到文件服务，再把地址保存到用户资料
+const uploadAvatar = ({file}) => {
+  avatarUploading.value = true;
+  const data = new FormData();
+  data.append("file", file);
+  uploadFile(data).then((res) => {
+    const avatarUrl = res.data.data;
+    return updateAvatar({avatarUrl});
+  }).then(() => {
+    // 保存成功后重新拉取用户信息，同步最新头像到store
+    return getCurrentUser();
+  }).then((res) => {
+    const userInfo = res.data.data;
+    if (userInfo) {
+      userStore.changeUserInfo({...userStore.userInfo, ...userInfo});
+    }
+    ElMessage.success("头像更新成功");
+  }).catch(() => {
+    // 错误消息已由axios响应拦截器统一弹出，这里仅需吞掉异常，防止出现未处理的Promise拒绝
+  }).finally(() => {
+    avatarUploading.value = false;
+  });
+};
+
+// 复制内容到剪贴板
+const copy = (content) => {
+  if (!content) {
+    return;
+  }
+  const fallbackCopy = () => {
+    const input = document.createElement("textarea");
+    input.value = String(content);
+    input.style.position = "fixed";
+    input.style.opacity = "0";
+    document.body.appendChild(input);
+    input.select();
+    try {
+      document.execCommand("copy");
+      ElMessage.success("已复制到剪贴板");
+    } catch (e) {
+      ElMessage.error("复制失败，请手动复制");
+    }
+    document.body.removeChild(input);
+  };
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(String(content)).then(() => {
+      ElMessage.success("已复制到剪贴板");
+    }).catch(fallbackCopy);
+  } else {
+    fallbackCopy();
+  }
+};
+
+// 打开绑定邮箱弹窗
+const openBindDialog = () => {
+  bindDialogVisible.value = true;
+};
+
+// 发送绑定邮箱验证码
+const sendCode = () => {
+  bindFormRef.value.validateField("email", (errorMessage) => {
+    if (errorMessage) {
+      return;
+    }
+    sendBindEmailCode(bindForm.email.trim()).then(() => {
+      ElMessage.success("验证码已发送，请查收邮件");
+      sendCountdown.value = 60;
+      countdownTimer = setInterval(() => {
+        sendCountdown.value--;
+        if (sendCountdown.value <= 0) {
+          clearInterval(countdownTimer);
+          countdownTimer = null;
+        }
+      }, 1000);
     }).catch(() => {
       // 错误消息已由axios响应拦截器统一弹出，这里仅需吞掉异常，防止出现未处理的Promise拒绝
     });
-  },
-  methods: {
-    // 头像上传前校验：仅支持jpeg/png/gif，大小不超过2M
-    beforeAvatarUpload(file) {
-      let typeOk = ["image/jpeg", "image/png", "image/gif"].includes(file.type);
-      if (!typeOk) {
-        this.$message.error("头像格式仅支持jpeg/png/gif");
-        return false;
-      }
-      if (file.size > ARTICLE_COVER_SIZE_LIMIT) {
-        this.$message.error("头像大小不能超过2M");
-        return false;
-      }
-      return true;
-    },
-    // 上传头像：先上传到文件服务，再把地址保存到用户资料
-    uploadAvatar({file}) {
-      let that = this;
-      that.avatarUploading = true;
-      let data = new FormData();
-      data.append("file", file);
-      uploadFile(data).then((res) => {
-        let avatarUrl = res.data.data;
-        return updateAvatar({avatarUrl});
-      }).then(() => {
-        // 保存成功后重新拉取用户信息，同步最新头像到store
-        return getCurrentUser();
-      }).then((res) => {
-        let userInfo = res.data.data;
-        if (userInfo) {
-          that.$store.commit("user/changeUserInfo", {...that.userInfo, ...userInfo});
-        }
-        that.$message.success("头像更新成功");
-      }).catch(() => {
-        // 错误消息已由axios响应拦截器统一弹出，这里仅需吞掉异常，防止出现未处理的Promise拒绝
-      }).finally(() => {
-        that.avatarUploading = false;
-      });
-    },
-    // 复制内容到剪贴板
-    copy(content) {
-      let that = this;
-      if (!content) {
-        return;
-      }
-      let fallbackCopy = () => {
-        let input = document.createElement("textarea");
-        input.value = String(content);
-        input.style.position = "fixed";
-        input.style.opacity = "0";
-        document.body.appendChild(input);
-        input.select();
-        try {
-          document.execCommand("copy");
-          that.$message.success("已复制到剪贴板");
-        } catch (e) {
-          that.$message.error("复制失败，请手动复制");
-        }
-        document.body.removeChild(input);
-      };
-      if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(String(content)).then(() => {
-          that.$message.success("已复制到剪贴板");
-        }).catch(fallbackCopy);
-      } else {
-        fallbackCopy();
-      }
-    },
-    // 打开绑定邮箱弹窗
-    openBindDialog() {
-      this.bindDialogVisible = true;
-    },
-    // 发送绑定邮箱验证码
-    sendCode() {
-      let that = this;
-      that.$refs.bindForm.validateField("email", (errorMessage) => {
-        if (errorMessage) {
-          return;
-        }
-        sendBindEmailCode(that.bindForm.email.trim()).then(() => {
-          that.$message.success("验证码已发送，请查收邮件");
-          that.sendCountdown = 60;
-          that.countdownTimer = setInterval(() => {
-            that.sendCountdown--;
-            if (that.sendCountdown <= 0) {
-              clearInterval(that.countdownTimer);
-              that.countdownTimer = null;
-            }
-          }, 1000);
-        }).catch(() => {
-          // 错误消息已由axios响应拦截器统一弹出，这里仅需吞掉异常，防止出现未处理的Promise拒绝
-        });
-      });
-    },
-    // 确认绑定邮箱
-    confirmBind() {
-      let that = this;
-      that.$refs.bindForm.validate((valid) => {
-        if (!valid) {
-          return;
-        }
-        that.bindSubmitting = true;
-        bindEmail({email: that.bindForm.email.trim(), code: that.bindForm.code.trim()}).then(() => {
-          that.$message.success("邮箱绑定成功");
-          // 同步更新store中的用户信息
-          that.$store.commit("user/changeUserInfo", {...that.userInfo, email: that.bindForm.email.trim()});
-          that.bindDialogVisible = false;
-        }).catch(() => {
-          // 错误消息已由axios响应拦截器统一弹出，这里仅需吞掉异常，防止出现未处理的Promise拒绝
-        }).finally(() => {
-          that.bindSubmitting = false;
-        });
-      });
-    },
-    // 重置绑定弹窗
-    resetBindDialog() {
-      this.$refs.bindForm.resetFields();
-      this.bindForm.code = "";
-      if (this.countdownTimer) {
-        clearInterval(this.countdownTimer);
-        this.countdownTimer = null;
-      }
-      this.sendCountdown = 0;
-    }
-  },
-  beforeDestroy() {
-    if (this.countdownTimer) {
-      clearInterval(this.countdownTimer);
-      this.countdownTimer = null;
-    }
-  }
+  });
 };
-</script>
 
+// 确认绑定邮箱
+const confirmBind = () => {
+  bindFormRef.value.validate((valid) => {
+    if (!valid) {
+      return;
+    }
+    bindSubmitting.value = true;
+    bindEmail({email: bindForm.email.trim(), code: bindForm.code.trim()}).then(() => {
+      ElMessage.success("邮箱绑定成功");
+      // 同步更新store中的用户信息
+      userStore.changeUserInfo({...userStore.userInfo, email: bindForm.email.trim()});
+      bindDialogVisible.value = false;
+    }).catch(() => {
+      // 错误消息已由axios响应拦截器统一弹出，这里仅需吞掉异常，防止出现未处理的Promise拒绝
+    }).finally(() => {
+      bindSubmitting.value = false;
+    });
+  });
+};
+
+// 重置绑定弹窗
+const resetBindDialog = () => {
+  bindFormRef.value.resetFields();
+  bindForm.code = "";
+  if (countdownTimer) {
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
+  sendCountdown.value = 0;
+};
+
+onBeforeUnmount(() => {
+  if (countdownTimer) {
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
+});
+</script>
 <style lang="scss" scoped>
 // ========== 设计变量 ==========
 $primary: #409eff;
@@ -639,7 +632,7 @@ $page-bg: #f1f1f1;
   flex-shrink: 0;
 }
 
-::v-deep .bind-email-dialog {
+:deep(.bind-email-dialog) {
   border-radius: 10px;
 }
 

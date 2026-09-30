@@ -2,12 +2,6 @@
   <router-view />
 </template>
 
-<script>
-export default {
-  name: "System"
-}
+<script setup>
+defineOptions({ name: "System" });
 </script>
-
-<style scoped lang="scss">
-
-</style>

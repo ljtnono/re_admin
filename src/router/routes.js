@@ -16,7 +16,7 @@ export default [
     component: () => import("@v/Login.vue")
   },
   {
-    path: "*",
+    path: "/:pathMatch(.*)*",
     name: "NotFound",
     meta: {
       title: "404",

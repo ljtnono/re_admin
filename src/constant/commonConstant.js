@@ -1,9 +1,7 @@
 // #################### 常用常量池 #################### //
 
-// 页面基础访问url
-// export const BASE_URL = "http://api.lingjiatong.cn:30152";
-// export const BASE_URL = "http://127.0.0.1:8152";
-export const BASE_URL = process.env.NODE_ENV === "production" ? "http://api.lingjiatong.cn:30152" : "http://127.0.0.1:9100";
+// 页面基础访问url，通过 .env / .env.[mode] 中的 VITE_API_BASE_URL 配置
+export const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:9100";
 // 请求成功code值
 export const HTTP_RESULT_SUCCESS_CODE = 0;
 // 请求成功message值

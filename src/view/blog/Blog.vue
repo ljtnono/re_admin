@@ -2,12 +2,6 @@
   <router-view />
 </template>
 
-<script>
-export default {
-  name: "Blog"
-}
+<script setup>
+defineOptions({ name: "Blog" });
 </script>
-
-<style scoped>
-
-</style>
