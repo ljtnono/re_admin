@@ -1,6 +1,6 @@
-# re_admin_vue3
+# re_admin
 
-根元素博客（RootElement Blog）后台管理系统前端，基于 Vue 3 全家桶构建（原 Vue2 + Element UI 版本已归档于 git 历史）。
+根元素博客（RootElement）后台管理系统前端，基于 Vue 3 全家桶构建。
 
 ## 技术栈
 
