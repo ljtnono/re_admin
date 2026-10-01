@@ -15,8 +15,6 @@
 import { ref, computed, onMounted } from "vue";
 import Header from "@c/Header.vue";
 import Navigation from "@c/Navigation.vue";
-import { findCategoryList } from "@/api/category";
-import { findTagList } from "@/api/tag";
 import { findRoleList } from "@/api/role";
 import { useUserStore } from "@/store/user";
 import { useCommonStore } from "@/store/common";
@@ -41,13 +39,9 @@ const toggleNav = () => {
 onMounted(() => {
   const commonStore = useCommonStore();
   // 获取文章分类列表
-  findCategoryList().then((res) => {
-    commonStore.changeCategoryList(res.data.data);
-  }).catch(() => {});
+  commonStore.refreshCategoryList().catch(() => {});
   // 获取文章标签列表
-  findTagList().then((res) => {
-    commonStore.changeTagList(res.data.data);
-  }).catch(() => {});
+  commonStore.refreshTagList().catch(() => {});
   // 获取角色列表
   findRoleList().then((res) => {
     commonStore.changeRoleList(res.data.data);

@@ -276,7 +276,6 @@ import {
   ARTICLE_PUBLISH_TAG_REGEX,
   ARTICLE_PUBLISH_TITLE_REGEX
 } from "@/constant/regexConstant";
-import {findTagList} from "@/api/tag";
 
 // markdown编辑器空内容提示文本
 const EDITOR_PLACEHOLDER = "还没有内容哦！快来写点什么吧...";
@@ -663,9 +662,7 @@ function commitPublishForm() {
     // 再请求一次文章列表
     await refreshArticleList();
     // 再获取一次标签列表
-    await findTagList().then(res => {
-      commonStore.changeTagList(res.data.data);
-    });
+    await commonStore.refreshTagList();
   }).catch(() => {
     // 错误消息已由响应拦截器弹出
     closePageLoading();
@@ -882,9 +879,12 @@ async function onUploadImg(files, callback) {
 onMounted(async () => {
   // 获取草稿列表和已发布文章列表
   openPageLoading();
+  // 重新拉取分类/标签列表，保证分类管理页增删改后下拉选项实时
   await Promise.all([
     refreshDraftList(),
-    refreshArticleList()
+    refreshArticleList(),
+    commonStore.refreshCategoryList().catch(() => {}),
+    commonStore.refreshTagList().catch(() => {})
   ]).catch(() => {
     // 错误消息已由响应拦截器弹出
   });
