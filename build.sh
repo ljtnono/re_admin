@@ -7,10 +7,13 @@ set -e
 ROOT=$(cd "$(dirname "$0")" && pwd)
 cd "$ROOT"
 
-# 从 package.json 读取应用版本号，作为镜像 tag
-VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "")
+# 版本号作为镜像 tag。优先级：环境变量 RE_ADMIN_VERSION（如 Jenkins 发版传入）> package.json 的 version
+VERSION="${RE_ADMIN_VERSION:-}"
 if [ -z "$VERSION" ]; then
-    echo "!! 未能从 package.json 解析 version，默认使用 latest"
+    VERSION=$(node -p "require('./package.json').version" 2>/dev/null || echo "")
+fi
+if [ -z "$VERSION" ]; then
+    echo "!! 未能解析版本号（RE_ADMIN_VERSION 环境变量与 package.json version 均为空），默认使用 latest"
     VERSION="latest"
 fi
 echo "==> 应用版本：$VERSION"
