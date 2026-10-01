@@ -1,0 +1,39 @@
+# Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: rootelement
+  name: re-admin
+spec:
+  selector:
+    matchLabels:
+      app: re-admin
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: re-admin
+    spec:
+      containers:
+        - name: re-admin
+          image: ljtnono/re-admin:<VERSION>
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: http
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: re-admin
+  namespace: rootelement
+spec:
+  selector:
+    app: re-admin
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30151
