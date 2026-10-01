@@ -59,6 +59,21 @@ INSTANCE.interceptors.response.use((response) => {
   return response;
 }, (error) => {
   const message = error.message || "";
+  // HTTP 401：未认证或登录状态失效，强制登出并跳转登录页
+  if (error.response && error.response.status === 401) {
+    if (router.currentRoute.value.name !== "Login") {
+      ElMessage.error({
+        message: "登录状态已失效，请重新登录",
+        duration: 2000,
+        center: false
+      });
+      globalLogout();
+      router.push({
+        name: "Login"
+      });
+    }
+    return Promise.reject(error);
+  }
   if (message.indexOf("status code 503") !== -1) {
     ElMessage.error({
       message: "后台服务异常，请联系管理员！",
