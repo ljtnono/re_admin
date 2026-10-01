@@ -32,7 +32,7 @@ export const ARTICLE_CREATION_YC = 1;
 export const ARTICLE_CREATION_ZZ = 2;
 export const ARTICLE_CREATION_TYPE_VALUES = [ARTICLE_CREATION_YC, ARTICLE_CREATION_ZZ];
 // 图片封面最大大小
-export const ARTICLE_COVER_SIZE_LIMIT = 2 * 1024 * 1024;
+export const ARTICLE_COVER_SIZE_LIMIT = 5 * 1024 * 1024;
 // 升序
 export const ORDER_BY_ASC = 1;
 // 降序

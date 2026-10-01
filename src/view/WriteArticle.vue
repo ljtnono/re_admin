@@ -222,7 +222,7 @@
                 </div>
               </template>
               <template #tip>
-                <div class="el-upload__tip">图片的格式为jpeg/png/gif，大小不能超过2M</div>
+                <div class="el-upload__tip">图片的格式为jpeg/png/gif，大小不能超过5M</div>
               </template>
             </el-upload>
           </el-form-item>
@@ -425,9 +425,15 @@ function publishFormOpen() {
 // 上传文章封面图片
 async function uploadArticleCover(request) {
   const size = request.file.size;
-  // 不能超过2M
+  // 不能超过大小限制
   if (ARTICLE_COVER_SIZE_LIMIT < size) {
-    return false;
+    ElMessage({
+      message: "封面图片大小不能超过 " + ARTICLE_COVER_SIZE_LIMIT / 1024 / 1024 + "M",
+      type: "error",
+      duration: 2000,
+      center: false
+    });
+    return Promise.reject(new Error("cover size exceed"));
   }
   const data = new FormData();
   data.append("file", request.file);
