@@ -437,24 +437,35 @@ async function uploadArticleCover(request) {
   }
   const data = new FormData();
   data.append("file", request.file);
-  let result;
-  await uploadFile(data).then(res => {
-    result = res.data.data;
-  });
-  return result;
-}
-
-// 上传文章封面图片成功回调函数
-function uploadArticleCoverSuccess(response) {
-  if (response) {
-    articleCoverUrl.value = response;
-    publishForm.value.coverUrl = response;
+  try {
+    const res = await uploadFile(data);
+    const url = res.data.data;
+    // 上传成功后立即回填，不依赖 el-upload 的 on-success 回调链
+    articleCoverUrl.value = url;
+    publishForm.value.coverUrl = url;
     ElMessage({
-      message: "上传成功",
+      message: "封面上传成功",
       type: "success",
       duration: 2000,
       center: false
     });
+    return url;
+  } catch (e) {
+    ElMessage({
+      message: "封面上传失败，请重试",
+      type: "error",
+      duration: 2000,
+      center: false
+    });
+    return Promise.reject(e);
+  }
+}
+
+// 上传文章封面图片成功回调函数（兜底，实际赋值已在 uploadArticleCover 中完成）
+function uploadArticleCoverSuccess(response) {
+  if (response && typeof response === "string") {
+    articleCoverUrl.value = response;
+    publishForm.value.coverUrl = response;
   }
 }
 
